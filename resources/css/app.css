@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-[#080b11] text-slate-100 antialiased min-h-screen relative overflow-x-hidden selection:bg-indigo-500/30 selection:text-indigo-200;
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    }
+
+    body::before {
+        content: "";
+        position: fixed;
+        top: -50%;
+        left: -50%;
+        right: -50%;
+        bottom: -50%;
+        width: 200%;
+        height: 200%;
+        background: 
+            radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.22) 0%, transparent 35%),
+            radial-gradient(circle at 80% 20%, rgba(219, 39, 119, 0.18) 0%, transparent 35%),
+            radial-gradient(circle at 40% 80%, rgba(20, 184, 166, 0.15) 0%, transparent 40%),
+            radial-gradient(circle at 75% 75%, rgba(147, 51, 234, 0.18) 0%, transparent 35%),
+            radial-gradient(circle at 50% 50%, rgba(79, 70, 229, 0.12) 0%, transparent 45%);
+        animation: ambient-shift 20s infinite alternate ease-in-out;
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    @keyframes ambient-shift {
+        0% {
+            transform: translate(0, 0) scale(1) rotate(0deg);
+        }
+        50% {
+            transform: translate(-5%, 8%) scale(1.08) rotate(8deg);
+        }
+        100% {
+            transform: translate(8%, -4%) scale(0.95) rotate(-5deg);
+        }
+    }
+}
+
+@layer components {
+    /* Glassmorphism Utilities */
+    .glass-card {
+        @apply bg-white/[0.03] backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] rounded-2xl transition-all duration-300 ease-in-out-cubic;
+    }
+    
+    .glass-card-hover {
+        @apply hover:bg-white/[0.06] hover:border-white/[0.12] hover:shadow-[0_12px_40px_0_rgba(0,0,0,0.5)];
+    }
+
+    .glass-input {
+        @apply w-full px-4 py-3 bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 focus:bg-white/[0.06] transition-all duration-200;
+    }
+
+    .glass-button {
+        @apply px-5 py-2.5 bg-white/[0.07] backdrop-blur-md border border-white/[0.1] rounded-xl font-medium text-white shadow-sm hover:bg-white/[0.12] hover:border-white/[0.15] active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50;
+    }
+
+    .glass-button-primary {
+        @apply px-5 py-2.5 bg-gradient-to-r from-indigo-500/80 to-purple-500/80 backdrop-blur-md border border-white/[0.12] rounded-xl font-medium text-white shadow-[0_4px_20px_0_rgba(99,102,241,0.25)] hover:from-indigo-500 hover:to-purple-500 hover:shadow-[0_4px_25px_0_rgba(99,102,241,0.4)] active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50;
+    }
+}
