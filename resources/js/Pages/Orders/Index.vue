@@ -130,6 +130,7 @@ const canCancel = (order) => {
                                     {{ order.status }}
                                 </span>
                             </div>
+                        </div>
                     </div>
 
                     <!-- Order Progress Timeline -->
