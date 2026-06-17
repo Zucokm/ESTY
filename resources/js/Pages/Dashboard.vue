@@ -2,15 +2,22 @@
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-const { props } = usePage();
-const userName = ref(props.auth.user?.name || 'Admin');
-const userEmail = ref(props.auth.user?.email || 'admin@verone.com');
+const { props: pageProps } = usePage();
+const userName = ref(pageProps.auth.user?.name || 'Admin');
+const userEmail = ref(pageProps.auth.user?.email || 'admin@verone.com');
+
+defineProps({
+    orders: {
+        type: Array,
+        required: true
+    }
+});
 
 // Menu toggle states
 const activeTab = ref('dashboard');
 const showProfileDropdown = ref(false);
 
-// Mock Stats Data
+// Mock Stats Data (calculated statically or from props in production)
 const stats = ref([
     {
         title: 'Total Revenue',
@@ -38,45 +45,28 @@ const stats = ref([
     }
 ]);
 
-// Mock Orders Data
-const recentOrders = ref([
-    {
-        id: '#VR-8902',
-        customer: 'Sophia Mitchell',
-        product: 'Classic Cashmere Knitwear',
-        variant: 'M / Charcoal',
-        total: '$240.00',
-        status: 'Delivered',
-        statusClass: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-    },
-    {
-        id: '#VR-8899',
-        customer: 'Liam Henderson',
-        product: 'Tailored Pleated Trouser',
-        variant: '32 / sage Green',
-        total: '$180.00',
-        status: 'Processing',
-        statusClass: 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-    },
-    {
-        id: '#VR-8898',
-        customer: 'Emma Watson',
-        product: 'Structured Trench Overcoat',
-        variant: 'L / Classic Khaki',
-        total: '$380.00',
-        status: 'Shipped',
-        statusClass: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
-    },
-    {
-        id: '#VR-8895',
-        customer: 'Oliver Vance',
-        product: 'Pima Cotton Heavyweight Tee',
-        variant: 'XL / Off-White',
-        total: '$130.00',
-        status: 'Delivered',
-        statusClass: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+const getStatusClass = (status) => {
+    switch (status.toLowerCase()) {
+        case 'pending':
+            return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+        case 'processing':
+            return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+        case 'completed':
+            return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+        case 'cancelled':
+            return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+        default:
+            return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
     }
-]);
+};
+
+const formatDate = (dateStr) => {
+    return new Date(dateStr).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+};
 </script>
 
 <template>
@@ -122,9 +112,8 @@ const recentOrders = ref([
                     Products
                 </Link>
 
-                <a 
-                    href="#" 
-                    @click.prevent="activeTab = 'orders'"
+                <Link 
+                    :href="route('admin.orders.index')"
                     :class="[activeTab === 'orders' ? 'bg-white/[0.08] text-white shadow-inner border-white/10' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] border-transparent']"
                     class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm border transition-all duration-200"
                 >
@@ -132,7 +121,7 @@ const recentOrders = ref([
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
                     Orders
-                </a>
+                </Link>
 
                 <a 
                     href="#" 
@@ -256,7 +245,7 @@ const recentOrders = ref([
                     </div>
                 </div>
 
-                <!-- Data Table: Recent Orders -->
+                <!-- Data Table: Recent Orders (Real Database Data) -->
                 <div class="glass-card overflow-hidden">
                     <!-- Table Header -->
                     <div class="px-6 py-5 border-b border-white/[0.06] flex items-center justify-between">
@@ -276,34 +265,37 @@ const recentOrders = ref([
                                 <tr class="border-b border-white/[0.04] text-[10px] uppercase font-bold text-slate-400 tracking-wider">
                                     <th class="px-6 py-4">Order ID</th>
                                     <th class="px-6 py-4">Customer</th>
-                                    <th class="px-6 py-4">Garment Item</th>
-                                    <th class="px-6 py-4">Variant Options</th>
-                                    <th class="px-6 py-4">Total Price</th>
+                                    <th class="px-6 py-4">Shipping Details</th>
+                                    <th class="px-6 py-4">Phone Number</th>
+                                    <th class="px-6 py-4">Total Amount</th>
+                                    <th class="px-6 py-4">Date</th>
                                     <th class="px-6 py-4">Status</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-white/[0.02]">
                                 <tr 
-                                    v-for="(order, oIdx) in recentOrders" 
-                                    :key="oIdx"
+                                    v-for="(order, oIdx) in orders" 
+                                    :key="order.id"
                                     class="hover:bg-white/[0.02] text-sm text-slate-200 transition-colors duration-150"
                                 >
-                                    <td class="px-6 py-4.5 font-mono text-xs text-slate-400">{{ order.id }}</td>
-                                    <td class="px-6 py-4.5 font-semibold text-white">{{ order.customer }}</td>
-                                    <td class="px-6 py-4.5">{{ order.product }}</td>
-                                    <td class="px-6 py-4.5 text-xs text-slate-400">
-                                        <span class="px-2 py-1 bg-white/[0.04] border border-white/[0.06] rounded-md font-semibold text-[10px]">
-                                            {{ order.variant }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4.5 font-bold text-white">{{ order.total }}</td>
+                                    <td class="px-6 py-4.5 font-mono text-xs text-slate-400">#VR-{{ order.id }}</td>
+                                    <td class="px-6 py-4.5 font-semibold text-white">{{ order.user?.name || 'Guest' }}</td>
+                                    <td class="px-6 py-4.5 text-xs text-slate-400 max-w-[200px] truncate">{{ order.shipping_address }}</td>
+                                    <td class="px-6 py-4.5 font-mono text-xs text-slate-400">{{ order.phone }}</td>
+                                    <td class="px-6 py-4.5 font-bold text-white">${{ parseFloat(order.total_amount).toFixed(2) }}</td>
+                                    <td class="px-6 py-4.5 text-xs text-slate-400">{{ formatDate(order.created_at) }}</td>
                                     <td class="px-6 py-4.5">
                                         <span 
-                                            :class="[order.statusClass]"
+                                            :class="getStatusClass(order.status)"
                                             class="px-2.5 py-1 text-xs font-semibold rounded-full border"
                                         >
                                             {{ order.status }}
                                         </span>
+                                    </td>
+                                </tr>
+                                <tr v-if="orders.length === 0">
+                                    <td colspan="7" class="px-6 py-10 text-center text-slate-400">
+                                        No recent checkout orders recorded in database.
                                     </td>
                                 </tr>
                             </tbody>

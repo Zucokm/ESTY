@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import { useCart } from '@/Composables/useCart';
 
@@ -24,7 +24,7 @@ defineProps({
     }
 });
 
-const { cart, addToCart, removeFromCart, updateQuantity, cartCount, cartTotal } = useCart();
+const { cart, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal } = useCart();
 
 // Selection Modal States
 const showSelectionModal = ref(false);
@@ -34,6 +34,16 @@ const selectedColor = ref('');
 
 // Cart Drawer States
 const showCartDrawer = ref(false);
+const checkoutStep = ref('cart'); // 'cart' or 'checkout'
+const shippingAddress = ref('');
+const phone = ref('');
+const showSuccessAlert = ref(false);
+
+const checkoutForm = useForm({
+    shipping_address: '',
+    phone: '',
+    items: []
+});
 
 // Helper color swatches map for clothing tags
 const colorMap = {
@@ -77,7 +87,6 @@ const getUniqueColors = (variants) => {
 // Modal Interaction
 const openProductModal = (product) => {
     selectedProduct.value = product;
-    // Set default selections if available
     const sizes = getUniqueSizes(product.variants);
     const colors = getUniqueColors(product.variants);
     selectedSize.value = sizes[0] || '';
@@ -105,9 +114,38 @@ const handleAddToCart = () => {
     if (selectedProduct.value && selectedVariant.value) {
         addToCart(selectedProduct.value, selectedVariant.value, 1);
         showSelectionModal.value = false;
-        // Optionally trigger drawer open on add
         showCartDrawer.value = true;
     }
+};
+
+const handleCheckoutProceed = () => {
+    checkoutStep.value = 'checkout';
+};
+
+const submitCheckout = () => {
+    checkoutForm.items = cart.value.map(item => ({
+        product_id: item.product_id,
+        variant_id: item.variant_id,
+        quantity: item.quantity,
+        price: item.price
+    }));
+    checkoutForm.shipping_address = shippingAddress.value;
+    checkoutForm.phone = phone.value;
+
+    checkoutForm.post(route('checkout.store'), {
+        onSuccess: () => {
+            clearCart();
+            shippingAddress.value = '';
+            phone.value = '';
+            checkoutStep.value = 'cart';
+            showCartDrawer.value = false;
+            showSuccessAlert.value = true;
+            // Dismiss alert automatically
+            setTimeout(() => {
+                showSuccessAlert.value = false;
+            }, 6000);
+        }
+    });
 };
 </script>
 
@@ -116,6 +154,25 @@ const handleAddToCart = () => {
 
     <div class="min-h-screen relative overflow-hidden pb-20 selection:bg-indigo-500/30 selection:text-indigo-200">
         
+        <!-- Top Success Toast Alert -->
+        <div 
+            v-if="showSuccessAlert"
+            class="fixed top-8 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md p-0.5 rounded-3xl bg-gradient-to-r from-emerald-500/50 to-teal-500/50 shadow-2xl border border-white/20 backdrop-blur-2xl transition-all"
+        >
+            <div class="bg-slate-950/80 rounded-[22px] p-5 flex items-start gap-4">
+                <div class="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-bold text-white tracking-tight text-base mb-1">Order Placed Successfully</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">Thank you for shopping at Vérone. Our administrators are processing your garments delivery.</p>
+                </div>
+                <button @click="showSuccessAlert = false" class="text-slate-500 hover:text-white transition-colors">✕</button>
+            </div>
+        </div>
+
         <!-- Floating Header/Navigation (Dynamic Island / macOS Dock Style) -->
         <div class="fixed top-6 left-0 right-0 z-40 flex justify-center px-4">
             <nav class="glass-card px-6 py-3.5 w-full max-w-4xl flex items-center justify-between shadow-[0_12px_40px_0_rgba(0,0,0,0.3)] rounded-full border-white/10">
@@ -291,7 +348,7 @@ const handleAddToCart = () => {
 
         <!-- Floating Shopping Cart Button (Bottom Right) -->
         <button 
-            @click="showCartDrawer = true"
+            @click="showCartDrawer = true; checkoutStep = 'cart';"
             class="fixed bottom-8 right-8 z-30 w-16 h-16 rounded-full glass-card hover:bg-white/[0.08] flex items-center justify-center border-white/20 shadow-[0_12px_40px_0_rgba(0,0,0,0.5)] hover:scale-110 active:scale-95 transition-all duration-300"
         >
             <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -426,7 +483,9 @@ const handleAddToCart = () => {
                             <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                             </svg>
-                            <h2 class="text-lg font-bold text-white tracking-tight">Shopping Bag ({{ cartCount }})</h2>
+                            <h2 class="text-lg font-bold text-white tracking-tight">
+                                {{ checkoutStep === 'cart' ? 'Shopping Bag' : 'Shipping Details' }} ({{ cartCount }})
+                            </h2>
                         </div>
                         <button @click="showCartDrawer = false" class="text-slate-400 hover:text-white transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -435,8 +494,8 @@ const handleAddToCart = () => {
                         </button>
                     </div>
 
-                    <!-- Items Scrollable List -->
-                    <div class="flex-1 overflow-y-auto p-6 space-y-4">
+                    <!-- Drawer Step 1: Cart Items List -->
+                    <div v-if="checkoutStep === 'cart'" class="flex-1 overflow-y-auto p-6 space-y-4">
                         <div 
                             v-for="item in cart" 
                             :key="item.variant_id"
@@ -490,6 +549,42 @@ const handleAddToCart = () => {
                         </div>
                     </div>
 
+                    <!-- Drawer Step 2: Shipping Form -->
+                    <div v-else class="flex-1 overflow-y-auto p-6 space-y-6">
+                        <div class="space-y-4">
+                            <!-- Shipping Address -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 ml-1">Shipping Address</label>
+                                <textarea 
+                                    v-model="shippingAddress" 
+                                    rows="4" 
+                                    class="glass-input" 
+                                    placeholder="Enter your complete home address for delivery..."
+                                    required
+                                ></textarea>
+                                <span v-if="checkoutForm.errors.shipping_address" class="text-xs text-rose-400 mt-1 block ml-1">{{ checkoutForm.errors.shipping_address }}</span>
+                            </div>
+
+                            <!-- Phone Number -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 ml-1">Phone Number</label>
+                                <input 
+                                    type="text" 
+                                    v-model="phone" 
+                                    class="glass-input" 
+                                    placeholder="+95 9..."
+                                    required
+                                />
+                                <span v-if="checkoutForm.errors.phone" class="text-xs text-rose-400 mt-1 block ml-1">{{ checkoutForm.errors.phone }}</span>
+                            </div>
+
+                            <!-- Stock Error Flash -->
+                            <div v-if="checkoutForm.errors.items" class="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs font-semibold text-rose-400 leading-relaxed">
+                                {{ checkoutForm.errors.items }}
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Bottom Action & Total -->
                     <div class="p-6 border-t border-white/[0.08] space-y-4">
                         <div class="flex items-center justify-between">
@@ -497,12 +592,44 @@ const handleAddToCart = () => {
                             <span class="text-2xl font-black text-white">${{ cartTotal.toFixed(2) }}</span>
                         </div>
 
-                        <button 
-                            :disabled="cart.length === 0"
-                            class="glass-button-primary w-full py-4 font-bold text-base rounded-2xl flex justify-center items-center shadow-lg shadow-indigo-500/25 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
-                        >
-                            Proceed to Checkout
-                        </button>
+                        <!-- Button logic for Step 1 -->
+                        <div v-if="checkoutStep === 'cart'" class="space-y-2">
+                            <template v-if="$page.props.auth.user">
+                                <button 
+                                    @click="handleCheckoutProceed"
+                                    :disabled="cart.length === 0"
+                                    class="glass-button-primary w-full py-4 font-bold text-base rounded-2xl flex justify-center items-center shadow-lg shadow-indigo-500/25 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+                                >
+                                    Proceed to Checkout
+                                </button>
+                            </template>
+                            <template v-else>
+                                <Link 
+                                    :href="route('login')"
+                                    class="glass-button-primary w-full py-4 font-bold text-base rounded-2xl flex justify-center items-center shadow-lg shadow-indigo-500/25 text-center"
+                                >
+                                    Sign In to Checkout
+                                </Link>
+                            </template>
+                        </div>
+
+                        <!-- Button logic for Step 2 -->
+                        <div v-else class="flex gap-3">
+                            <button 
+                                @click="checkoutStep = 'cart'" 
+                                class="glass-button py-4 px-6 rounded-2xl text-slate-300 font-semibold"
+                            >
+                                Back
+                            </button>
+                            <button 
+                                @click="submitCheckout"
+                                :disabled="checkoutForm.processing || !shippingAddress || !phone"
+                                class="glass-button-primary flex-1 py-4 font-bold text-base rounded-2xl flex justify-center items-center shadow-lg shadow-indigo-500/25 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+                            >
+                                <span v-if="checkoutForm.processing" class="inline-block animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                                Place Order
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

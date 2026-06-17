@@ -1,13 +1,13 @@
 <script setup>
-import { Head, Link, usePage } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
-const { props } = usePage();
-const userName = ref(props.auth.user?.name || 'Admin');
-const userEmail = ref(props.auth.user?.email || 'admin@verone.com');
+const { props: pageProps } = usePage();
+const userName = ref(pageProps.auth.user?.name || 'Admin');
+const userEmail = ref(pageProps.auth.user?.email || 'admin@verone.com');
 
 defineProps({
-    products: {
+    orders: {
         type: Array,
         required: true
     }
@@ -15,29 +15,41 @@ defineProps({
 
 const showProfileDropdown = ref(false);
 
-// Helper to sum stock of variants
-const getTotalStock = (variants) => {
-    return variants.reduce((total, variant) => total + parseInt(variant.stock_quantity), 0);
+const statusForm = useForm({
+    status: ''
+});
+
+const updateOrderStatus = (orderId, newStatus) => {
+    statusForm.status = newStatus;
+    statusForm.put(route('admin.orders.updateStatus', orderId));
 };
 
-// Helper to get variants summary text
-const getVariantsSummary = (variants) => {
-    if (!variants || variants.length === 0) return 'No variants';
-    const sizes = [...new Set(variants.map(v => v.size))];
-    const colors = [...new Set(variants.map(v => v.color))];
-    return `${sizes.join(', ')} / ${colors.join(', ')}`;
+const getStatusClass = (status) => {
+    switch (status.toLowerCase()) {
+        case 'pending':
+            return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+        case 'processing':
+            return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+        case 'completed':
+            return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+        case 'cancelled':
+            return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+        default:
+            return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+    }
 };
 
-// Helper to find primary image or first image
-const getPrimaryImageUrl = (images) => {
-    if (!images || images.length === 0) return null;
-    const primary = images.find(img => img.is_primary === 1 || img.is_primary === true);
-    return primary ? primary.image_path : images[0].image_path;
+const formatDate = (dateStr) => {
+    return new Date(dateStr).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
 };
 </script>
 
 <template>
-    <Head title="Products Inventory - VÉRONE" />
+    <Head title="Orders Management - VÉRONE" />
 
     <div class="min-h-screen flex selection:bg-indigo-500/30 selection:text-indigo-200">
         
@@ -67,7 +79,7 @@ const getPrimaryImageUrl = (images) => {
 
                 <Link 
                     :href="route('products.index')"
-                    class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm border bg-white/[0.08] text-white shadow-inner border-white/10 transition-all duration-200"
+                    class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm border border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] transition-all duration-200"
                 >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -77,7 +89,7 @@ const getPrimaryImageUrl = (images) => {
 
                 <Link 
                     :href="route('admin.orders.index')"
-                    class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm border border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] transition-all duration-200"
+                    class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm border bg-white/[0.08] text-white shadow-inner border-white/10 transition-all duration-200"
                 >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -123,7 +135,7 @@ const getPrimaryImageUrl = (images) => {
                     </span>
                     <input 
                         type="text" 
-                        placeholder="Search products, sizes, colors..." 
+                        placeholder="Search orders, shipping details, clients..." 
                         class="glass-input pl-9 py-2 text-sm rounded-full"
                     />
                 </div>
@@ -166,117 +178,112 @@ const getPrimaryImageUrl = (images) => {
             <!-- Main Body -->
             <main class="flex-1 p-8 space-y-6">
                 <!-- Page Title -->
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h1 class="text-2xl font-bold text-white tracking-tight">Products Inventory</h1>
-                        <p class="text-slate-400 text-sm font-medium">Manage base catalog items and clothing SKU variants.</p>
-                    </div>
-                    
-                    <Link 
-                        :href="route('products.create')" 
-                        class="glass-button-primary flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
-                    >
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Add New Product
-                    </Link>
+                <div>
+                    <h1 class="text-2xl font-bold text-white tracking-tight">Orders Management</h1>
+                    <p class="text-slate-400 text-sm font-medium">Fulfill client purchases and modify order statuses.</p>
                 </div>
 
-                <!-- Products Table -->
+                <!-- Orders Table -->
                 <div class="glass-card overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-white/[0.04] text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                                    <th class="px-6 py-4">Product Info</th>
-                                    <th class="px-6 py-4">Category</th>
-                                    <th class="px-6 py-4">Base Price</th>
-                                    <th class="px-6 py-4">Total Stock</th>
-                                    <th class="px-6 py-4">Variants Detail (Sizes / Colors)</th>
+                                    <th class="px-6 py-4">Order Details</th>
+                                    <th class="px-6 py-4">Client Name</th>
+                                    <th class="px-6 py-4">Shipping Info</th>
+                                    <th class="px-6 py-4">Items Summary</th>
+                                    <th class="px-6 py-4">Total Amount</th>
+                                    <th class="px-6 py-4">Date Placed</th>
                                     <th class="px-6 py-4">Status</th>
                                     <th class="px-6 py-4 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-white/[0.02]">
                                 <tr 
-                                    v-for="product in products" 
-                                    :key="product.id"
-                                    class="hover:bg-white/[0.02] text-sm text-slate-200 transition-colors duration-150"
+                                    v-for="order in orders" 
+                                    :key="order.id"
+                                    class="hover:bg-white/[0.02] text-sm text-slate-200 transition-colors duration-150 animate-fade-in"
                                 >
-                                    <!-- Product Info Column -->
-                                    <td class="px-6 py-4.5">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 rounded-full overflow-hidden bg-slate-900 border border-white/10 shrink-0 shadow-sm">
-                                                <img 
-                                                    v-if="getPrimaryImageUrl(product.images)" 
-                                                    :src="getPrimaryImageUrl(product.images)" 
-                                                    class="w-full h-full object-cover" 
-                                                />
-                                                <div v-else class="w-full h-full flex items-center justify-center bg-indigo-500/10 text-indigo-400 font-bold text-xs uppercase">
-                                                    {{ product.name.charAt(0) }}
-                                                </div>
-                                            </div>
-                                            <div class="flex flex-col">
-                                                <span class="font-bold text-white text-base leading-tight">{{ product.name }}</span>
-                                                <span class="font-mono text-xs text-slate-500 mt-1">{{ product.slug }}</span>
-                                            </div>
-                                        </div>
-                                    </td>
+                                    <!-- Order ID -->
+                                    <td class="px-6 py-4.5 font-mono text-xs text-slate-400">#VR-{{ order.id }}</td>
                                     
-                                    <!-- Category Column -->
-                                    <td class="px-6 py-4.5">
-                                        <span class="px-2.5 py-1 text-xs font-semibold bg-white/[0.04] border border-white/[0.06] rounded-full text-slate-300">
-                                            {{ product.category?.name || 'N/A' }}
-                                        </span>
+                                    <!-- Client Name -->
+                                    <td class="px-6 py-4.5 font-semibold text-white">
+                                        {{ order.user?.name || 'Guest Customer' }}
                                     </td>
 
-                                    <!-- Base Price Column -->
-                                    <td class="px-6 py-4.5 font-bold text-white">
-                                        ${{ parseFloat(product.base_price).toFixed(2) }}
-                                    </td>
-
-                                    <!-- Total Stock Column -->
+                                    <!-- Shipping Info -->
                                     <td class="px-6 py-4.5">
-                                        <span 
-                                            :class="[getTotalStock(product.variants) > 10 ? 'text-slate-300' : 'text-rose-400 font-bold']"
-                                            class="text-sm"
-                                        >
-                                            {{ getTotalStock(product.variants) }} pcs
-                                        </span>
-                                    </td>
-
-                                    <!-- Variants Info Column -->
-                                    <td class="px-6 py-4.5">
-                                        <div class="flex flex-col gap-1.5">
-                                            <span class="text-xs text-slate-400">{{ getVariantsSummary(product.variants) }}</span>
-                                            <span class="text-[10px] text-slate-500 font-semibold">{{ product.variants?.length || 0 }} SKU variants total</span>
+                                        <div class="flex flex-col text-xs text-slate-400 max-w-[180px] truncate" :title="order.shipping_address">
+                                            <span class="truncate font-semibold">{{ order.shipping_address }}</span>
+                                            <span class="mt-1 font-mono text-[10px] text-slate-500">{{ order.phone }}</span>
                                         </div>
+                                    </td>
+
+                                    <!-- Items Summary -->
+                                    <td class="px-6 py-4.5">
+                                        <div class="flex flex-col gap-1">
+                                            <span 
+                                                v-for="item in order.items" 
+                                                :key="item.id" 
+                                                class="text-xs text-slate-300"
+                                            >
+                                                {{ item.product?.name }} (x{{ item.quantity }})
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    <!-- Total Price Column -->
+                                    <td class="px-6 py-4.5 font-bold text-white">
+                                        ${{ parseFloat(order.total_amount).toFixed(2) }}
+                                    </td>
+
+                                    <!-- Date Column -->
+                                    <td class="px-6 py-4.5 text-xs text-slate-400">
+                                        {{ formatDate(order.created_at) }}
                                     </td>
 
                                     <!-- Status Column -->
                                     <td class="px-6 py-4.5">
                                         <span 
-                                            :class="[product.is_active ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20']"
-                                            class="px-2.5 py-1 text-xs font-semibold rounded-full border"
+                                            :class="getStatusClass(order.status)"
+                                            class="px-2.5 py-1 text-xs font-semibold rounded-full border uppercase"
                                         >
-                                            {{ product.is_active ? 'Active' : 'Inactive' }}
+                                            {{ order.status }}
                                         </span>
                                     </td>
 
                                     <!-- Actions Column -->
                                     <td class="px-6 py-4.5 text-right">
-                                        <Link 
-                                            :href="route('products.edit', product.id)" 
-                                            class="glass-button text-xs py-1.5 px-3.5 rounded-full hover:bg-white/[0.08]"
-                                        >
-                                            Edit
-                                        </Link>
+                                        <div class="inline-flex gap-1.5">
+                                            <button 
+                                                v-if="order.status === 'pending'"
+                                                @click="updateOrderStatus(order.id, 'processing')"
+                                                class="px-2.5 py-1.5 bg-blue-600/20 border border-blue-500/30 text-blue-400 hover:bg-blue-600 hover:text-white rounded-lg text-xs font-semibold transition-all"
+                                            >
+                                                Process
+                                            </button>
+                                            <button 
+                                                v-if="order.status === 'processing'"
+                                                @click="updateOrderStatus(order.id, 'completed')"
+                                                class="px-2.5 py-1.5 bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-600 hover:text-white rounded-lg text-xs font-semibold transition-all"
+                                            >
+                                                Complete
+                                            </button>
+                                            <button 
+                                                v-if="order.status === 'pending'"
+                                                @click="updateOrderStatus(order.id, 'cancelled')"
+                                                class="px-2.5 py-1.5 bg-rose-600/20 border border-rose-500/30 text-rose-400 hover:bg-rose-600 hover:text-white rounded-lg text-xs font-semibold transition-all"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
-                                <tr v-if="products.length === 0">
-                                    <td colspan="7" class="px-6 py-10 text-center text-slate-400">
-                                        No products in catalog yet. Click "Add New Product" to populate items.
+                                <tr v-if="orders.length === 0">
+                                    <td colspan="8" class="px-6 py-10 text-center text-slate-400">
+                                        No customer orders found in the database.
                                     </td>
                                 </tr>
                             </tbody>
