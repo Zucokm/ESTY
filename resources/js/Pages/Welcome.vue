@@ -580,171 +580,181 @@ const submitCheckout = () => {
 
         <!-- Slide-out Cart Drawer -->
         <div 
-            v-if="showCartDrawer"
-            class="fixed inset-0 z-50 overflow-hidden"
+            class="fixed inset-0 z-50 overflow-hidden pointer-events-none"
+            :class="{ 'pointer-events-auto': showCartDrawer }"
         >
             <!-- Backdrop -->
-            <div @click="showCartDrawer = false" class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"></div>
+            <Transition name="fade">
+                <div 
+                    v-if="showCartDrawer" 
+                    @click="showCartDrawer = false" 
+                    class="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300 pointer-events-auto"
+                ></div>
+            </Transition>
 
             <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
                 <!-- Drawer Content -->
-                <div class="w-screen max-w-md bg-black/[0.2] border-l border-white/10 backdrop-blur-3xl shadow-[0_0_50px_0_rgba(0,0,0,0.6)] flex flex-col justify-between">
-                    
-                    <!-- Header -->
-                    <div class="px-6 py-5 border-b border-white/[0.08] flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                            </svg>
-                            <h2 class="text-lg font-bold text-white tracking-tight">
-                                {{ checkoutStep === 'cart' ? 'Shopping Bag' : 'Shipping Details' }} ({{ cartCount }})
-                            </h2>
-                        </div>
-                        <button @click="showCartDrawer = false" class="text-slate-400 hover:text-white transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- Drawer Step 1: Cart Items List -->
-                    <div v-if="checkoutStep === 'cart'" class="flex-1 overflow-y-auto p-6 space-y-4">
-                        <div 
-                            v-for="item in cart" 
-                            :key="item.variant_id"
-                            class="p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.04] flex gap-4 relative group hover:border-white/[0.08] transition-all"
-                        >
-                            <!-- Mini Thumbnail -->
-                            <div class="w-16 h-20 rounded-xl overflow-hidden bg-slate-900 shrink-0">
-                                <img v-if="item.image" :src="item.image" class="w-full h-full object-cover" />
-                                <div v-else class="w-full h-full flex items-center justify-center bg-indigo-500/10 text-indigo-300 text-xs font-bold uppercase">
-                                    {{ item.name.charAt(0) }}
-                                </div>
+                <Transition name="slide">
+                    <div 
+                        v-if="showCartDrawer" 
+                        class="w-screen max-w-md bg-slate-950/40 border-l border-white/10 backdrop-blur-3xl shadow-[0_0_50px_0_rgba(0,0,0,0.6)] flex flex-col justify-between pointer-events-auto h-full"
+                    >
+                        <!-- Header -->
+                        <div class="px-6 py-5 border-b border-white/[0.08] flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                </svg>
+                                <h2 class="text-lg font-bold text-white tracking-tight">
+                                    {{ checkoutStep === 'cart' ? 'Shopping Bag' : 'Shipping Details' }} ({{ cartCount }})
+                                </h2>
                             </div>
-
-                            <!-- Details -->
-                            <div class="flex-1 flex flex-col justify-between">
-                                <div>
-                                    <h3 class="font-bold text-white text-sm tracking-tight line-clamp-1">{{ item.name }}</h3>
-                                    <span class="inline-block mt-1 text-[10px] font-bold text-slate-400 bg-white/[0.05] border border-white/[0.08] px-2 py-0.5 rounded-md">
-                                        {{ item.size }} / {{ item.color }}
-                                    </span>
-                                </div>
-
-                                <!-- Quantity / Price Controllers -->
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2 bg-white/[0.04] border border-white/[0.06] rounded-lg px-2 py-1">
-                                        <button @click="updateQuantity(item.variant_id, item.quantity - 1)" class="text-slate-400 hover:text-white font-bold text-xs">-</button>
-                                        <span class="text-xs text-white font-bold px-1.5">{{ item.quantity }}</span>
-                                        <button @click="updateQuantity(item.variant_id, item.quantity + 1)" class="text-slate-400 hover:text-white font-bold text-xs">+</button>
-                                    </div>
-                                    <span class="font-extrabold text-white text-sm">${{ (item.price * item.quantity).toFixed(2) }}</span>
-                                </div>
-                            </div>
-
-                            <!-- Delete button -->
-                            <button 
-                                @click="removeFromCart(item.variant_id)" 
-                                class="absolute top-2 right-2 text-slate-500 hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-all"
-                            >
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            <button @click="showCartDrawer = false" class="text-slate-400 hover:text-white transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
                         </div>
 
-                        <!-- Empty state -->
-                        <div v-if="cart.length === 0" class="h-64 flex flex-col items-center justify-center text-slate-500 text-center gap-3">
-                            <svg class="w-10 h-10 stroke-current text-slate-600" fill="none" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                            </svg>
-                            <span class="text-sm font-semibold tracking-wide">Your Shopping bag is empty.</span>
-                        </div>
-                    </div>
+                        <!-- Drawer Step 1: Cart Items List -->
+                        <div v-if="checkoutStep === 'cart'" class="flex-1 overflow-y-auto p-6 space-y-4">
+                            <div 
+                                v-for="item in cart" 
+                                :key="item.variant_id"
+                                class="p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.04] flex gap-4 relative group hover:border-white/[0.08] transition-all"
+                            >
+                                <!-- Mini Thumbnail -->
+                                <div class="w-16 h-20 rounded-xl overflow-hidden bg-slate-900 shrink-0">
+                                    <img v-if="item.image" :src="item.image" class="w-full h-full object-cover" />
+                                    <div v-else class="w-full h-full flex items-center justify-center bg-indigo-500/10 text-indigo-300 text-xs font-bold uppercase">
+                                        {{ item.name.charAt(0) }}
+                                    </div>
+                                </div>
 
-                    <!-- Drawer Step 2: Shipping Form -->
-                    <div v-else class="flex-1 overflow-y-auto p-6 space-y-6">
-                        <div class="space-y-4">
-                            <!-- Shipping Address -->
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 ml-1">Shipping Address</label>
-                                <textarea 
-                                    v-model="shippingAddress" 
-                                    rows="4" 
-                                    class="glass-input" 
-                                    placeholder="Enter your complete home address for delivery..."
-                                    required
-                                ></textarea>
-                                <span v-if="checkoutForm.errors.shipping_address" class="text-xs text-rose-400 mt-1 block ml-1">{{ checkoutForm.errors.shipping_address }}</span>
-                            </div>
+                                <!-- Details -->
+                                <div class="flex-1 flex flex-col justify-between">
+                                    <div>
+                                        <h3 class="font-bold text-white text-sm tracking-tight line-clamp-1">{{ item.name }}</h3>
+                                        <span class="inline-block mt-1 text-[10px] font-bold text-slate-400 bg-white/[0.05] border border-white/[0.08] px-2 py-0.5 rounded-md">
+                                            {{ item.size }} / {{ item.color }}
+                                        </span>
+                                    </div>
 
-                            <!-- Phone Number -->
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 ml-1">Phone Number</label>
-                                <input 
-                                    type="text" 
-                                    v-model="phone" 
-                                    class="glass-input" 
-                                    placeholder="+95 9..."
-                                    required
-                                />
-                                <span v-if="checkoutForm.errors.phone" class="text-xs text-rose-400 mt-1 block ml-1">{{ checkoutForm.errors.phone }}</span>
-                            </div>
+                                    <!-- Quantity / Price Controllers -->
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2 bg-white/[0.04] border border-white/[0.06] rounded-lg px-2 py-1">
+                                            <button @click="updateQuantity(item.variant_id, item.quantity - 1)" class="text-slate-400 hover:text-white font-bold text-xs">-</button>
+                                            <span class="text-xs text-white font-bold px-1.5">{{ item.quantity }}</span>
+                                            <button @click="updateQuantity(item.variant_id, item.quantity + 1)" class="text-slate-400 hover:text-white font-bold text-xs">+</button>
+                                        </div>
+                                        <span class="font-extrabold text-white text-sm">${{ (item.price * item.quantity).toFixed(2) }}</span>
+                                    </div>
+                                </div>
 
-                            <!-- Stock Error Flash -->
-                            <div v-if="checkoutForm.errors.items" class="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs font-semibold text-rose-400 leading-relaxed">
-                                {{ checkoutForm.errors.items }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bottom Action & Total -->
-                    <div class="p-6 border-t border-white/[0.08] space-y-4">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-bold text-slate-400">Total Price</span>
-                            <span class="text-2xl font-black text-white">${{ cartTotal.toFixed(2) }}</span>
-                        </div>
-
-                        <!-- Button logic for Step 1 -->
-                        <div v-if="checkoutStep === 'cart'" class="space-y-2">
-                            <template v-if="$page.props.auth.user">
+                                <!-- Delete button -->
                                 <button 
-                                    @click="handleCheckoutProceed"
-                                    :disabled="cart.length === 0"
-                                    class="glass-button-primary w-full py-4 font-bold text-base rounded-2xl flex justify-center items-center shadow-lg shadow-indigo-500/25 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+                                    @click="removeFromCart(item.variant_id)" 
+                                    class="absolute top-2 right-2 text-slate-500 hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-all"
                                 >
-                                    Proceed to Checkout
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
                                 </button>
-                            </template>
-                            <template v-else>
-                                <Link 
-                                    :href="route('login')"
-                                    class="glass-button-primary w-full py-4 font-bold text-base rounded-2xl flex justify-center items-center shadow-lg shadow-indigo-500/25 text-center"
-                                >
-                                    Sign In to Checkout
-                                </Link>
-                            </template>
+                            </div>
+
+                            <!-- Empty state -->
+                            <div v-if="cart.length === 0" class="h-64 flex flex-col items-center justify-center text-slate-500 text-center gap-3">
+                                <svg class="w-10 h-10 stroke-current text-slate-600" fill="none" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                </svg>
+                                <span class="text-sm font-semibold tracking-wide">Your Shopping bag is empty.</span>
+                            </div>
                         </div>
 
-                        <!-- Button logic for Step 2 -->
-                        <div v-else class="flex gap-3">
-                            <button 
-                                @click="checkoutStep = 'cart'" 
-                                class="glass-button py-4 px-6 rounded-2xl text-slate-300 font-semibold"
-                            >
-                                Back
-                            </button>
-                            <button 
-                                @click="submitCheckout"
-                                :disabled="checkoutForm.processing || !shippingAddress || !phone"
-                                class="glass-button-primary flex-1 py-4 font-bold text-base rounded-2xl flex justify-center items-center shadow-lg shadow-indigo-500/25 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
-                            >
-                                <span v-if="checkoutForm.processing" class="inline-block animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
-                                Place Order
-                            </button>
+                        <!-- Drawer Step 2: Shipping Form -->
+                        <div v-else class="flex-1 overflow-y-auto p-6 space-y-6">
+                            <div class="space-y-4">
+                                <!-- Shipping Address -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 ml-1">Shipping Address</label>
+                                    <textarea 
+                                        v-model="shippingAddress" 
+                                        rows="4" 
+                                        class="glass-input" 
+                                        placeholder="Enter your complete home address for delivery..."
+                                        required
+                                    ></textarea>
+                                    <span v-if="checkoutForm.errors.shipping_address" class="text-xs text-rose-400 mt-1 block ml-1">{{ checkoutForm.errors.shipping_address }}</span>
+                                </div>
+
+                                <!-- Phone Number -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 ml-1">Phone Number</label>
+                                    <input 
+                                        type="text" 
+                                        v-model="phone" 
+                                        class="glass-input" 
+                                        placeholder="+95 9..."
+                                        required
+                                    />
+                                    <span v-if="checkoutForm.errors.phone" class="text-xs text-rose-400 mt-1 block ml-1">{{ checkoutForm.errors.phone }}</span>
+                                </div>
+
+                                <!-- Stock Error Flash -->
+                                <div v-if="checkoutForm.errors.items" class="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs font-semibold text-rose-400 leading-relaxed">
+                                    {{ checkoutForm.errors.items }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Action & Total -->
+                        <div class="p-6 border-t border-white/[0.08] space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-bold text-slate-400">Total Price</span>
+                                <span class="text-2xl font-black text-white">${{ cartTotal.toFixed(2) }}</span>
+                            </div>
+
+                            <!-- Button logic for Step 1 -->
+                            <div v-if="checkoutStep === 'cart'" class="space-y-2">
+                                <template v-if="$page.props.auth.user">
+                                    <button 
+                                        @click="handleCheckoutProceed"
+                                        :disabled="cart.length === 0"
+                                        class="glass-button-primary w-full py-4 font-bold text-base rounded-2xl flex justify-center items-center shadow-lg shadow-indigo-500/25 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+                                    >
+                                        Proceed to Checkout
+                                    </button>
+                                </template>
+                                <template v-else>
+                                    <Link 
+                                        :href="route('login')"
+                                        class="glass-button-primary w-full py-4 font-bold text-base rounded-2xl flex justify-center items-center shadow-lg shadow-indigo-500/25 text-center"
+                                    >
+                                        Sign In to Checkout
+                                    </Link>
+                                </template>
+                            </div>
+
+                            <!-- Button logic for Step 2 -->
+                            <div v-else class="flex gap-3">
+                                <button 
+                                    @click="checkoutStep = 'cart'" 
+                                    class="glass-button py-4 px-6 rounded-2xl text-slate-300 font-semibold"
+                                >
+                                    Back
+                                </button>
+                                <button 
+                                    @click="submitCheckout"
+                                    :disabled="checkoutForm.processing || !shippingAddress || !phone"
+                                    class="glass-button-primary flex-1 py-4 font-bold text-base rounded-2xl flex justify-center items-center shadow-lg shadow-indigo-500/25 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+                                >
+                                    <span v-if="checkoutForm.processing" class="inline-block animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                                    Place Order
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </Transition>
             </div>
         </div>
 
@@ -754,3 +764,26 @@ const submitCheckout = () => {
         </footer>
     </div>
 </template>
+
+<style scoped>
+/* Fade Backdrop Transition */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+/* Slide Panel Transition */
+.slide-enter-active,
+.slide-leave-active {
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.slide-enter-from,
+.slide-slide-leave-to,
+.slide-leave-to {
+    transform: translateX(100%);
+}
+</style>
