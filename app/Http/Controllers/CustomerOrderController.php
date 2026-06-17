@@ -42,6 +42,13 @@ class CustomerOrderController extends Controller
             ]);
         }
 
+        // Enforce 30-minute time limit for cancellation
+        if ($order->created_at->diffInMinutes(now()) > 30) {
+            throw ValidationException::withMessages([
+                'order' => 'Orders can only be cancelled within 30 minutes of placement.'
+            ]);
+        }
+
         try {
             DB::beginTransaction();
 
