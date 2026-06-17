@@ -27,11 +27,11 @@ const form = useForm({
 <template>
     <section>
         <header>
-            <h2 class="text-lg font-medium text-gray-900">
+            <h2 class="text-xl font-extrabold text-white tracking-tight">
                 Profile Information
             </h2>
 
-            <p class="mt-1 text-sm text-gray-600">
+            <p class="mt-1.5 text-sm text-slate-400 font-medium">
                 Update your account's profile information, default shipping address, and phone number.
             </p>
         </header>
@@ -90,7 +90,7 @@ const form = useForm({
 
                 <textarea
                     id="shipping_address"
-                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm dark:bg-slate-900 dark:text-white"
+                    class="glass-input mt-1 block w-full"
                     v-model="form.shipping_address"
                     rows="3"
                     placeholder="Enter your default delivery address..."
