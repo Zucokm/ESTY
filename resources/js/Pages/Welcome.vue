@@ -235,16 +235,17 @@ const submitCheckout = () => {
                     <template v-if="canLogin">
                         <template v-if="$page.props.auth.user">
                             <Link
-                                :href="route('orders.index')"
-                                class="text-xs font-semibold text-slate-300 hover:text-white px-3 py-2 transition-colors duration-200"
-                            >
-                                My Orders
-                            </Link>
-                            <Link
+                                v-if="$page.props.auth.user.role === 'admin'"
                                 :href="route('dashboard')"
                                 class="glass-button text-xs py-2 px-4 rounded-full border-white/10"
                             >
-                                Dashboard
+                                Admin Dashboard
+                            </Link>
+                            <Link
+                                :href="route('profile.edit')"
+                                class="glass-button text-xs py-2 px-4 rounded-full border-white/10"
+                            >
+                                Profile
                             </Link>
                             <Link
                                 :href="route('logout')"

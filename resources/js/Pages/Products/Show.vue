@@ -192,10 +192,25 @@ const submitCheckout = () => {
                 <div class="flex items-center gap-3">
                     <template v-if="$page.props.auth.user">
                         <Link
+                            v-if="$page.props.auth.user.role === 'admin'"
                             :href="route('dashboard')"
                             class="glass-button text-xs py-2 px-4 rounded-full border-white/10"
                         >
-                            Dashboard
+                            Admin Dashboard
+                        </Link>
+                        <Link
+                            :href="route('profile.edit')"
+                            class="glass-button text-xs py-2 px-4 rounded-full border-white/10"
+                        >
+                            Profile
+                        </Link>
+                        <Link
+                            :href="route('logout')"
+                            method="post"
+                            as="button"
+                            class="text-xs font-semibold text-rose-400 hover:text-rose-300 px-3 py-2 transition-colors duration-200"
+                        >
+                            Log Out
                         </Link>
                     </template>
                     <template v-else>
