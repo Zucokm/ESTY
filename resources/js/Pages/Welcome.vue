@@ -3,7 +3,7 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import { useCart } from '@/Composables/useCart';
 
-defineProps({
+const props = defineProps({
     canLogin: {
         type: Boolean,
     },
@@ -21,7 +21,46 @@ defineProps({
     products: {
         type: Array,
         required: true,
+    },
+    categories: {
+        type: Array,
+        required: true,
     }
+});
+
+// Search and Filter States
+const searchQuery = ref('');
+const selectedCategoryId = ref(null);
+const sortBy = ref('latest');
+
+// Computed Filtered & Sorted Products
+const filteredProducts = computed(() => {
+    let result = [...props.products];
+
+    // Filter by Category
+    if (selectedCategoryId.value !== null) {
+        result = result.filter(product => product.category_id === selectedCategoryId.value);
+    }
+
+    // Filter by Search Query
+    if (searchQuery.value.trim()) {
+        const query = searchQuery.value.toLowerCase();
+        result = result.filter(product => 
+            product.name.toLowerCase().includes(query) || 
+            (product.description && product.description.toLowerCase().includes(query))
+        );
+    }
+
+    // Sort
+    if (sortBy.value === 'latest') {
+        result.sort((a, b) => b.id - a.id);
+    } else if (sortBy.value === 'price_asc') {
+        result.sort((a, b) => parseFloat(a.base_price) - parseFloat(b.base_price));
+    } else if (sortBy.value === 'price_desc') {
+        result.sort((a, b) => parseFloat(b.base_price) - parseFloat(a.base_price));
+    }
+
+    return result;
 });
 
 const { cart, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal } = useCart();
@@ -264,22 +303,89 @@ const submitCheckout = () => {
 
         <!-- Product Grid Section -->
         <section id="shop" class="py-16 px-4 max-w-7xl mx-auto relative z-10">
-            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
-                <div>
-                    <h2 class="text-3xl font-extrabold text-white tracking-tight mb-2">Featured Garments</h2>
-                    <p class="text-slate-400 font-medium">Modern essentials engineered with variant-level precision.</p>
+            <!-- Search & Filters -->
+            <div class="flex flex-col gap-6 mb-12">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-white tracking-tight mb-2">Featured Garments</h2>
+                        <p class="text-slate-400 font-medium">Modern essentials engineered with variant-level precision.</p>
+                    </div>
+                    
+                    <!-- Search & Sort Controls -->
+                    <div class="flex flex-wrap items-center gap-3">
+                        <!-- Search Box -->
+                        <div class="relative min-w-[240px]">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </span>
+                            <input 
+                                v-model="searchQuery"
+                                type="text"
+                                placeholder="Search products..."
+                                class="w-full pl-10 pr-4 py-2 text-sm text-white bg-white/[0.04] border border-white/[0.08] hover:border-white/[0.15] focus:border-indigo-500/50 focus:bg-white/[0.08] rounded-full focus:outline-none transition-all duration-300 backdrop-blur-md"
+                            />
+                        </div>
+
+                        <!-- Sort Dropdown -->
+                        <div class="relative">
+                            <select 
+                                v-model="sortBy"
+                                class="appearance-none pl-4 pr-10 py-2 text-sm text-slate-300 bg-white/[0.04] border border-white/[0.08] hover:border-white/[0.15] focus:border-indigo-500/50 rounded-full focus:outline-none transition-all duration-300 backdrop-blur-md cursor-pointer"
+                            >
+                                <option value="latest" class="bg-slate-900 text-white">Latest</option>
+                                <option value="price_asc" class="bg-slate-900 text-white">Price: Low to High</option>
+                                <option value="price_desc" class="bg-slate-900 text-white">Price: High to Low</option>
+                            </select>
+                            <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <div class="mt-4 md:mt-0 flex gap-2">
-                    <button class="glass-button text-xs py-2 px-4 rounded-full bg-white/[0.08]">All</button>
-                    <button class="glass-button text-xs py-2 px-4 rounded-full text-slate-400 border-transparent">New Arrival</button>
-                    <button class="glass-button text-xs py-2 px-4 rounded-full text-slate-400 border-transparent">Bestsellers</button>
+
+                <!-- Dynamic Categories List -->
+                <div class="flex flex-wrap gap-2 pb-2 border-b border-white/[0.06]">
+                    <button 
+                        @click="selectedCategoryId = null"
+                        class="glass-button text-xs py-2 px-4 rounded-full transition-all duration-200"
+                        :class="selectedCategoryId === null ? 'bg-white/[0.12] text-white border-white/20' : 'text-slate-400 border-transparent'"
+                    >
+                        All Products
+                    </button>
+                    <button 
+                        v-for="category in categories"
+                        :key="category.id"
+                        @click="selectedCategoryId = category.id"
+                        class="glass-button text-xs py-2 px-4 rounded-full transition-all duration-200"
+                        :class="selectedCategoryId === category.id ? 'bg-white/[0.12] text-white border-white/20' : 'text-slate-400 border-transparent'"
+                    >
+                        {{ category.name }}
+                    </button>
                 </div>
             </div>
 
+            <!-- Empty State -->
+            <div 
+                v-if="filteredProducts.length === 0" 
+                class="glass-card py-20 px-4 text-center rounded-[2.5rem] border-white/[0.06] flex flex-col items-center justify-center"
+            >
+                <div class="w-16 h-16 rounded-full bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-slate-400 mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-1">No products found</h3>
+                <p class="text-slate-400 text-sm max-w-sm">We couldn't find any garments matching your search criteria or category filter.</p>
+            </div>
+
             <!-- Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div 
-                    v-for="product in products" 
+                    v-for="product in filteredProducts" 
                     :key="product.id" 
                     @click="openProductModal(product)"
                     class="glass-card glass-card-hover group flex flex-col h-full rounded-[2.5rem] overflow-hidden p-3 cursor-pointer"

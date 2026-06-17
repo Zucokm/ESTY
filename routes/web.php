@@ -6,11 +6,14 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 use App\Models\Product;
+use App\Models\Category;
 
 Route::get('/', function () {
     $products = Product::with(['category', 'variants', 'images' => function ($query) {
         $query->where('is_primary', true);
     }])->where('is_active', true)->latest()->get();
+
+    $categories = Category::all();
 
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -18,6 +21,7 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
         'products' => $products,
+        'categories' => $categories,
     ]);
 });
 
