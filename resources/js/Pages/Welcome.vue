@@ -185,6 +185,7 @@ const submitCheckout = () => {
                 <div class="hidden md:flex items-center gap-7">
                     <a href="#" class="text-sm font-semibold text-slate-200 hover:text-white transition-colors duration-200">Home</a>
                     <a href="#shop" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200">Shop</a>
+                    <Link v-if="$page.props.auth.user" :href="route('orders.index')" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200">My Orders</Link>
                     <a href="#" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200">Categories</a>
                     <a href="#" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200">About</a>
                 </div>
@@ -193,6 +194,12 @@ const submitCheckout = () => {
                 <div class="flex items-center gap-3">
                     <template v-if="canLogin">
                         <template v-if="$page.props.auth.user">
+                            <Link
+                                :href="route('orders.index')"
+                                class="text-xs font-semibold text-slate-300 hover:text-white px-3 py-2 transition-colors duration-200"
+                            >
+                                My Orders
+                            </Link>
                             <Link
                                 :href="route('dashboard')"
                                 class="glass-button text-xs py-2 px-4 rounded-full border-white/10"
