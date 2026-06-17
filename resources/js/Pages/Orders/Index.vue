@@ -130,6 +130,99 @@ const canCancel = (order) => {
                                     {{ order.status }}
                                 </span>
                             </div>
+                    </div>
+
+                    <!-- Order Progress Timeline -->
+                    <div class="relative py-4 px-2 relative z-10 border-b border-white/[0.04] mb-6">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-4">Order Track</span>
+                        
+                        <div class="flex items-center justify-between max-w-lg relative">
+                            <!-- Connecting Line -->
+                            <div class="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-white/[0.08] z-0"></div>
+                            <div 
+                                class="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 transition-all duration-500 z-0"
+                                :style="{
+                                    width: order.status.toLowerCase() === 'pending' ? '0%' 
+                                           : order.status.toLowerCase() === 'processing' ? '50%' 
+                                           : order.status.toLowerCase() === 'completed' ? '100%' 
+                                           : '100%',
+                                    background: order.status.toLowerCase() === 'cancelled' 
+                                                ? 'linear-gradient(to right, #818cf8, #f43f5e)' 
+                                                : undefined
+                                }"
+                            ></div>
+
+                            <!-- Steps -->
+                            <template v-if="order.status.toLowerCase() === 'cancelled'">
+                                <!-- Step 1: Placed -->
+                                <div class="flex flex-col items-center gap-2 relative z-10">
+                                    <div class="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-bold ring-4 ring-indigo-500/20">
+                                        ✓
+                                    </div>
+                                    <span class="text-[11px] font-bold text-slate-400">Order Placed</span>
+                                </div>
+                                <!-- Step 2: Cancelled -->
+                                <div class="flex flex-col items-center gap-2 relative z-10">
+                                    <div class="w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center text-xs font-bold ring-4 ring-rose-500/20">
+                                        ✕
+                                    </div>
+                                    <span class="text-[11px] font-bold text-rose-400">Cancelled</span>
+                                </div>
+                            </template>
+
+                            <template v-else>
+                                <!-- Step 1: Pending (Order Placed) -->
+                                <div class="flex flex-col items-center gap-2 relative z-10">
+                                    <div 
+                                        class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
+                                        :class="order.status.toLowerCase() !== 'pending' 
+                                            ? 'bg-indigo-500 text-white ring-4 ring-indigo-500/20' 
+                                            : 'bg-indigo-600 text-white ring-4 ring-indigo-500/30 animate-pulse'"
+                                    >
+                                        ✓
+                                    </div>
+                                    <span class="text-[11px] font-bold text-slate-300">Placed</span>
+                                </div>
+
+                                <!-- Step 2: Processing (Garment Tailoring/Packing) -->
+                                <div class="flex flex-col items-center gap-2 relative z-10">
+                                    <div 
+                                        class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
+                                        :class="order.status.toLowerCase() === 'completed'
+                                            ? 'bg-indigo-500 text-white ring-4 ring-indigo-500/20'
+                                            : order.status.toLowerCase() === 'processing'
+                                            ? 'bg-purple-600 text-white ring-4 ring-purple-600/30 animate-pulse'
+                                            : 'bg-slate-900 text-slate-500 border border-white/10'"
+                                    >
+                                        <span v-if="order.status.toLowerCase() === 'completed'">✓</span>
+                                        <span v-else>2</span>
+                                    </div>
+                                    <span 
+                                        class="text-[11px] font-bold"
+                                        :class="order.status.toLowerCase() === 'processing' || order.status.toLowerCase() === 'completed' ? 'text-slate-300' : 'text-slate-500'"
+                                    >
+                                        Processing
+                                    </span>
+                                </div>
+
+                                <!-- Step 3: Completed (Delivered) -->
+                                <div class="flex flex-col items-center gap-2 relative z-10">
+                                    <div 
+                                        class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
+                                        :class="order.status.toLowerCase() === 'completed'
+                                            ? 'bg-emerald-500 text-white ring-4 ring-emerald-500/20'
+                                            : 'bg-slate-900 text-slate-500 border border-white/10'"
+                                    >
+                                        ✓
+                                    </div>
+                                    <span 
+                                        class="text-[11px] font-bold"
+                                        :class="order.status.toLowerCase() === 'completed' ? 'text-emerald-400' : 'text-slate-500'"
+                                    >
+                                        Completed
+                                    </span>
+                                </div>
+                            </template>
                         </div>
                     </div>
 
