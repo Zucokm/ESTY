@@ -70,7 +70,7 @@ const formatDate = (dateStr) => {
 </script>
 
 <template>
-    <Head title="Admin Dashboard - VÉRONE" />
+    <Head title="Admin Dashboard - ESTY" />
 
     <div class="min-h-screen flex selection:bg-indigo-500/30 selection:text-indigo-200">
         
@@ -84,7 +84,7 @@ const formatDate = (dateStr) => {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4a3 3 0 00-3 3v1h6V7a3 3 0 00-3-3zM3 19a2 2 0 002 2h14a2 2 0 002-2M5 11h14l1 8H4l1-8z" />
                         </svg>
                     </div>
-                    <span class="text-white font-bold tracking-tight text-base uppercase">VÉRONE <span class="text-xs text-indigo-400 font-medium tracking-normal lowercase ml-1">admin</span></span>
+                    <span class="text-white font-bold tracking-tight text-base uppercase">ESTY <span class="text-xs text-indigo-400 font-medium tracking-normal lowercase ml-1">admin</span></span>
                 </div>
             </div>
 

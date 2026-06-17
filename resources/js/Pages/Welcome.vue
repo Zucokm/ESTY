@@ -150,7 +150,7 @@ const submitCheckout = () => {
 </script>
 
 <template>
-    <Head title="Vérone Garments - Premium Clothing" />
+    <Head title="ESTY Garments - Premium Clothing" />
 
     <div class="min-h-screen relative overflow-hidden pb-20 selection:bg-indigo-500/30 selection:text-indigo-200">
         
@@ -167,7 +167,7 @@ const submitCheckout = () => {
                 </div>
                 <div class="flex-1">
                     <h3 class="font-bold text-white tracking-tight text-base mb-1">Order Placed Successfully</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Thank you for shopping at Vérone. Our administrators are processing your garments delivery.</p>
+                    <p class="text-xs text-slate-400 leading-relaxed">Thank you for shopping at ESTY. Our administrators are processing your garments delivery.</p>
                 </div>
                 <button @click="showSuccessAlert = false" class="text-slate-500 hover:text-white transition-colors">✕</button>
             </div>
@@ -178,7 +178,7 @@ const submitCheckout = () => {
             <nav class="glass-card px-6 py-3.5 w-full max-w-4xl flex items-center justify-between shadow-[0_12px_40px_0_rgba(0,0,0,0.3)] rounded-full border-white/10">
                 <!-- Logo -->
                 <div class="flex items-center gap-2">
-                    <span class="text-white font-bold tracking-tight text-lg">VÉRONE</span>
+                    <span class="text-white font-bold tracking-tight text-lg">ESTY</span>
                 </div>
 
                 <!-- Main Nav Links -->
@@ -644,7 +644,7 @@ const submitCheckout = () => {
 
         <!-- Dynamic Version/Footer Status -->
         <footer class="mt-20 py-8 text-center text-xs text-slate-500">
-            Vérone Garments Platform &bull; Laravel v{{ laravelVersion }} (PHP v{{ phpVersion }})
+            ESTY Garments Platform &bull; Laravel v{{ laravelVersion }} (PHP v{{ phpVersion }})
         </footer>
     </div>
 </template>

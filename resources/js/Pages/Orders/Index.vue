@@ -50,7 +50,7 @@ const canCancel = (order) => {
 </script>
 
 <template>
-    <Head title="My Orders - VÉRONE" />
+    <Head title="My Orders - ESTY" />
 
     <div class="min-h-screen relative overflow-hidden pb-20 selection:bg-indigo-500/30 selection:text-indigo-200">
         
@@ -59,7 +59,7 @@ const canCancel = (order) => {
             <nav class="glass-card px-6 py-3.5 w-full max-w-4xl flex items-center justify-between shadow-[0_12px_40px_0_rgba(0,0,0,0.3)] rounded-full border-white/10">
                 <!-- Logo -->
                 <div class="flex items-center gap-2">
-                    <span class="text-white font-bold tracking-tight text-lg">VÉRONE</span>
+                    <span class="text-white font-bold tracking-tight text-lg">ESTY</span>
                 </div>
 
                 <!-- Main Nav Links -->
