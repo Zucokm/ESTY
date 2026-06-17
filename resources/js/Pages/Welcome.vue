@@ -2,6 +2,7 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import { useCart } from '@/Composables/useCart';
+import { useWishlist } from '@/Composables/useWishlist';
 
 const props = defineProps({
     canLogin: {
@@ -64,6 +65,9 @@ const filteredProducts = computed(() => {
 });
 
 const { cart, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal } = useCart();
+const { wishlist, toggleWishlist, isInWishlist, wishlistCount } = useWishlist();
+
+const showWishlistDrawer = ref(false);
 
 // Selection Modal States
 const showSelectionModal = ref(false);
@@ -225,9 +229,11 @@ const submitCheckout = () => {
                 <div class="hidden md:flex items-center gap-7">
                     <a href="#" class="text-sm font-semibold text-slate-200 hover:text-white transition-colors duration-200">Home</a>
                     <a href="#shop" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200">Shop</a>
+                    <button @click="showWishlistDrawer = true" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200 flex items-center gap-1.5 focus:outline-none">
+                        Wishlist
+                        <span v-if="wishlistCount > 0" class="px-2 py-0.5 rounded-full text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold">{{ wishlistCount }}</span>
+                    </button>
                     <Link v-if="$page.props.auth.user" :href="route('orders.index')" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200">My Orders</Link>
-                    <a href="#" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200">Categories</a>
-                    <a href="#" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200">About</a>
                 </div>
 
                 <!-- Auth Navigation -->
@@ -414,6 +420,17 @@ const submitCheckout = () => {
                         <span class="absolute top-4 left-4 text-[10px] font-bold tracking-widest text-white uppercase bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
                             {{ product.category?.name || 'Garment' }}
                         </span>
+
+                        <!-- Wishlist Toggle -->
+                        <button 
+                            @click.stop.prevent="toggleWishlist(product)"
+                            class="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-300 focus:outline-none backdrop-blur-md z-10"
+                            :class="isInWishlist(product.id) ? 'bg-rose-500 border-rose-400 text-white shadow-lg shadow-rose-500/20' : 'bg-black/40 border-white/10 text-white hover:bg-black/60'"
+                        >
+                            <svg class="w-4 h-4" :fill="isInWishlist(product.id) ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                        </button>
                         
                         <!-- Floating Add to Cart Quick Action -->
                         <button 
@@ -757,6 +774,107 @@ const submitCheckout = () => {
                                     Place Order
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                </Transition>
+            </div>
+        </div>
+
+        <!-- Slide-out Wishlist Drawer -->
+        <div 
+            class="fixed inset-0 z-50 overflow-hidden pointer-events-none"
+            :class="{ 'pointer-events-auto': showWishlistDrawer }"
+        >
+            <!-- Backdrop -->
+            <Transition name="fade">
+                <div 
+                    v-if="showWishlistDrawer" 
+                    @click="showWishlistDrawer = false" 
+                    class="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300 pointer-events-auto"
+                ></div>
+            </Transition>
+
+            <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
+                <!-- Drawer Content -->
+                <Transition name="slide">
+                    <div 
+                        v-if="showWishlistDrawer" 
+                        class="w-screen max-w-md bg-slate-950/40 border-l border-white/10 backdrop-blur-3xl shadow-[0_0_50px_0_rgba(0,0,0,0.6)] flex flex-col justify-between pointer-events-auto h-full"
+                    >
+                        <!-- Header -->
+                        <div class="px-6 py-5 border-b border-white/[0.08] flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                                <h2 class="text-lg font-bold text-white tracking-tight">
+                                    My Wishlist ({{ wishlistCount }})
+                                </h2>
+                            </div>
+                            <button @click="showWishlistDrawer = false" class="text-slate-400 hover:text-white transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Wishlist Items List -->
+                        <div class="flex-1 overflow-y-auto p-6 space-y-4">
+                            <div 
+                                v-for="item in wishlist" 
+                                :key="item.id"
+                                class="p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.04] flex gap-4 relative group hover:border-white/[0.08] transition-all"
+                            >
+                                <!-- Thumbnail -->
+                                <Link :href="route('products.show', item.slug)" @click="showWishlistDrawer = false" class="w-16 h-20 rounded-xl overflow-hidden bg-slate-900 shrink-0 block">
+                                    <img v-if="item.images && item.images.length > 0" :src="item.images[0].image_path" class="w-full h-full object-cover object-top" />
+                                    <div v-else class="w-full h-full flex items-center justify-center bg-indigo-500/10 text-indigo-300 text-xs font-bold uppercase">
+                                        {{ item.name.charAt(0) }}
+                                    </div>
+                                </Link>
+
+                                <!-- Details -->
+                                <div class="flex-1 flex flex-col justify-between">
+                                    <div>
+                                        <Link :href="route('products.show', item.slug)" @click="showWishlistDrawer = false" class="font-bold text-white text-sm tracking-tight line-clamp-1 hover:text-indigo-300 transition-colors">{{ item.name }}</Link>
+                                        <span class="block mt-1 text-xs font-extrabold text-slate-300">${{ parseFloat(item.base_price).toFixed(2) }}</span>
+                                    </div>
+
+                                    <!-- Quick actions -->
+                                    <div class="flex items-center gap-2">
+                                        <button 
+                                            @click="openProductModal(item); showWishlistDrawer = false;" 
+                                            class="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500 hover:text-white border border-indigo-500/20 px-2.5 py-1 rounded-md transition-all"
+                                        >
+                                            Add to Bag
+                                        </button>
+                                        <button 
+                                            @click="removeFromWishlist(item.id)" 
+                                            class="text-[10px] font-bold text-rose-400 bg-rose-500/10 hover:bg-rose-500 hover:text-white border border-rose-500/20 px-2.5 py-1 rounded-md transition-all"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Empty state -->
+                            <div v-if="wishlist.length === 0" class="h-64 flex flex-col items-center justify-center text-slate-500 text-center gap-3">
+                                <svg class="w-10 h-10 stroke-current text-slate-600" fill="none" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                                <span class="text-sm font-semibold tracking-wide">Your Wishlist is empty.</span>
+                            </div>
+                        </div>
+
+                        <!-- Footer actions -->
+                        <div class="p-6 border-t border-white/[0.08]">
+                            <button 
+                                @click="showWishlistDrawer = false" 
+                                class="glass-button w-full py-3.5 font-bold text-sm rounded-xl text-center"
+                            >
+                                Continue Shopping
+                            </button>
                         </div>
                     </div>
                 </Transition>
