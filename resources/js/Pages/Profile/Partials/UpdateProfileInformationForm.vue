@@ -19,6 +19,8 @@ const user = usePage().props.auth.user;
 const form = useForm({
     name: user.name,
     email: user.email,
+    shipping_address: user.shipping_address || '',
+    phone: user.phone || '',
 });
 </script>
 
@@ -30,7 +32,7 @@ const form = useForm({
             </h2>
 
             <p class="mt-1 text-sm text-gray-600">
-                Update your account's profile information and email address.
+                Update your account's profile information, default shipping address, and phone number.
             </p>
         </header>
 
@@ -67,6 +69,34 @@ const form = useForm({
                 />
 
                 <InputError class="mt-2" :message="form.errors.email" />
+            </div>
+
+            <div>
+                <InputLabel for="phone" value="Default Phone Number" />
+
+                <TextInput
+                    id="phone"
+                    type="text"
+                    class="mt-1 block w-full"
+                    v-model="form.phone"
+                    placeholder="+95 9..."
+                />
+
+                <InputError class="mt-2" :message="form.errors.phone" />
+            </div>
+
+            <div>
+                <InputLabel for="shipping_address" value="Default Shipping Address" />
+
+                <textarea
+                    id="shipping_address"
+                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm dark:bg-slate-900 dark:text-white"
+                    v-model="form.shipping_address"
+                    rows="3"
+                    placeholder="Enter your default delivery address..."
+                ></textarea>
+
+                <InputError class="mt-2" :message="form.errors.shipping_address" />
             </div>
 
             <div v-if="mustVerifyEmail && user.email_verified_at === null">

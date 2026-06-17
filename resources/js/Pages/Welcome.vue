@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import { useCart } from '@/Composables/useCart';
 
@@ -74,8 +74,9 @@ const selectedColor = ref('');
 // Cart Drawer States
 const showCartDrawer = ref(false);
 const checkoutStep = ref('cart'); // 'cart' or 'checkout'
-const shippingAddress = ref('');
-const phone = ref('');
+const page = usePage();
+const shippingAddress = ref(page.props.auth.user?.shipping_address || '');
+const phone = ref(page.props.auth.user?.phone || '');
 const showSuccessAlert = ref(false);
 
 const checkoutForm = useForm({
