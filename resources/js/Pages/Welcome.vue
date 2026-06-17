@@ -384,10 +384,10 @@ const submitCheckout = () => {
 
             <!-- Grid -->
             <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div 
+                <Link 
                     v-for="product in filteredProducts" 
                     :key="product.id" 
-                    @click="openProductModal(product)"
+                    :href="route('products.show', product.slug)"
                     class="glass-card glass-card-hover group flex flex-col h-full rounded-[2.5rem] overflow-hidden p-3 cursor-pointer"
                 >
                     <!-- Product Image Container -->
@@ -414,7 +414,10 @@ const submitCheckout = () => {
                         </span>
                         
                         <!-- Floating Add to Cart Quick Action -->
-                        <button class="absolute bottom-4 right-4 w-11 h-11 rounded-full bg-white text-slate-950 flex items-center justify-center shadow-lg transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hover:bg-indigo-600 hover:text-white">
+                        <button 
+                            @click.stop.prevent="openProductModal(product)"
+                            class="absolute bottom-4 right-4 w-11 h-11 rounded-full bg-white text-slate-950 flex items-center justify-center shadow-lg transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hover:bg-indigo-600 hover:text-white"
+                        >
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
@@ -455,7 +458,7 @@ const submitCheckout = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </Link>
             </div>
         </section>
 

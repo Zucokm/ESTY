@@ -25,6 +25,13 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/products/{slug}', function ($slug) {
+    $product = Product::with(['category', 'variants', 'images'])->where('slug', $slug)->where('is_active', true)->firstOrFail();
+    return Inertia::render('Products/Show', [
+        'product' => $product
+    ]);
+})->name('products.show');
+
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Models\Order;
