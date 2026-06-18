@@ -226,4 +226,17 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')->with('success', 'Product and variants updated successfully.');
     }
+
+    /**
+     * Toggle the active status of a specific product.
+     */
+    public function toggleStatus($id)
+    {
+        $product = Product::findOrFail($id);
+        $product->update([
+            'is_active' => !$product->is_active
+        ]);
+
+        return redirect()->back()->with('success', 'Product status toggled successfully.');
+    }
 }

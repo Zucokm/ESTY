@@ -3,6 +3,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import { useCart } from '@/Composables/useCart';
 import { useWishlist } from '@/Composables/useWishlist';
+import Footer from '@/Components/Footer.vue';
 
 const props = defineProps({
     canLogin: {
@@ -65,7 +66,7 @@ const filteredProducts = computed(() => {
 });
 
 const { cart, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal } = useCart();
-const { wishlist, toggleWishlist, isInWishlist, wishlistCount } = useWishlist();
+const { wishlist, toggleWishlist, removeFromWishlist, isInWishlist, wishlistCount } = useWishlist();
 
 const showWishlistDrawer = ref(false);
 
@@ -323,7 +324,7 @@ const submitCheckout = () => {
 <template>
     <Head title="ESTY Garments - Premium Clothing" />
 
-    <div class="min-h-screen relative overflow-hidden pb-20 selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div class="min-h-screen relative overflow-hidden selection:bg-indigo-500/30 selection:text-indigo-200">
         
         <!-- Top Success Toast Alert -->
         <div 
@@ -423,7 +424,7 @@ const submitCheckout = () => {
             </h1>
             
             <p class="text-lg md:text-xl text-slate-400 max-w-2xl mb-10 font-medium leading-relaxed">
-                Discover clean silhouettes, premium Italian fabrics, and timeless styles designed to elevate your everyday wear.
+                Discover clean images, premium Myanmar fabrics, and timeless styles designed to enhance your everyday wear.
             </p>
 
             <div class="flex gap-4">
@@ -587,13 +588,14 @@ const submitCheckout = () => {
                                     v-for="(color, cIdx) in getUniqueColors(product.variants)" 
                                     :key="cIdx"
                                     @click.stop.prevent="setProductColor(product.id, color)"
-                                    :style="getColorStyle(color)"
                                     :class="[
                                         getActiveColor(product) === color ? 'ring-2 ring-indigo-400 scale-125 z-10' : 'ring-1 ring-white/20 hover:scale-110'
                                     ]" 
-                                    class="w-3.5 h-3.5 rounded-full transition-transform focus:outline-none"
+                                    class="w-3.5 h-3.5 rounded-full transition-transform focus:outline-none overflow-hidden flex items-center justify-center"
                                     :title="color"
-                                ></button>
+                                >
+                                    <span :style="getColorStyle(color)" class="w-full h-full block"></span>
+                                </button>
                             </div>
 
                             <!-- Sizes List -->
@@ -705,7 +707,9 @@ const submitCheckout = () => {
                                     :class="[selectedColor === color ? 'bg-white/[0.08] border-white/30 text-white' : 'bg-white/[0.03] border-white/10 text-slate-400 hover:bg-white/[0.08]']"
                                     class="px-4 py-2 text-xs font-bold rounded-xl border flex items-center gap-2 transition-all duration-200"
                                 >
-                                    <span :style="getColorStyle(color)" class="w-3.5 h-3.5 rounded-full ring-1 ring-white/20 border border-white/10"></span>
+                                    <span class="w-3.5 h-3.5 rounded-full ring-1 ring-white/20 border border-white/10 overflow-hidden inline-flex">
+                                        <span :style="getColorStyle(color)" class="w-full h-full block"></span>
+                                    </span>
                                     {{ color }}
                                 </button>
                             </div>
@@ -1012,10 +1016,7 @@ const submitCheckout = () => {
             </div>
         </div>
 
-        <!-- Dynamic Version/Footer Status -->
-        <footer class="mt-20 py-8 text-center text-xs text-slate-500">
-            ESTY Garments Platform &bull; Laravel v{{ laravelVersion }} (PHP v{{ phpVersion }})
-        </footer>
+        <Footer />
     </div>
 </template>
 

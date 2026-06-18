@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import Footer from '@/Components/Footer.vue';
 
 defineProps({
     orders: {
@@ -15,6 +16,12 @@ const getStatusClass = (status) => {
             return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
         case 'processing':
             return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+        case 'packing':
+            return 'bg-pink-500/10 text-pink-400 border-pink-500/20';
+        case 'shipping':
+            return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20';
+        case 'delivered':
+            return 'bg-teal-500/10 text-teal-400 border-teal-500/20';
         case 'completed':
             return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
         case 'cancelled':
@@ -22,6 +29,27 @@ const getStatusClass = (status) => {
         default:
             return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
     }
+};
+
+const getStatusStep = (status) => {
+    switch (status.toLowerCase()) {
+        case 'pending': return 1;
+        case 'processing': return 2;
+        case 'packing': return 3;
+        case 'shipping': return 4;
+        case 'delivered': return 5;
+        case 'completed': return 6;
+        default: return 0;
+    }
+};
+
+const getTimelineWidth = (status) => {
+    const step = getStatusStep(status);
+    if (step <= 1) return '0%';
+    if (step === 2) return '25%';
+    if (step === 3) return '50%';
+    if (step === 4) return '75%';
+    return '100%'; // step >= 5
 };
 
 const formatDate = (dateStr) => {
@@ -71,7 +99,7 @@ const getItemImage = (item) => {
 <template>
     <Head title="My Orders - ESTY" />
 
-    <div class="min-h-screen relative overflow-hidden pb-20 selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div class="min-h-screen relative overflow-hidden selection:bg-indigo-500/30 selection:text-indigo-200">
         
         <!-- Floating Header/Navigation (Dynamic Island Style) -->
         <div class="fixed top-6 left-0 right-0 z-40 flex justify-center px-4">
@@ -161,19 +189,18 @@ const getItemImage = (item) => {
                     </div>
 
                     <!-- Order Progress Timeline -->
-                    <div class="relative py-4 px-2 relative z-10 border-b border-white/[0.04] mb-6">
-                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-4">Order Track</span>
+                    <div class="relative py-8 px-4 relative z-10 border-b border-white/[0.04] mb-8 bg-white/[0.01] rounded-2xl border border-white/[0.03]">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-6">Order Track</span>
                         
-                        <div class="flex items-center justify-between max-w-lg relative">
-                            <!-- Connecting Line -->
-                            <div class="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-white/[0.08] z-0"></div>
+                        <div class="flex items-center justify-between max-w-2xl mx-auto relative px-2">
+                            <!-- Connecting Line Background -->
+                            <div class="absolute left-5 right-5 top-[20px] -translate-y-1/2 h-1 bg-white/[0.06] rounded-full z-0"></div>
+                            
+                            <!-- Active Progress Line -->
                             <div 
-                                class="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 transition-all duration-500 z-0"
+                                class="absolute left-5 top-[20px] -translate-y-1/2 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 via-pink-500 via-blue-500 to-emerald-500 rounded-full transition-all duration-500 z-0"
                                 :style="{
-                                    width: order.status.toLowerCase() === 'pending' ? '0%' 
-                                           : order.status.toLowerCase() === 'processing' ? '50%' 
-                                           : order.status.toLowerCase() === 'completed' ? '100%' 
-                                           : '100%',
+                                    width: getTimelineWidth(order.status),
                                     background: order.status.toLowerCase() === 'cancelled' 
                                                 ? 'linear-gradient(to right, #818cf8, #f43f5e)' 
                                                 : undefined
@@ -183,71 +210,126 @@ const getItemImage = (item) => {
                             <!-- Steps -->
                             <template v-if="order.status.toLowerCase() === 'cancelled'">
                                 <!-- Step 1: Placed -->
-                                <div class="flex flex-col items-center gap-2 relative z-10">
-                                    <div class="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-bold ring-4 ring-indigo-500/20">
+                                <div class="flex flex-col items-center gap-2.5 relative z-10">
+                                    <div class="w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-bold ring-4 ring-indigo-500/20 shadow-lg shadow-indigo-500/10">
                                         ✓
                                     </div>
-                                    <span class="text-[11px] font-bold text-slate-400">Order Placed</span>
+                                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Placed</span>
                                 </div>
                                 <!-- Step 2: Cancelled -->
-                                <div class="flex flex-col items-center gap-2 relative z-10">
-                                    <div class="w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center text-xs font-bold ring-4 ring-rose-500/20">
+                                <div class="flex flex-col items-center gap-2.5 relative z-10">
+                                    <div class="w-10 h-10 rounded-full bg-rose-500 text-white flex items-center justify-center text-xs font-bold ring-4 ring-rose-500/20 shadow-lg shadow-rose-500/10">
                                         ✕
                                     </div>
-                                    <span class="text-[11px] font-bold text-rose-400">Cancelled</span>
+                                    <span class="text-[11px] font-bold text-rose-400 uppercase tracking-wide">Cancelled</span>
                                 </div>
                             </template>
 
                             <template v-else>
-                                <!-- Step 1: Pending (Order Placed) -->
-                                <div class="flex flex-col items-center gap-2 relative z-10">
+                                <!-- Step 1: Placed -->
+                                <div class="flex flex-col items-center gap-2.5 relative z-10">
                                     <div 
-                                        class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
-                                        :class="order.status.toLowerCase() !== 'pending' 
-                                            ? 'bg-indigo-500 text-white ring-4 ring-indigo-500/20' 
-                                            : 'bg-indigo-600 text-white ring-4 ring-indigo-500/30 animate-pulse'"
+                                        class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg"
+                                        :class="getStatusStep(order.status) > 1
+                                            ? 'bg-indigo-500 text-white ring-4 ring-indigo-500/20 shadow-indigo-500/10' 
+                                            : 'bg-indigo-600 text-white ring-4 ring-indigo-500/30 animate-pulse shadow-indigo-600/20'"
                                     >
-                                        ✓
+                                        <span v-if="getStatusStep(order.status) > 1" class="text-xs font-bold">✓</span>
+                                        <svg v-else class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
                                     </div>
-                                    <span class="text-[11px] font-bold text-slate-300">Placed</span>
+                                    <span class="text-[10px] sm:text-[11px] font-bold tracking-wide uppercase" :class="getStatusStep(order.status) >= 1 ? 'text-indigo-400' : 'text-slate-500'">Placed</span>
                                 </div>
 
-                                <!-- Step 2: Processing (Garment Tailoring/Packing) -->
-                                <div class="flex flex-col items-center gap-2 relative z-10">
+                                <!-- Step 2: Processing -->
+                                <div class="flex flex-col items-center gap-2.5 relative z-10">
                                     <div 
-                                        class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
-                                        :class="order.status.toLowerCase() === 'completed'
-                                            ? 'bg-indigo-500 text-white ring-4 ring-indigo-500/20'
-                                            : order.status.toLowerCase() === 'processing'
-                                            ? 'bg-purple-600 text-white ring-4 ring-purple-600/30 animate-pulse'
-                                            : 'bg-slate-900 text-slate-500 border border-white/10'"
+                                        class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg"
+                                        :class="getStatusStep(order.status) > 2
+                                            ? 'bg-indigo-500 text-white ring-4 ring-indigo-500/20 shadow-indigo-500/10'
+                                            : getStatusStep(order.status) === 2
+                                            ? 'bg-purple-600 text-white ring-4 ring-purple-600/30 animate-pulse shadow-purple-600/20'
+                                            : 'bg-slate-900/90 text-slate-500 border border-white/10'"
                                     >
-                                        <span v-if="order.status.toLowerCase() === 'completed'">✓</span>
-                                        <span v-else>2</span>
+                                        <span v-if="getStatusStep(order.status) > 2" class="text-xs font-bold">✓</span>
+                                        <svg v-else class="w-4.5 h-4.5" :class="{'animate-spin [animation-duration:8s]': getStatusStep(order.status) === 2}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
                                     </div>
                                     <span 
-                                        class="text-[11px] font-bold"
-                                        :class="order.status.toLowerCase() === 'processing' || order.status.toLowerCase() === 'completed' ? 'text-slate-300' : 'text-slate-500'"
+                                        class="text-[10px] sm:text-[11px] font-bold tracking-wide uppercase"
+                                        :class="getStatusStep(order.status) >= 2 ? 'text-purple-400' : 'text-slate-500'"
                                     >
                                         Processing
                                     </span>
                                 </div>
 
-                                <!-- Step 3: Completed (Delivered) -->
-                                <div class="flex flex-col items-center gap-2 relative z-10">
+                                <!-- Step 3: Packing -->
+                                <div class="flex flex-col items-center gap-2.5 relative z-10">
                                     <div 
-                                        class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
-                                        :class="order.status.toLowerCase() === 'completed'
-                                            ? 'bg-emerald-500 text-white ring-4 ring-emerald-500/20'
-                                            : 'bg-slate-900 text-slate-500 border border-white/10'"
+                                        class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg"
+                                        :class="getStatusStep(order.status) > 3
+                                            ? 'bg-indigo-500 text-white ring-4 ring-indigo-500/20 shadow-indigo-500/10'
+                                            : getStatusStep(order.status) === 3
+                                            ? 'bg-pink-600 text-white ring-4 ring-pink-600/30 animate-pulse shadow-pink-600/20'
+                                            : 'bg-slate-900/90 text-slate-500 border border-white/10'"
                                     >
-                                        ✓
+                                        <span v-if="getStatusStep(order.status) > 3" class="text-xs font-bold">✓</span>
+                                        <svg v-else class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                        </svg>
                                     </div>
                                     <span 
-                                        class="text-[11px] font-bold"
-                                        :class="order.status.toLowerCase() === 'completed' ? 'text-emerald-400' : 'text-slate-500'"
+                                        class="text-[10px] sm:text-[11px] font-bold tracking-wide uppercase"
+                                        :class="getStatusStep(order.status) >= 3 ? 'text-pink-400' : 'text-slate-500'"
                                     >
-                                        Completed
+                                        Packing
+                                    </span>
+                                </div>
+
+                                <!-- Step 4: Delivering -->
+                                <div class="flex flex-col items-center gap-2.5 relative z-10">
+                                    <div 
+                                        class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg"
+                                        :class="getStatusStep(order.status) > 4
+                                            ? 'bg-indigo-500 text-white ring-4 ring-indigo-500/20 shadow-indigo-500/10'
+                                            : getStatusStep(order.status) === 4
+                                            ? 'bg-blue-600 text-white ring-4 ring-blue-600/30 animate-pulse shadow-blue-600/20'
+                                            : 'bg-slate-900/90 text-slate-500 border border-white/10'"
+                                    >
+                                        <span v-if="getStatusStep(order.status) > 4" class="text-xs font-bold">✓</span>
+                                        <svg v-else class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V14a1 1 0 00-1-1H13" />
+                                        </svg>
+                                    </div>
+                                    <span 
+                                        class="text-[10px] sm:text-[11px] font-bold tracking-wide uppercase"
+                                        :class="getStatusStep(order.status) >= 4 ? 'text-blue-400' : 'text-slate-500'"
+                                    >
+                                        Delivering
+                                    </span>
+                                </div>
+
+                                <!-- Step 5: Completed / Delivered -->
+                                <div class="flex flex-col items-center gap-2.5 relative z-10">
+                                    <div 
+                                        class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg"
+                                        :class="getStatusStep(order.status) >= 5
+                                            ? 'bg-emerald-500 text-white ring-4 ring-emerald-500/20 shadow-emerald-500/20 shadow-lg'
+                                            : 'bg-slate-900/90 text-slate-500 border border-white/10'"
+                                    >
+                                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <span 
+                                        class="text-[10px] sm:text-[11px] font-bold tracking-wide uppercase"
+                                        :class="getStatusStep(order.status) >= 5 ? 'text-emerald-400' : 'text-slate-500'"
+                                    >
+                                        {{ order.status.toLowerCase() === 'delivered' ? 'Delivered' : 'Completed' }}
                                     </span>
                                 </div>
                             </template>
@@ -322,9 +404,24 @@ const getItemImage = (item) => {
                                     Processing - Cannot Cancel
                                 </span>
                             </div>
+                            <div v-else-if="order.status.toLowerCase() === 'packing'" class="text-right">
+                                <span class="inline-block px-3 py-1.5 rounded-lg bg-pink-500/10 border border-pink-500/20 text-pink-400/70 text-[10px] font-bold uppercase tracking-wider">
+                                    Packing - Cannot Cancel
+                                </span>
+                            </div>
+                            <div v-else-if="order.status.toLowerCase() === 'shipping'" class="text-right">
+                                <span class="inline-block px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400/70 text-[10px] font-bold uppercase tracking-wider">
+                                    Delivering - Cannot Cancel
+                                </span>
+                            </div>
+                            <div v-else-if="order.status.toLowerCase() === 'delivered'" class="text-right">
+                                <span class="inline-block px-3 py-1.5 rounded-lg bg-teal-500/10 border border-teal-500/20 text-teal-400/70 text-[10px] font-bold uppercase tracking-wider">
+                                    Delivered - Cannot Cancel
+                                </span>
+                            </div>
                             <div v-else-if="order.status.toLowerCase() === 'completed'" class="text-right">
                                 <span class="inline-block px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400/70 text-[10px] font-bold uppercase tracking-wider">
-                                    Delivered - Order Closed
+                                    Completed - Order Closed
                                 </span>
                             </div>
                             <div v-else-if="order.status.toLowerCase() === 'cancelled'" class="text-right">
@@ -347,6 +444,8 @@ const getItemImage = (item) => {
                 <Link href="/" class="glass-button-primary px-6 py-2.5 text-xs rounded-full mt-2 inline-block">Explore Shop</Link>
             </div>
         </main>
+
+        <Footer />
 
         <!-- Custom Confirmation Modal -->
         <div 

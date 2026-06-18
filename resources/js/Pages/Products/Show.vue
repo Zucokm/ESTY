@@ -3,6 +3,7 @@ import { Head, Link, useForm, usePage, router } from '@inertiajs/vue3';
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useCart } from '@/Composables/useCart';
 import { useWishlist } from '@/Composables/useWishlist';
+import Footer from '@/Components/Footer.vue';
 
 const props = defineProps({
     product: {
@@ -12,7 +13,7 @@ const props = defineProps({
 });
 
 const { cart, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal } = useCart();
-const { wishlist, toggleWishlist, isInWishlist, wishlistCount } = useWishlist();
+const { wishlist, toggleWishlist, removeFromWishlist, isInWishlist, wishlistCount } = useWishlist();
 
 const showWishlistDrawer = ref(false);
 
@@ -251,7 +252,7 @@ const submitCheckout = () => {
 <template>
     <Head :title="`${product.name} - ESTY`" />
 
-    <div class="min-h-screen relative overflow-hidden pb-20 selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div class="min-h-screen relative overflow-hidden selection:bg-indigo-500/30 selection:text-indigo-200">
         
         <!-- Top Success Toast Alert -->
         <div 
@@ -403,7 +404,9 @@ const submitCheckout = () => {
                                         :class="selectedColor === color ? 'border-indigo-500 scale-110 shadow-lg shadow-indigo-500/20' : 'border-white/10 hover:border-white/30'"
                                         :title="color"
                                     >
-                                        <span :style="getColorStyle(color)" class="w-7 h-7 rounded-full inline-block border border-white/10"></span>
+                                        <span class="w-7 h-7 rounded-full inline-flex border border-white/10 overflow-hidden">
+                                            <span :style="getColorStyle(color)" class="w-full h-full block"></span>
+                                        </span>
                                     </button>
                                 </div>
                             </div>
@@ -773,7 +776,8 @@ const submitCheckout = () => {
                 </Transition>
             </div>
         </div>
-
+        
+        <Footer />
     </div>
 </template>
 

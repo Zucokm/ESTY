@@ -509,9 +509,10 @@ const submit = () => {
                                         <div class="flex items-center gap-2 truncate">
                                             <span 
                                                 v-if="variant.color" 
-                                                :style="getColorStyle(variant.color)" 
-                                                class="w-5 h-5 rounded-full inline-block border border-white/20 shrink-0 shadow-inner"
-                                            ></span>
+                                                class="w-5 h-5 rounded-full inline-flex border border-white/20 shrink-0 shadow-inner overflow-hidden"
+                                            >
+                                                <span :style="getColorStyle(variant.color)" class="w-full h-full block"></span>
+                                            </span>
                                             <span class="truncate text-slate-200">{{ variant.color || 'Select Colors' }}</span>
                                         </div>
                                         <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
