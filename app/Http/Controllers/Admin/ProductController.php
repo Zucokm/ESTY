@@ -57,8 +57,7 @@ class ProductController extends Controller
             'slug' => 'required|string|unique:products,slug',
             'description' => 'nullable|string',
             'base_price' => 'required|numeric|min:0',
-            'images' => 'nullable|array',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:4096',
+            'color_images' => 'nullable|array',
             'variants' => 'required|array|min:1',
             'variants.*.size' => 'required|string|max:50',
             'variants.*.color' => 'required|string|max:50',
@@ -87,14 +86,21 @@ class ProductController extends Controller
             ]);
         }
 
-        // Process images
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $file) {
-                $path = $file->store('products', 'public');
-                $product->images()->create([
-                    'image_path' => '/storage/' . $path,
-                    'is_primary' => $index === 0,
-                ]);
+        // Process color-grouped images
+        if ($request->file('color_images')) {
+            $isFirstImage = true;
+            foreach ($request->file('color_images') as $color => $files) {
+                if (is_array($files)) {
+                    foreach ($files as $index => $file) {
+                        $path = $file->store('products', 'public');
+                        $product->images()->create([
+                            'image_path' => '/storage/' . $path,
+                            'color' => $color === 'general_unspecified' ? null : $color,
+                            'is_primary' => $isFirstImage,
+                        ]);
+                        $isFirstImage = false;
+                    }
+                }
             }
         }
 
@@ -127,8 +133,11 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'required|string|unique:products,slug,' . $product->id,
             'description' => 'nullable|string',
-            'images' => 'nullable|array',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:4096',
+            'color_images' => 'nullable|array',
+            'existing_image_colors' => 'nullable|array',
+            'existing_image_colors.*' => 'nullable|string',
+            'deleted_image_ids' => 'nullable|array',
+            'deleted_image_ids.*' => 'integer',
             'base_price' => 'required|numeric|min:0',
             'variants' => 'required|array|min:1',
             'variants.*.id' => 'nullable|integer',
@@ -139,9 +148,6 @@ class ProductController extends Controller
             'variants.*.additional_price' => 'required|numeric|min:0',
         ]);
 
-        // Laravel forms don't support files with PUT method natively, 
-        // so Inertia redirects edit files via standard POST with _method=PUT.
-        // This validates successfully here.
         $product->update([
             'category_id' => $validated['category_id'],
             'name' => $validated['name'],
@@ -183,14 +189,38 @@ class ProductController extends Controller
         // Delete variants that were removed in the UI
         $product->variants()->whereNotIn('id', $savedVariantIds)->delete();
 
-        // Process new images
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $file) {
-                $path = $file->store('products', 'public');
-                $product->images()->create([
-                    'image_path' => '/storage/' . $path,
-                    'is_primary' => !$product->images()->where('is_primary', true)->exists() && $index === 0,
+        // Process deleted images
+        if (!empty($validated['deleted_image_ids'])) {
+            $imagesToDelete = $product->images()->whereIn('id', $validated['deleted_image_ids'])->get();
+            foreach ($imagesToDelete as $img) {
+                $filePath = str_replace('/storage/', '', $img->image_path);
+                Storage::disk('public')->delete($filePath);
+                $img->delete();
+            }
+        }
+
+        // Update colors for existing images
+        if (!empty($validated['existing_image_colors'])) {
+            foreach ($validated['existing_image_colors'] as $imgId => $color) {
+                $product->images()->where('id', $imgId)->update([
+                    'color' => $color === 'general_unspecified' ? null : $color
                 ]);
+            }
+        }
+
+        // Process new color-grouped images
+        if ($request->file('color_images')) {
+            foreach ($request->file('color_images') as $color => $files) {
+                if (is_array($files)) {
+                    foreach ($files as $index => $file) {
+                        $path = $file->store('products', 'public');
+                        $product->images()->create([
+                            'image_path' => '/storage/' . $path,
+                            'color' => $color === 'general_unspecified' ? null : $color,
+                            'is_primary' => !$product->images()->where('is_primary', true)->exists() && $index === 0,
+                        ]);
+                    }
+                }
             }
         }
 

@@ -7,7 +7,10 @@ if (typeof window !== 'undefined') {
     const savedCart = localStorage.getItem('verone_cart');
     if (savedCart) {
         try {
-            cart.value = JSON.parse(savedCart);
+            const parsed = JSON.parse(savedCart);
+            cart.value = Array.isArray(parsed)
+                ? parsed.filter(item => item && item.name && item.variant_id)
+                : [];
         } catch (e) {
             console.error('Failed to parse cart storage', e);
         }
@@ -21,14 +24,17 @@ watch(cart, (newCart) => {
 
 export function useCart() {
     
-    const addToCart = (product, variant, quantity = 1) => {
+    const addToCart = (product, variant, quantity = 1, customImage = null) => {
         const existingItem = cart.value.find(item => item.variant_id === variant.id);
         
         if (existingItem) {
             existingItem.quantity += quantity;
+            if (customImage) {
+                existingItem.image = customImage;
+            }
         } else {
             const price = parseFloat(product.base_price) + parseFloat(variant.additional_price || 0);
-            const image = product.images && product.images.length > 0 ? product.images[0].image_path : null;
+            const image = customImage || (product.images && product.images.length > 0 ? product.images[0].image_path : null);
             
             cart.value.push({
                 product_id: product.id,

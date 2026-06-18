@@ -89,33 +89,80 @@ const checkoutForm = useForm({
     items: []
 });
 
-// Helper color swatches map for clothing tags
 const colorMap = {
-    oatmeal: 'bg-[#e5dcd3]',
-    charcoal: 'bg-[#2f3542]',
-    navy: 'bg-[#1e272e]',
-    black: 'bg-[#111111]',
-    sage: 'bg-[#a3b19b]',
-    beige: 'bg-[#d2b48c]',
-    khaki: 'bg-[#c3b091]',
-    gray: 'bg-[#718093]',
-    white: 'bg-[#f5f6fa]',
-    olive: 'bg-[#57606f]',
-    rose: 'bg-[#fda7df]',
-    red: 'bg-[#ff7675]',
-    blue: 'bg-[#74b9ff]',
-    green: 'bg-[#55efc4]',
+    oatmeal: '#e5dcd3',
+    charcoal: '#2f3542',
+    navy: '#1e272e',
+    black: '#111111',
+    sage: '#a3b19b',
+    beige: '#d2b48c',
+    khaki: '#c3b091',
+    gray: '#718093',
+    grey: '#718093',
+    white: '#f5f6fa',
+    olive: '#57606f',
+    rose: '#fda7df',
+    red: '#ff7675',
+    blue: '#74b9ff',
+    green: '#55efc4',
+    pink: '#ff80ab',
+    yellow: '#feca57',
+    orange: '#ff9f43',
+    purple: '#9c27b0',
+    brown: '#8d6e63',
+    cream: '#fffdd0',
+    tan: '#d2b48c',
+    maroon: '#800000',
+    burgundy: '#800020',
+    teal: '#008080',
+    lavender: '#e6e6fa',
+    mustard: '#e1ad01',
+    camel: '#c19a6b',
+    coral: '#ff7f50',
+    sand: '#c2b280',
+    mint: '#98ff98',
+    indigo: '#4b0082',
+    violet: '#ee82ee',
+    plum: '#dda0dd',
+    magenta: '#ff00ff',
+    gold: '#ffd700',
+    silver: '#c0c0c0',
+    sky: '#87ceeb',
+    emerald: '#50c878',
+    apricot: '#fbceb1',
+    peach: '#ffcba4',
+    rust: '#b7410e',
+    turquoise: '#40e0d0',
+    cyan: '#00ffff',
+    forest: '#228b22',
 };
 
-const getColorClass = (colorName) => {
-    if (!colorName) return 'bg-slate-500';
-    const norm = colorName.toLowerCase().trim();
-    for (const key in colorMap) {
-        if (norm.includes(key)) {
-            return colorMap[key];
-        }
+const getColorStyle = (colorName) => {
+    if (!colorName) return { backgroundColor: '#718093' };
+    
+    const getHex = (name) => {
+        const norm = name.toLowerCase().trim();
+        const foundKey = Object.keys(colorMap).find(key => key === norm || norm.includes(key));
+        return foundKey ? colorMap[foundKey] : norm;
+    };
+
+    const parts = colorName.split('/').map(p => p.trim()).filter(p => p !== '');
+    if (parts.length === 0) return { backgroundColor: '#718093' };
+    if (parts.length === 1) return { backgroundColor: getHex(parts[0]) };
+    
+    const hexes = parts.map(getHex);
+    if (hexes.length === 2) {
+        return { background: `linear-gradient(135deg, ${hexes[0]} 50%, ${hexes[1]} 50%)` };
     }
-    return 'bg-slate-500';
+    if (hexes.length === 3) {
+        return { background: `conic-gradient(${hexes[0]} 120deg, ${hexes[1]} 120deg 240deg, ${hexes[2]} 240deg)` };
+    }
+    if (hexes.length === 4) {
+        return { background: `conic-gradient(${hexes[0]} 90deg, ${hexes[1]} 90deg 180deg, ${hexes[2]} 180deg 270deg, ${hexes[3]} 270deg)` };
+    }
+    const step = 360 / hexes.length;
+    const conicParts = hexes.map((hex, i) => `${hex} ${i * step}deg ${(i + 1) * step}deg`);
+    return { background: `conic-gradient(${conicParts.join(', ')})` };
 };
 
 const getUniqueSizes = (variants) => {
@@ -128,13 +175,62 @@ const getUniqueColors = (variants) => {
     return [...new Set(variants.map(v => v.color))];
 };
 
+const selectedProductColors = ref({});
+
+const getActiveProductImage = (product) => {
+    const selectedColor = selectedProductColors.value[product.id];
+    if (selectedColor && product.images) {
+        const normalizedColor = selectedColor.toLowerCase().trim();
+        
+        // 1. Try to find image with explicit color match first (case-insensitive)
+        let matchingImage = product.images.find(img => 
+            img.color && img.color.toLowerCase().trim() === normalizedColor
+        );
+        
+        // 2. Fallback to substring matching on path
+        if (!matchingImage) {
+            matchingImage = product.images.find(img => 
+                img.image_path && img.image_path.toLowerCase().includes(normalizedColor)
+            );
+        }
+        
+        if (matchingImage) return matchingImage.image_path;
+        
+        // 3. Fallback to index-based matching
+        const colors = getUniqueColors(product.variants);
+        const colorIndex = colors.indexOf(selectedColor);
+        if (colorIndex !== -1 && product.images[colorIndex]) {
+            return product.images[colorIndex].image_path;
+        }
+    }
+    return product.images && product.images.length > 0 ? product.images[0].image_path : null;
+};
+
+const getActiveColor = (product) => {
+    if (selectedProductColors.value[product.id]) {
+        return selectedProductColors.value[product.id];
+    }
+    const colors = getUniqueColors(product.variants);
+    return colors[0] || null;
+};
+
+const setProductColor = (productId, color) => {
+    selectedProductColors.value[productId] = color;
+};
+
 // Modal Interaction
 const openProductModal = (product) => {
     selectedProduct.value = product;
     const sizes = getUniqueSizes(product.variants);
     const colors = getUniqueColors(product.variants);
     selectedSize.value = sizes[0] || '';
-    selectedColor.value = colors[0] || '';
+    
+    // Carry over selected color from card, or fallback to first color
+    const currentCardColor = selectedProductColors.value[product.id];
+    selectedColor.value = currentCardColor && colors.includes(currentCardColor) 
+        ? currentCardColor 
+        : (colors[0] || '');
+        
     showSelectionModal.value = true;
 };
 
@@ -144,6 +240,37 @@ const selectedVariant = computed(() => {
     return selectedProduct.value.variants.find(
         v => v.size === selectedSize.value && v.color === selectedColor.value
     );
+});
+
+// Computes the active image for the selection modal based on selected color
+const modalProductImage = computed(() => {
+    if (!selectedProduct.value) return null;
+    const color = selectedColor.value;
+    if (color && selectedProduct.value.images) {
+        const normalizedColor = color.toLowerCase().trim();
+        
+        // 1. Try to find image with explicit color match first (case-insensitive)
+        let matchingImage = selectedProduct.value.images.find(img => 
+            img.color && img.color.toLowerCase().trim() === normalizedColor
+        );
+        
+        // 2. Fallback to substring matching on path
+        if (!matchingImage) {
+            matchingImage = selectedProduct.value.images.find(img => 
+                img.image_path && img.image_path.toLowerCase().includes(normalizedColor)
+            );
+        }
+        
+        if (matchingImage) return matchingImage.image_path;
+        
+        // 3. Fallback to index-based matching
+        const colorsList = getUniqueColors(selectedProduct.value.variants);
+        const colorIndex = colorsList.indexOf(color);
+        if (colorIndex !== -1 && selectedProduct.value.images[colorIndex]) {
+            return selectedProduct.value.images[colorIndex].image_path;
+        }
+    }
+    return selectedProduct.value.images && selectedProduct.value.images.length > 0 ? selectedProduct.value.images[0].image_path : null;
 });
 
 // Calculate variant-specific price (base + additional)
@@ -156,7 +283,7 @@ const variantPrice = computed(() => {
 
 const handleAddToCart = () => {
     if (selectedProduct.value && selectedVariant.value) {
-        addToCart(selectedProduct.value, selectedVariant.value, 1);
+        addToCart(selectedProduct.value, selectedVariant.value, 1, modalProductImage.value);
         showSelectionModal.value = false;
         showCartDrawer.value = true;
     }
@@ -402,7 +529,7 @@ const submitCheckout = () => {
                     <div class="relative aspect-[4/5] rounded-[2rem] overflow-hidden mb-4 bg-slate-900/40">
                         <img 
                             v-if="product.images && product.images.length > 0"
-                            :src="product.images[0].image_path" 
+                            :src="getActiveProductImage(product)" 
                             :alt="product.name" 
                             class="w-full h-full object-cover object-top transition-transform duration-700 ease-in-out group-hover:scale-110"
                         />
@@ -456,13 +583,17 @@ const submitCheckout = () => {
                         <div class="flex items-center justify-between mt-auto pt-4 border-t border-white/[0.06]">
                             <!-- Color Swatches -->
                             <div class="flex items-center gap-1.5">
-                                <div 
+                                <button 
                                     v-for="(color, cIdx) in getUniqueColors(product.variants)" 
                                     :key="cIdx"
-                                    :class="getColorClass(color)" 
-                                    class="w-3.5 h-3.5 rounded-full ring-1 ring-white/20 cursor-pointer hover:scale-125 transition-transform"
+                                    @click.stop.prevent="setProductColor(product.id, color)"
+                                    :style="getColorStyle(color)"
+                                    :class="[
+                                        getActiveColor(product) === color ? 'ring-2 ring-indigo-400 scale-125 z-10' : 'ring-1 ring-white/20 hover:scale-110'
+                                    ]" 
+                                    class="w-3.5 h-3.5 rounded-full transition-transform focus:outline-none"
                                     :title="color"
-                                ></div>
+                                ></button>
                             </div>
 
                             <!-- Sizes List -->
@@ -509,8 +640,8 @@ const submitCheckout = () => {
                 <!-- Left: Image Area -->
                 <div class="md:w-1/2 relative bg-slate-900/60 aspect-[4/5] md:aspect-auto">
                     <img 
-                        v-if="selectedProduct.images && selectedProduct.images.length > 0" 
-                        :src="selectedProduct.images[0].image_path" 
+                        v-if="modalProductImage" 
+                        :src="modalProductImage" 
                         class="w-full h-full object-cover object-top"
                     />
                     <div v-else class="w-full h-full flex items-center justify-center text-slate-600 bg-slate-950">
@@ -574,7 +705,7 @@ const submitCheckout = () => {
                                     :class="[selectedColor === color ? 'bg-white/[0.08] border-white/30 text-white' : 'bg-white/[0.03] border-white/10 text-slate-400 hover:bg-white/[0.08]']"
                                     class="px-4 py-2 text-xs font-bold rounded-xl border flex items-center gap-2 transition-all duration-200"
                                 >
-                                    <span :class="getColorClass(color)" class="w-3.5 h-3.5 rounded-full ring-1 ring-white/20"></span>
+                                    <span :style="getColorStyle(color)" class="w-3.5 h-3.5 rounded-full ring-1 ring-white/20 border border-white/10"></span>
                                     {{ color }}
                                 </button>
                             </div>
@@ -649,7 +780,7 @@ const submitCheckout = () => {
                                 <div class="w-16 h-20 rounded-xl overflow-hidden bg-slate-900 shrink-0">
                                     <img v-if="item.image" :src="item.image" class="w-full h-full object-cover" />
                                     <div v-else class="w-full h-full flex items-center justify-center bg-indigo-500/10 text-indigo-300 text-xs font-bold uppercase">
-                                        {{ item.name.charAt(0) }}
+                                        {{ item.name ? item.name.charAt(0) : '' }}
                                     </div>
                                 </div>
 

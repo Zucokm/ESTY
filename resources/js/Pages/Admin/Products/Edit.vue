@@ -18,7 +18,94 @@ const props = defineProps({
 });
 
 const showProfileDropdown = ref(false);
-const imagePreviews = ref([]);
+const imagePreviews = ref({});
+const openDropdownIndex = ref(null);
+
+import { computed } from 'vue';
+
+const presetColors = [
+    { name: 'Oatmeal', hex: '#e5dcd3' },
+    { name: 'Charcoal', hex: '#2f3542' },
+    { name: 'Navy', hex: '#1e272e' },
+    { name: 'Black', hex: '#111111' },
+    { name: 'Sage', hex: '#a3b19b' },
+    { name: 'Beige', hex: '#d2b48c' },
+    { name: 'Khaki', hex: '#c3b091' },
+    { name: 'Gray', hex: '#718093' },
+    { name: 'White', hex: '#f5f6fa' },
+    { name: 'Olive', hex: '#57606f' },
+    { name: 'Rose', hex: '#fda7df' },
+    { name: 'Red', hex: '#ff7675' },
+    { name: 'Blue', hex: '#74b9ff' },
+    { name: 'Green', hex: '#55efc4' },
+    { name: 'Pink', hex: '#ff80ab' },
+    { name: 'Yellow', hex: '#feca57' },
+    { name: 'Orange', hex: '#ff9f43' },
+    { name: 'Purple', hex: '#9c27b0' },
+    { name: 'Brown', hex: '#8d6e63' },
+    { name: 'Cream', hex: '#fffdd0' },
+    { name: 'Tan', hex: '#d2b48c' },
+    { name: 'Maroon', hex: '#800000' },
+    { name: 'Burgundy', hex: '#800020' },
+    { name: 'Teal', hex: '#008080' },
+    { name: 'Lavender', hex: '#e6e6fa' },
+    { name: 'Mustard', hex: '#e1ad01' },
+    { name: 'Camel', hex: '#c19a6b' },
+    { name: 'Coral', hex: '#ff7f50' },
+    { name: 'Sand', hex: '#c2b280' },
+    { name: 'Mint', hex: '#98ff98' },
+    { name: 'Indigo', hex: '#4b0082' },
+    { name: 'Violet', hex: '#ee82ee' },
+    { name: 'Plum', hex: '#dda0dd' },
+    { name: 'Magenta', hex: '#ff00ff' },
+    { name: 'Gold', hex: '#ffd700' },
+    { name: 'Silver', hex: '#c0c0c0' },
+    { name: 'Sky Blue', hex: '#87ceeb' },
+    { name: 'Emerald', hex: '#50c878' }
+];
+
+const getColorStyle = (colorName) => {
+    if (!colorName) return { backgroundColor: '#334155' };
+    
+    const getHex = (name) => {
+        const norm = name.toLowerCase().trim();
+        const found = presetColors.find(c => c.name.toLowerCase().trim() === norm);
+        return found ? found.hex : norm;
+    };
+
+    const parts = colorName.split('/').map(p => p.trim()).filter(p => p !== '');
+    if (parts.length === 0) return { backgroundColor: '#334155' };
+    if (parts.length === 1) return { backgroundColor: getHex(parts[0]) };
+    
+    const hexes = parts.map(getHex);
+    if (hexes.length === 2) {
+        return { background: `linear-gradient(135deg, ${hexes[0]} 50%, ${hexes[1]} 50%)` };
+    }
+    if (hexes.length === 3) {
+        return { background: `conic-gradient(${hexes[0]} 120deg, ${hexes[1]} 120deg 240deg, ${hexes[2]} 240deg)` };
+    }
+    if (hexes.length === 4) {
+        return { background: `conic-gradient(${hexes[0]} 90deg, ${hexes[1]} 90deg 180deg, ${hexes[2]} 180deg 270deg, ${hexes[3]} 270deg)` };
+    }
+    const step = 360 / hexes.length;
+    const conicParts = hexes.map((hex, i) => `${hex} ${i * step}deg ${(i + 1) * step}deg`);
+    return { background: `conic-gradient(${conicParts.join(', ')})` };
+};
+
+const toggleColorInVariant = (variant, colorName) => {
+    if (!variant.selected_colors) {
+        variant.selected_colors = [];
+    }
+    const idx = variant.selected_colors.indexOf(colorName);
+    if (idx === -1) {
+        if (variant.selected_colors.length < 4) {
+            variant.selected_colors.push(colorName);
+        }
+    } else {
+        variant.selected_colors.splice(idx, 1);
+    }
+    variant.color = variant.selected_colors.join(' / ');
+};
 
 // Form Setup: uses PUT spoofing for file upload support on edit
 const form = useForm({
@@ -28,17 +115,36 @@ const form = useForm({
     slug: props.product.slug || '',
     description: props.product.description || '',
     base_price: props.product.base_price || '',
-    images: [],
+    color_images: {},
+    existing_image_colors: props.product.images
+        ? props.product.images.reduce((acc, img) => {
+            acc[img.id] = img.color || 'general_unspecified';
+            return acc;
+          }, {})
+        : {},
+    deleted_image_ids: [],
     variants: props.product.variants && props.product.variants.length > 0 
         ? props.product.variants.map(v => ({
             id: v.id,
             size: v.size,
             color: v.color,
+            selected_colors: v.color ? v.color.split(' / ').map(c => c.trim()) : [],
             stock_quantity: v.stock_quantity,
             sku: v.sku,
             additional_price: v.additional_price
           }))
-        : [{ size: 'M', color: '', stock_quantity: 10, sku: '', additional_price: 0.00 }]
+        : [{ size: 'M', color: '', selected_colors: [], stock_quantity: 10, sku: '', additional_price: 0.00 }]
+});
+
+// Extract unique colors defined in variants list
+const uniqueColors = computed(() => {
+    const colorsSet = new Set();
+    form.variants.forEach(v => {
+        if (v.color && v.color.trim() !== '') {
+            colorsSet.add(v.color.trim());
+        }
+    });
+    return Array.from(colorsSet);
 });
 
 // Auto-generate slug from name
@@ -50,21 +156,30 @@ watch(() => form.name, (newName) => {
         .replace(/-+/g, '-'); // collapse dashes
 });
 
-// Handle Multiple Image Upload Previews
-const handleImageUpload = (event) => {
+// Handle Multiple Image Upload Previews grouped by color
+const handleImageUpload = (event, colorKey) => {
     const files = event.target.files;
-    form.images = Array.from(files);
+    form.color_images[colorKey] = Array.from(files);
     
-    // Clear old previews
-    imagePreviews.value = [];
+    // Clear old previews for this color key
+    imagePreviews.value[colorKey] = [];
     
     // Generate new previews
     for (let i = 0; i < files.length; i++) {
         const reader = new FileReader();
         reader.onload = (e) => {
-            imagePreviews.value.push(e.target.result);
+            if (!imagePreviews.value[colorKey]) {
+                imagePreviews.value[colorKey] = [];
+            }
+            imagePreviews.value[colorKey].push(e.target.result);
         };
         reader.readAsDataURL(files[i]);
+    }
+};
+
+const deleteExistingImage = (imageId) => {
+    if (!form.deleted_image_ids.includes(imageId)) {
+        form.deleted_image_ids.push(imageId);
     }
 };
 
@@ -73,6 +188,7 @@ const addVariant = () => {
     form.variants.push({
         size: 'M',
         color: '',
+        selected_colors: [],
         stock_quantity: 10,
         sku: '',
         additional_price: 0.00
@@ -90,7 +206,7 @@ const submit = () => {
     form.post(route('products.update', props.product.id), {
         forceFormData: true,
         onSuccess: () => {
-            imagePreviews.value = [];
+            imagePreviews.value = {};
         }
     });
 };
@@ -311,48 +427,99 @@ const submit = () => {
 
                     <!-- Section 1.5: Image Uploads -->
                     <div class="glass-card p-6 sm:p-8 space-y-6">
-                        <h2 class="text-lg font-bold text-white tracking-tight border-b border-white/[0.06] pb-3">Section 1.5: Product Images</h2>
+                        <h2 class="text-lg font-bold text-white tracking-tight border-b border-white/[0.06] pb-3">Section 1.5: Product Images (Color Grouped)</h2>
                         
                         <!-- Existing database images list -->
-                        <div v-if="product.images && product.images.length > 0" class="space-y-2">
+                        <div v-if="product.images && product.images.length > 0" class="space-y-4">
                             <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider ml-1">Current Active Images</span>
-                            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                 <div 
                                     v-for="img in product.images" 
                                     :key="img.id" 
-                                    class="relative aspect-square rounded-2xl overflow-hidden border border-white/5 bg-slate-950"
+                                    v-show="!form.deleted_image_ids.includes(img.id)"
+                                    class="p-3 rounded-2xl bg-white/[0.02] border border-white/[0.05] flex gap-4 items-center"
                                 >
-                                    <img :src="img.image_path" class="w-full h-full object-cover" />
-                                    <span v-if="img.is_primary" class="absolute top-2 left-2 bg-emerald-500 text-white font-bold text-[8px] uppercase tracking-wider px-2 py-0.5 rounded-full shadow-md">
-                                        Primary
-                                    </span>
+                                    <div class="relative w-16 h-16 rounded-xl overflow-hidden border border-white/10 shrink-0 bg-slate-950">
+                                        <img :src="img.image_path" class="w-full h-full object-cover" />
+                                    </div>
+                                    <div class="flex-1 space-y-2">
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Image Color Association</label>
+                                        <select 
+                                            v-model="form.existing_image_colors[img.id]"
+                                            class="glass-input text-xs py-1.5 px-2.5"
+                                        >
+                                            <option value="general_unspecified">General / Cover Image</option>
+                                            <option v-for="color in uniqueColors" :key="color" :value="color">{{ color }}</option>
+                                        </select>
+                                    </div>
+                                    <button 
+                                        type="button"
+                                        @click="deleteExistingImage(img.id)"
+                                        class="h-8 w-8 flex items-center justify-center rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition-all shrink-0"
+                                    >
+                                        ✕
+                                    </button>
                                 </div>
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 ml-1">Upload New Images (Appends to list)</label>
-                            <input 
-                                type="file" 
-                                multiple 
-                                @change="handleImageUpload" 
-                                class="glass-input file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-indigo-600/20 file:text-indigo-200 hover:file:bg-indigo-600/30"
-                                accept="image/*"
-                            />
-                            <span v-if="form.errors.images" class="text-xs text-rose-400 mt-1 block ml-1">{{ form.errors.images }}</span>
-                        </div>
+                        <!-- New image uploads -->
+                        <div class="space-y-4 border-t border-white/[0.06] pt-6">
+                            <h3 class="text-sm font-semibold text-white ml-1">Upload New Images</h3>
+                            
+                            <!-- General images -->
+                            <div class="space-y-4 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2 ml-1">New General / Cover Images (No Specific Color)</label>
+                                    <input 
+                                        type="file" 
+                                        multiple 
+                                        @change="handleImageUpload($event, 'general_unspecified')" 
+                                        class="glass-input file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-indigo-600/20 file:text-indigo-200 hover:file:bg-indigo-600/30"
+                                        accept="image/*"
+                                    />
+                                </div>
+                                <div v-if="imagePreviews['general_unspecified'] && imagePreviews['general_unspecified'].length > 0" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                                    <div 
+                                        v-for="(preview, idx) in imagePreviews['general_unspecified']" 
+                                        :key="idx" 
+                                        class="relative aspect-square rounded-2xl overflow-hidden border border-white/10 group bg-slate-950"
+                                    >
+                                        <img :src="preview" class="w-full h-full object-cover" />
+                                        <span class="absolute top-2 left-2 bg-indigo-500 text-white font-bold text-[8px] uppercase tracking-wider px-2 py-0.5 rounded-full shadow-md">
+                                            New Cover
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <!-- Preview Area for new images -->
-                        <div v-if="imagePreviews.length > 0" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
-                            <div 
-                                v-for="(preview, idx) in imagePreviews" 
-                                :key="idx" 
-                                class="relative aspect-square rounded-2xl overflow-hidden border border-white/10 group bg-slate-950"
-                            >
-                                <img :src="preview" class="w-full h-full object-cover" />
-                                <span class="absolute top-2 left-2 bg-indigo-500 text-white font-bold text-[8px] uppercase tracking-wider px-2 py-0.5 rounded-full shadow-md">
-                                    New Image
-                                </span>
+                            <!-- Color specific images -->
+                            <div v-if="uniqueColors.length > 0" class="space-y-4 mt-6">
+                                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">New Images by Variant Color</h4>
+                                <div v-for="color in uniqueColors" :key="color" class="space-y-4 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+                                    <div>
+                                        <label class="block text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2 ml-1">New Images for Color: {{ color }}</label>
+                                        <input 
+                                            type="file" 
+                                            multiple 
+                                            @change="handleImageUpload($event, color)" 
+                                            class="glass-input file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-indigo-600/20 file:text-indigo-200 hover:file:bg-indigo-600/30"
+                                            accept="image/*"
+                                        />
+                                    </div>
+                                    <div v-if="imagePreviews[color] && imagePreviews[color].length > 0" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                                        <div 
+                                            v-for="(preview, idx) in imagePreviews[color]" 
+                                            :key="idx" 
+                                            class="relative aspect-square rounded-2xl overflow-hidden border border-white/10 group bg-slate-950"
+                                        >
+                                            <img :src="preview" class="w-full h-full object-cover" />
+                                            <span class="absolute top-2 left-2 bg-purple-500 text-white font-bold text-[8px] uppercase tracking-wider px-2 py-0.5 rounded-full shadow-md">
+                                                New {{ color }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -396,16 +563,45 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <!-- Color Input -->
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Color</label>
-                                    <input 
-                                        type="text" 
-                                        v-model="variant.color" 
-                                        class="glass-input text-sm py-2 px-3" 
-                                        placeholder="Charcoal"
-                                        required
-                                    />
+                                <!-- Color Selection Dropdown -->
+                                <div class="relative">
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Color (Select up to 4)</label>
+                                    <button 
+                                        type="button"
+                                        @click="openDropdownIndex = (openDropdownIndex === index ? null : index)"
+                                        class="glass-input text-sm py-2 px-3 flex items-center justify-between gap-2 text-left min-h-[42px] w-full"
+                                    >
+                                        <div class="flex items-center gap-2 truncate">
+                                            <span 
+                                                v-if="variant.color" 
+                                                :style="getColorStyle(variant.color)" 
+                                                class="w-5 h-5 rounded-full inline-block border border-white/20 shrink-0 shadow-inner"
+                                            ></span>
+                                            <span class="truncate text-slate-200">{{ variant.color || 'Select Colors' }}</span>
+                                        </div>
+                                        <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+
+                                    <!-- Dropdown list -->
+                                    <div 
+                                        v-if="openDropdownIndex === index" 
+                                        class="absolute left-0 right-0 bottom-full mb-2 max-h-60 overflow-y-auto glass-card border-white/10 shadow-2xl p-1.5 rounded-2xl z-50 flex flex-col gap-0.5 bg-[#121620]"
+                                    >
+                                        <div 
+                                            v-for="preset in presetColors" 
+                                            :key="preset.name"
+                                            @click="toggleColorInVariant(variant, preset.name)"
+                                            class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/[0.05] cursor-pointer transition-colors"
+                                        >
+                                            <div class="flex items-center gap-2">
+                                                <span :style="{ backgroundColor: preset.hex }" class="w-4.5 h-4.5 rounded-full border border-white/10"></span>
+                                                <span>{{ preset.name }}</span>
+                                            </div>
+                                            <span class="text-indigo-400 font-bold" v-if="variant.selected_colors && variant.selected_colors.includes(preset.name)">✓</span>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Stock Qty Input -->

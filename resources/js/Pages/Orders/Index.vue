@@ -34,18 +34,37 @@ const formatDate = (dateStr) => {
     });
 };
 
-const cancelOrder = (orderId) => {
-    if (confirm('Are you sure you want to cancel this order? This will restore the garment variants stock inventory.')) {
-        router.post(route('orders.cancel', orderId));
+const activeCancelOrderId = ref(null);
+
+const confirmCancel = (orderId) => {
+    activeCancelOrderId.value = orderId;
+};
+
+const cancelOrder = () => {
+    if (activeCancelOrderId.value) {
+        router.post(route('orders.cancel', activeCancelOrderId.value), {}, {
+            onSuccess: () => {
+                activeCancelOrderId.value = null;
+            }
+        });
     }
 };
 
-const canCancel = (order) => {
-    if (order.status.toLowerCase() !== 'pending') return false;
-    const createdTime = new Date(order.created_at).getTime();
-    const now = new Date().getTime();
-    const minutesPassed = (now - createdTime) / 60000;
-    return minutesPassed <= 30;
+const getItemImage = (item) => {
+    if (!item.product || !item.product.images || item.product.images.length === 0) return null;
+    if (item.variant && item.variant.color) {
+        const color = item.variant.color.toLowerCase().trim();
+        // 1. Try exact color match
+        let matched = item.product.images.find(img => img.color && img.color.toLowerCase().trim() === color);
+        // 2. Try substring match
+        if (!matched) {
+            matched = item.product.images.find(img => img.image_path && img.image_path.toLowerCase().includes(color));
+        }
+        if (matched) return matched.image_path;
+    }
+    // Fallback to primary image or first image
+    const primary = item.product.images.find(img => img.is_primary);
+    return primary ? primary.image_path : item.product.images[0].image_path;
 };
 </script>
 
@@ -245,12 +264,12 @@ const canCancel = (order) => {
                             <!-- Image -->
                             <div class="w-12 h-16 rounded-lg overflow-hidden bg-slate-900 shrink-0 border border-white/5">
                                 <img 
-                                    v-if="item.product?.images && item.product.images.length > 0" 
-                                    :src="item.product.images[0].image_path" 
+                                    v-if="getItemImage(item)" 
+                                    :src="getItemImage(item)" 
                                     class="w-full h-full object-cover object-top" 
                                 />
                                 <div v-else class="w-full h-full flex items-center justify-center bg-indigo-500/10 text-indigo-300 text-xs font-bold">
-                                    {{ item.product?.name.charAt(0) }}
+                                    {{ item.product?.name ? item.product.name.charAt(0) : '' }}
                                 </div>
                             </div>
 
@@ -277,14 +296,43 @@ const canCancel = (order) => {
                             <span>{{ order.shipping_address }} &bull; {{ order.phone }}</span>
                         </div>
                         
-                        <!-- Cancellation button -->
-                        <button 
-                            v-if="canCancel(order)"
-                            @click="cancelOrder(order.id)"
-                            class="px-5 py-2.5 rounded-xl border border-rose-500/20 bg-rose-500/10 hover:bg-rose-500 hover:text-white text-rose-400 active:scale-95 text-xs font-semibold tracking-wide transition-all"
-                        >
-                            Cancel Order
-                        </button>
+                        <!-- Cancellation Controls -->
+                        <div class="flex flex-col sm:items-end gap-2 shrink-0">
+                            <!-- Cancellable button -->
+                            <div v-if="order.is_cancellable" class="flex flex-col sm:items-end gap-1.5">
+                                <button 
+                                    @click="confirmCancel(order.id)"
+                                    class="px-5 py-2.5 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500 hover:text-white text-rose-400 hover:shadow-lg hover:shadow-rose-500/20 active:scale-95 text-xs font-bold tracking-wide transition-all"
+                                >
+                                    Cancel Order
+                                </button>
+                                <span class="text-[10px] font-bold text-rose-400/80 tracking-wide uppercase">
+                                    Cancellable for next {{ order.cancellation_minutes_remaining }} mins
+                                </span>
+                            </div>
+
+                            <!-- Non-cancellable reasons -->
+                            <div v-else-if="order.status.toLowerCase() === 'pending'" class="text-right">
+                                <span class="inline-block px-3 py-1.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400/70 text-[10px] font-bold uppercase tracking-wider">
+                                    Cancel Window Closed (30m limit)
+                                </span>
+                            </div>
+                            <div v-else-if="order.status.toLowerCase() === 'processing'" class="text-right">
+                                <span class="inline-block px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400/70 text-[10px] font-bold uppercase tracking-wider">
+                                    Processing - Cannot Cancel
+                                </span>
+                            </div>
+                            <div v-else-if="order.status.toLowerCase() === 'completed'" class="text-right">
+                                <span class="inline-block px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400/70 text-[10px] font-bold uppercase tracking-wider">
+                                    Delivered - Order Closed
+                                </span>
+                            </div>
+                            <div v-else-if="order.status.toLowerCase() === 'cancelled'" class="text-right">
+                                <span class="inline-block px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/10 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
+                                    Cancelled & Stock Restored
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -299,5 +347,37 @@ const canCancel = (order) => {
                 <Link href="/" class="glass-button-primary px-6 py-2.5 text-xs rounded-full mt-2 inline-block">Explore Shop</Link>
             </div>
         </main>
+
+        <!-- Custom Confirmation Modal -->
+        <div 
+            v-if="activeCancelOrderId !== null"
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md"
+        >
+            <div class="glass-card w-full max-w-md border-white/10 shadow-2xl p-6 sm:p-8 rounded-[2rem] text-center space-y-6 transform scale-100 transition-all duration-300">
+                <div class="w-14 h-14 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mx-auto text-xl">
+                    ⚠️
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-lg font-bold text-white tracking-tight">Cancel this order?</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Are you sure you want to cancel order #VR-{{ activeCancelOrderId }}? This action will restore the stock inventory for the items and cannot be undone.
+                    </p>
+                </div>
+                <div class="flex items-center gap-3 pt-2">
+                    <button 
+                        @click="activeCancelOrderId = null"
+                        class="flex-1 glass-button py-3 px-6 rounded-xl font-bold text-xs"
+                    >
+                        Keep Order
+                    </button>
+                    <button 
+                        @click="cancelOrder"
+                        class="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs py-3 px-6 rounded-xl hover:shadow-lg hover:shadow-rose-500/25 active:scale-95 transition-all duration-200"
+                    >
+                        Confirm Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>

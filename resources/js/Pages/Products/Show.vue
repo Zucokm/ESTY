@@ -1,6 +1,6 @@
 <script setup>
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { Head, Link, useForm, usePage, router } from '@inertiajs/vue3';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useCart } from '@/Composables/useCart';
 import { useWishlist } from '@/Composables/useWishlist';
 
@@ -16,6 +16,21 @@ const { wishlist, toggleWishlist, isInWishlist, wishlistCount } = useWishlist();
 
 const showWishlistDrawer = ref(false);
 
+// Escape Key Navigation
+const handleKeyDown = (event) => {
+    if (event.key === 'Escape') {
+        router.visit('/');
+    }
+};
+
+onMounted(() => {
+    window.addEventListener('keydown', handleKeyDown);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('keydown', handleKeyDown);
+});
+
 // Image Gallery
 const activeImageIndex = ref(0);
 const activeImageUrl = computed(() => {
@@ -24,6 +39,18 @@ const activeImageUrl = computed(() => {
     }
     return null;
 });
+
+// Handle Thumbnail Click to also update color selection
+const handleThumbnailClick = (img, idx) => {
+    activeImageIndex.value = idx;
+    if (img.color) {
+        // Ensure color exists in unique colors list before selecting it
+        const matchedColor = colors.find(c => c.toLowerCase().trim() === img.color.toLowerCase().trim());
+        if (matchedColor) {
+            selectedColor.value = matchedColor;
+        }
+    }
+};
 
 // Selection States
 const getUniqueSizes = (variants) => {
@@ -43,6 +70,34 @@ const selectedSize = ref(sizes[0] || '');
 const selectedColor = ref(colors[0] || '');
 const quantity = ref(1);
 
+watch(selectedColor, (newColor) => {
+    if (newColor && props.product.images) {
+        const normalizedNewColor = newColor.toLowerCase().trim();
+        
+        // 1. Try to find image with explicit color match first (case-insensitive)
+        let idx = props.product.images.findIndex(img => 
+            img.color && img.color.toLowerCase().trim() === normalizedNewColor
+        );
+        
+        // 2. Fallback to substring matching on path
+        if (idx === -1) {
+            idx = props.product.images.findIndex(img => 
+                img.image_path && img.image_path.toLowerCase().includes(normalizedNewColor)
+            );
+        }
+        
+        // 3. Fallback to index-based matching
+        if (idx !== -1) {
+            activeImageIndex.value = idx;
+        } else {
+            const colorIndex = colors.indexOf(newColor);
+            if (colorIndex !== -1 && props.product.images[colorIndex]) {
+                activeImageIndex.value = colorIndex;
+            }
+        }
+    }
+}, { immediate: true });
+
 // Cart Drawer States
 const showCartDrawer = ref(false);
 const checkoutStep = ref('cart'); // 'cart' or 'checkout'
@@ -57,33 +112,80 @@ const checkoutForm = useForm({
     items: []
 });
 
-// Helper color swatches map for clothing tags
 const colorMap = {
-    oatmeal: 'bg-[#e5dcd3]',
-    charcoal: 'bg-[#2f3542]',
-    navy: 'bg-[#1e272e]',
-    black: 'bg-[#111111]',
-    sage: 'bg-[#a3b19b]',
-    beige: 'bg-[#d2b48c]',
-    khaki: 'bg-[#c3b091]',
-    gray: 'bg-[#718093]',
-    white: 'bg-[#f5f6fa]',
-    olive: 'bg-[#57606f]',
-    rose: 'bg-[#fda7df]',
-    red: 'bg-[#ff7675]',
-    blue: 'bg-[#74b9ff]',
-    green: 'bg-[#55efc4]',
+    oatmeal: '#e5dcd3',
+    charcoal: '#2f3542',
+    navy: '#1e272e',
+    black: '#111111',
+    sage: '#a3b19b',
+    beige: '#d2b48c',
+    khaki: '#c3b091',
+    gray: '#718093',
+    grey: '#718093',
+    white: '#f5f6fa',
+    olive: '#57606f',
+    rose: '#fda7df',
+    red: '#ff7675',
+    blue: '#74b9ff',
+    green: '#55efc4',
+    pink: '#ff80ab',
+    yellow: '#feca57',
+    orange: '#ff9f43',
+    purple: '#9c27b0',
+    brown: '#8d6e63',
+    cream: '#fffdd0',
+    tan: '#d2b48c',
+    maroon: '#800000',
+    burgundy: '#800020',
+    teal: '#008080',
+    lavender: '#e6e6fa',
+    mustard: '#e1ad01',
+    camel: '#c19a6b',
+    coral: '#ff7f50',
+    sand: '#c2b280',
+    mint: '#98ff98',
+    indigo: '#4b0082',
+    violet: '#ee82ee',
+    plum: '#dda0dd',
+    magenta: '#ff00ff',
+    gold: '#ffd700',
+    silver: '#c0c0c0',
+    sky: '#87ceeb',
+    emerald: '#50c878',
+    apricot: '#fbceb1',
+    peach: '#ffcba4',
+    rust: '#b7410e',
+    turquoise: '#40e0d0',
+    cyan: '#00ffff',
+    forest: '#228b22',
 };
 
-const getColorClass = (colorName) => {
-    if (!colorName) return 'bg-slate-500';
-    const norm = colorName.toLowerCase().trim();
-    for (const key in colorMap) {
-        if (norm.includes(key)) {
-            return colorMap[key];
-        }
+const getColorStyle = (colorName) => {
+    if (!colorName) return { backgroundColor: '#718093' };
+    
+    const getHex = (name) => {
+        const norm = name.toLowerCase().trim();
+        const foundKey = Object.keys(colorMap).find(key => key === norm || norm.includes(key));
+        return foundKey ? colorMap[foundKey] : norm;
+    };
+
+    const parts = colorName.split('/').map(p => p.trim()).filter(p => p !== '');
+    if (parts.length === 0) return { backgroundColor: '#718093' };
+    if (parts.length === 1) return { backgroundColor: getHex(parts[0]) };
+    
+    const hexes = parts.map(getHex);
+    if (hexes.length === 2) {
+        return { background: `linear-gradient(135deg, ${hexes[0]} 50%, ${hexes[1]} 50%)` };
     }
-    return 'bg-slate-500';
+    if (hexes.length === 3) {
+        return { background: `conic-gradient(${hexes[0]} 120deg, ${hexes[1]} 120deg 240deg, ${hexes[2]} 240deg)` };
+    }
+    if (hexes.length === 4) {
+        return { background: `conic-gradient(${hexes[0]} 90deg, ${hexes[1]} 90deg 180deg, ${hexes[2]} 180deg 270deg, ${hexes[3]} 270deg)` };
+    }
+    const step = 360 / hexes.length;
+    const conicParts = hexes.map((hex, i) => `${hex} ${i * step}deg ${(i + 1) * step}deg`);
+    return { background: `conic-gradient(${conicParts.join(', ')})` };
 };
 
 // Computes the active variant based on size & color choices
@@ -104,18 +206,11 @@ const finalPrice = computed(() => {
 const handleAddToCart = () => {
     if (!selectedVariant.value) return;
     
-    const primaryImg = props.product.images.find(img => img.is_primary) || props.product.images[0];
-    const imagePath = primaryImg ? primaryImg.image_path : null;
-
     addToCart(
-        props.product.id,
-        selectedVariant.value.id,
-        selectedSize.value,
-        selectedColor.value,
+        props.product,
+        selectedVariant.value,
         quantity.value,
-        finalPrice.value,
-        imagePath,
-        props.product.name
+        activeImageUrl.value
     );
 
     // Reset details and open cart drawer
@@ -231,6 +326,16 @@ const submitCheckout = () => {
 
         <!-- Main Product Detail View -->
         <main class="pt-32 px-4 max-w-5xl mx-auto relative z-10">
+            <!-- Back to Shop Link -->
+            <div class="mb-6 flex justify-start">
+                <Link href="/" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-white transition-all group">
+                    <svg class="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Shop <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-[10px] font-mono border border-white/10 ml-1">Esc</kbd>
+                </Link>
+            </div>
+
             <div class="glass-card p-6 md:p-10 rounded-[3rem] border-white/10 grid grid-cols-1 md:grid-cols-2 gap-10">
                 
                 <!-- Left: Image Gallery & Previews -->
@@ -258,7 +363,7 @@ const submitCheckout = () => {
                         <button 
                             v-for="(img, idx) in product.images" 
                             :key="img.id"
-                            @click="activeImageIndex = idx"
+                            @click="handleThumbnailClick(img, idx)"
                             class="w-20 h-24 rounded-xl overflow-hidden bg-slate-900 border transition-all duration-200 shrink-0"
                             :class="activeImageIndex === idx ? 'border-indigo-500 ring-2 ring-indigo-500/20 scale-95' : 'border-white/10 hover:border-white/30'"
                         >
@@ -298,7 +403,7 @@ const submitCheckout = () => {
                                         :class="selectedColor === color ? 'border-indigo-500 scale-110 shadow-lg shadow-indigo-500/20' : 'border-white/10 hover:border-white/30'"
                                         :title="color"
                                     >
-                                        <span :class="getColorClass(color)" class="w-7 h-7 rounded-full inline-block"></span>
+                                        <span :style="getColorStyle(color)" class="w-7 h-7 rounded-full inline-block border border-white/10"></span>
                                     </button>
                                 </div>
                             </div>
@@ -436,7 +541,7 @@ const submitCheckout = () => {
                                 <div class="w-16 h-20 rounded-xl overflow-hidden bg-slate-900 shrink-0">
                                     <img v-if="item.image" :src="item.image" class="w-full h-full object-cover" />
                                     <div v-else class="w-full h-full flex items-center justify-center bg-indigo-500/10 text-indigo-300 text-xs font-bold uppercase">
-                                        {{ item.name.charAt(0) }}
+                                        {{ item.name ? item.name.charAt(0) : '' }}
                                     </div>
                                 </div>
 
@@ -616,7 +721,7 @@ const submitCheckout = () => {
                                 <Link :href="route('products.show', item.slug)" @click="showWishlistDrawer = false" class="w-16 h-20 rounded-xl overflow-hidden bg-slate-900 shrink-0 block">
                                     <img v-if="item.images && item.images.length > 0" :src="item.images[0].image_path" class="w-full h-full object-cover object-top" />
                                     <div v-else class="w-full h-full flex items-center justify-center bg-indigo-500/10 text-indigo-300 text-xs font-bold uppercase">
-                                        {{ item.name.charAt(0) }}
+                                        {{ item.name ? item.name.charAt(0) : '' }}
                                     </div>
                                 </Link>
 

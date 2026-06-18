@@ -9,9 +9,7 @@ use App\Models\Product;
 use App\Models\Category;
 
 Route::get('/', function () {
-    $products = Product::with(['category', 'variants', 'images' => function ($query) {
-        $query->where('is_primary', true);
-    }])->where('is_active', true)->latest()->get();
+    $products = Product::with(['category', 'variants', 'images'])->where('is_active', true)->latest()->get();
 
     $categories = Category::all();
 

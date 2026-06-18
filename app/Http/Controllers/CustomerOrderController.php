@@ -22,6 +22,13 @@ class CustomerOrderController extends Controller
             ->latest()
             ->get();
 
+        // Append cancellation properties on backend to avoid timezone/clock mismatch bugs
+        $orders->each(function ($order) {
+            $minutesPassed = $order->created_at->diffInMinutes(now());
+            $order->is_cancellable = $order->status === 'pending' && $minutesPassed <= 30;
+            $order->cancellation_minutes_remaining = max(0, 30 - $minutesPassed);
+        });
+
         return Inertia::render('Orders/Index', [
             'orders' => $orders
         ]);
