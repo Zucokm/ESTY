@@ -9,6 +9,7 @@ use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 class HomepageController extends Controller
 {
@@ -71,6 +72,7 @@ class HomepageController extends Controller
 
         HeroSlide::create($validated);
 
+        Cache::forget('esty_active_slides');
         return redirect()->back()->with('success', 'Hero slide created successfully.');
     }
 
@@ -106,6 +108,7 @@ class HomepageController extends Controller
 
         $slide->update($validated);
 
+        Cache::forget('esty_active_slides');
         return redirect()->back()->with('success', 'Hero slide updated successfully.');
     }
 
@@ -124,6 +127,7 @@ class HomepageController extends Controller
 
         $slide->delete();
 
+        Cache::forget('esty_active_slides');
         return redirect()->back()->with('success', 'Hero slide deleted successfully.');
     }
 
@@ -150,6 +154,7 @@ class HomepageController extends Controller
 
         Lookbook::create($validated);
 
+        Cache::forget('esty_active_lookbooks');
         return redirect()->back()->with('success', 'Lookbook card created successfully.');
     }
 
@@ -183,6 +188,7 @@ class HomepageController extends Controller
 
         $lookbook->update($validated);
 
+        Cache::forget('esty_active_lookbooks');
         return redirect()->back()->with('success', 'Lookbook card updated successfully.');
     }
 
@@ -200,6 +206,7 @@ class HomepageController extends Controller
 
         $lookbook->delete();
 
+        Cache::forget('esty_active_lookbooks');
         return redirect()->back()->with('success', 'Lookbook card deleted successfully.');
     }
 
@@ -239,6 +246,7 @@ class HomepageController extends Controller
             Setting::set('brand_story_image', '/storage/' . $path);
         }
 
+        Cache::forget('esty_homepage_settings');
         return redirect()->back()->with('success', 'Brand philosophy settings updated successfully.');
     }
 }

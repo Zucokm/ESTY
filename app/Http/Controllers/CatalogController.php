@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Category;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Cache;
 
 class CatalogController extends Controller
 {
@@ -14,8 +15,12 @@ class CatalogController extends Controller
      */
     public function index(): Response
     {
-        $products = Product::with(['category', 'variants', 'images'])->where('is_active', true)->latest()->get();
-        $categories = Category::all();
+        $products = Cache::rememberForever('esty_active_products', function () {
+            return Product::with(['category', 'variants', 'images'])->where('is_active', true)->latest()->get();
+        });
+        $categories = Cache::rememberForever('esty_all_categories', function () {
+            return Category::all();
+        });
         
         return Inertia::render('Products/Index', [
             'products' => $products,

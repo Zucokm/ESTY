@@ -7,6 +7,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class CategoryController extends Controller
@@ -45,6 +46,8 @@ class CategoryController extends Controller
             'description' => $validated['description'] ?? '',
             'image_path' => $imagePath,
         ]);
+
+        Cache::forget('esty_all_categories');
 
         // If it's an AJAX request (like our "+ New" quick modal), return JSON.
         // Otherwise, redirect back.
@@ -86,6 +89,7 @@ class CategoryController extends Controller
             'image_path' => $imagePath,
         ]);
 
+        Cache::forget('esty_all_categories');
         return redirect()->back()->with('success', 'Category updated successfully.');
     }
 
@@ -108,6 +112,7 @@ class CategoryController extends Controller
 
         $category->delete();
 
+        Cache::forget('esty_all_categories');
         return redirect()->back()->with('success', 'Category deleted successfully.');
     }
 }

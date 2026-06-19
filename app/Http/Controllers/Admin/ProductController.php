@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
 {
@@ -58,6 +59,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'base_price' => 'required|numeric|min:0',
             'color_images' => 'nullable|array',
+            'color_images.*.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:10240',
             'variants' => 'required|array|min:1',
             'variants.*.size' => 'required|string|max:50',
             'variants.*.color' => 'required|string|max:50',
@@ -104,6 +106,7 @@ class ProductController extends Controller
             }
         }
 
+        Cache::forget('esty_active_products');
         return redirect()->route('admin.products.index')->with('success', 'Product, variants and images created successfully.');
     }
 
@@ -134,6 +137,7 @@ class ProductController extends Controller
             'slug' => 'required|string|unique:products,slug,' . $product->id,
             'description' => 'nullable|string',
             'color_images' => 'nullable|array',
+            'color_images.*.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:10240',
             'existing_image_colors' => 'nullable|array',
             'existing_image_colors.*' => 'nullable|string',
             'deleted_image_ids' => 'nullable|array',
@@ -224,6 +228,7 @@ class ProductController extends Controller
             }
         }
 
+        Cache::forget('esty_active_products');
         return redirect()->route('admin.products.index')->with('success', 'Product and variants updated successfully.');
     }
 
@@ -237,6 +242,7 @@ class ProductController extends Controller
             'is_active' => !$product->is_active
         ]);
 
+        Cache::forget('esty_active_products');
         return redirect()->back()->with('success', 'Product status toggled successfully.');
     }
 }
