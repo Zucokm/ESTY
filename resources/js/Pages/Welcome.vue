@@ -4,6 +4,7 @@ import { ref, computed } from 'vue';
 import { useCart } from '@/Composables/useCart';
 import { useWishlist } from '@/Composables/useWishlist';
 import Footer from '@/Components/Footer.vue';
+import HeroCarousel from '@/Components/HeroCarousel.vue';
 
 const props = defineProps({
     canLogin: {
@@ -26,6 +27,18 @@ const props = defineProps({
     },
     categories: {
         type: Array,
+        required: true,
+    },
+    heroSlides: {
+        type: Array,
+        required: true,
+    },
+    lookbooks: {
+        type: Array,
+        required: true,
+    },
+    settings: {
+        type: Object,
         required: true,
     }
 });
@@ -410,30 +423,56 @@ const submitCheckout = () => {
             </nav>
         </div>
 
-        <!-- Hero Section -->
-        <section class="pt-36 pb-16 px-4 max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
-            <!-- Premium Badge -->
-            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-md mb-8">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span class="text-xs font-semibold tracking-wider text-slate-300 uppercase">Autumn / Winter '26 Collection</span>
-            </div>
-            
-            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6 max-w-4xl leading-tight">
-                Designed for Comfort. <br/>
-                <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-200 via-purple-300 to-pink-200">Crafted for Excellence.</span>
-            </h1>
-            
-            <p class="text-lg md:text-xl text-slate-400 max-w-2xl mb-10 font-medium leading-relaxed">
-                Discover clean images, premium Myanmar fabrics, and timeless styles designed to enhance your everyday wear.
-            </p>
+        <!-- Hero Slideshow Carousel Section -->
+        <HeroCarousel :slides="heroSlides" />
 
-            <div class="flex gap-4">
-                <a href="#shop" class="glass-button-primary px-8 py-3.5 text-base font-semibold rounded-full hover:scale-105 transition-transform">
-                    Explore Shop
-                </a>
-                <a href="#" class="glass-button px-8 py-3.5 text-base font-semibold rounded-full hover:bg-white/[0.12] transition-colors">
-                    Learn More
-                </a>
+        <!-- Value Highlights Banner -->
+        <section class="py-12 border-b border-white/[0.04] bg-white/[0.01] relative z-10">
+            <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center text-indigo-400 shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-bold text-xs sm:text-sm tracking-wide uppercase">Free Express Shipping</h4>
+                        <p class="text-slate-400 text-xs mt-1">On all domestic orders over $150.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center text-purple-400 shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.25" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-bold text-xs sm:text-sm tracking-wide uppercase">Easy Returns</h4>
+                        <p class="text-slate-400 text-xs mt-1">30-day effortless swap collection service.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center text-pink-400 shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-bold text-xs sm:text-sm tracking-wide uppercase">Organic Cotton</h4>
+                        <p class="text-slate-400 text-xs mt-1">100% sustainably grown in Myanmar.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center text-teal-400 shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-bold text-xs sm:text-sm tracking-wide uppercase">Bespoke Adjustments</h4>
+                        <p class="text-slate-400 text-xs mt-1">Tailored customization for select products.</p>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -611,6 +650,81 @@ const submitCheckout = () => {
                         </div>
                     </div>
                 </Link>
+            </div>
+        </section>
+
+        <!-- Featured Collections Lookbook Section -->
+        <section class="py-20 px-6 max-w-7xl mx-auto relative z-10 border-t border-white/[0.04]">
+            <div class="text-center mb-16">
+                <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Seasonal Lookbook</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-2">Curated Style Guides</h2>
+                <p class="text-slate-400 text-sm mt-2 font-medium max-w-lg mx-auto">Explore editorial drops and streetwear essentials curated for the AW26 collection.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div 
+                    v-for="item in lookbooks" 
+                    :key="item.id" 
+                    class="group relative h-[450px] rounded-3xl overflow-hidden border border-white/[0.06] shadow-2xl flex flex-col justify-end p-8 bg-slate-950"
+                >
+                    <div class="absolute inset-0 w-full h-full overflow-hidden">
+                        <img 
+                            :src="item.image_path" 
+                            :alt="item.title" 
+                            class="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
+                    </div>
+                    <div class="relative z-10 space-y-3">
+                        <span class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest bg-indigo-500/10 px-2.5 py-1 rounded-full border border-indigo-500/20">
+                            {{ item.badge }}
+                        </span>
+                        <h3 class="text-2xl font-extrabold text-white tracking-tight">{{ item.title }}</h3>
+                        <p class="text-slate-300 text-xs sm:text-sm max-w-xs leading-relaxed">{{ item.description }}</p>
+                        <a :href="item.cta_link || '#shop'" class="glass-button text-xs font-bold px-5 py-2.5 rounded-full inline-block hover:bg-white/[0.12] transition-colors mt-2">
+                            {{ item.cta_text || 'Explore Lookbook' }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Brand Story Editorial Section -->
+        <section class="py-24 px-6 max-w-7xl mx-auto relative z-10 border-t border-white/[0.04]">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+                <!-- Left Editorial Text -->
+                <div class="lg:col-span-7 space-y-6 flex flex-col justify-center text-center lg:text-left">
+                    <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Our Philosophy</span>
+                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight" v-html="settings.brand_story_title"></h2>
+                    <p class="text-slate-400 text-sm sm:text-base leading-relaxed max-w-xl mx-auto lg:mx-0">
+                        {{ settings.brand_story_text_1 }}
+                    </p>
+                    <p class="text-slate-500 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto lg:mx-0">
+                        {{ settings.brand_story_text_2 }}
+                    </p>
+                    <div class="pt-4">
+                        <div class="flex items-center gap-6 justify-center lg:justify-start">
+                            <div>
+                                <span class="block text-2xl font-extrabold text-white">{{ settings.brand_story_stat_1_val }}</span>
+                                <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-1">{{ settings.brand_story_stat_1_lbl }}</span>
+                            </div>
+                            <div class="h-8 w-px bg-white/10"></div>
+                            <div>
+                                <span class="block text-2xl font-extrabold text-white">{{ settings.brand_story_stat_2_val }}</span>
+                                <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-1">{{ settings.brand_story_stat_2_lbl }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Close-up Detail Image -->
+                <div class="lg:col-span-5 relative h-[400px] lg:h-[480px] rounded-3xl overflow-hidden border border-white/[0.06] shadow-2xl bg-slate-950">
+                    <img 
+                        :src="settings.brand_story_image" 
+                        alt="Bespoke Tailoring Details" 
+                        class="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-700"
+                    />
+                </div>
             </div>
         </section>
 
