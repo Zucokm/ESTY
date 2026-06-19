@@ -76,7 +76,7 @@ const categoriesList = computed(() => {
 
 // Reactively filter and sort products
 const filteredProducts = computed(() => {
-    let result = [...props.products];
+    let result = [...(props.products || [])];
 
     // 1. Search Query Filter
     if (searchQuery.value.trim() !== '') {

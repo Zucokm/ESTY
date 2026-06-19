@@ -182,7 +182,7 @@ const getColorStyle = (colorName) => {
 
 // Filtered items logic
 const filteredProducts = computed(() => {
-    let result = [...props.products];
+    let result = [...(props.products || [])];
 
     if (selectedCategoryId.value !== null) {
         result = result.filter(product => product.category_id === selectedCategoryId.value);

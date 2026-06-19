@@ -150,7 +150,7 @@ const getUniqueColors = (variants) => {
 
 // Computed Filtered & Sorted Products
 const filteredProducts = computed(() => {
-    let result = [...props.products];
+    let result = [...(props.products || [])];
 
     // Filter by Category
     if (selectedCategoryId.value !== null) {
