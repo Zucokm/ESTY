@@ -214,7 +214,7 @@ const submitNewCategory = async () => {
 
 const submit = () => {
     // Inertia requires posting raw FormData for file uploads, which useForm handles automatically
-    form.post(route('products.store'), {
+    form.post(route('admin.products.store'), {
         onSuccess: () => {
             form.reset();
             imagePreviews.value = {};
@@ -281,7 +281,7 @@ const submit = () => {
                         <p class="text-slate-400 text-sm font-medium">Create a base catalog item and define its variants.</p>
                     </div>
                     <Link 
-                        :href="route('products.index')" 
+                        :href="route('admin.products.index')" 
                         class="glass-button text-xs py-2.5 px-5 rounded-full"
                     >
                         Back to Inventory
@@ -584,7 +584,7 @@ const submit = () => {
                     <!-- Submit / Form Action -->
                     <div class="flex items-center justify-end gap-4">
                         <Link 
-                            :href="route('products.index')" 
+                            :href="route('admin.products.index')" 
                             class="glass-button py-3 px-6 rounded-xl font-semibold text-sm"
                         >
                             Cancel

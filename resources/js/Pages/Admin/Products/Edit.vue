@@ -240,7 +240,7 @@ const submitNewCategory = async () => {
 
 const submit = () => {
     // We send a POST request with _method=PUT to support multipart file uploads in PHP
-    form.post(route('products.update', props.product.id), {
+    form.post(route('admin.products.update', props.product.id), {
         forceFormData: true,
         onSuccess: () => {
             imagePreviews.value = {};
@@ -307,7 +307,7 @@ const submit = () => {
                         <p class="text-slate-400 text-sm font-medium">Modify base details, variant configurations, and images.</p>
                     </div>
                     <Link 
-                        :href="route('products.index')" 
+                        :href="route('admin.products.index')" 
                         class="glass-button text-xs py-2.5 px-5 rounded-full"
                     >
                         Back to Inventory
@@ -649,7 +649,7 @@ const submit = () => {
                     <!-- Submit / Form Action -->
                     <div class="flex items-center justify-end gap-4">
                         <Link 
-                            :href="route('products.index')" 
+                            :href="route('admin.products.index')" 
                             class="glass-button py-3 px-6 rounded-xl font-semibold text-sm"
                         >
                             Cancel

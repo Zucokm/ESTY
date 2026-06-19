@@ -218,7 +218,7 @@ const toggleSidebar = () => {
                     </div>
                     
                     <Link 
-                        :href="route('products.create')" 
+                        :href="route('admin.products.create')" 
                         class="glass-button-primary flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
                     >
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -472,7 +472,7 @@ const toggleSidebar = () => {
                                     <!-- Actions Column -->
                                     <td class="px-6 py-5 text-right">
                                         <Link 
-                                            :href="route('products.edit', product.id)" 
+                                            :href="route('admin.products.edit', product.id)" 
                                             class="glass-button text-xs py-2 px-4 rounded-xl border border-white/5 hover:border-white/10 hover:bg-white/[0.06] hover:text-white transition-all duration-200 flex items-center gap-1.5 inline-flex"
                                         >
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

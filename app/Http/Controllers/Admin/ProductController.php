@@ -104,7 +104,7 @@ class ProductController extends Controller
             }
         }
 
-        return redirect()->route('products.index')->with('success', 'Product, variants and images created successfully.');
+        return redirect()->route('admin.products.index')->with('success', 'Product, variants and images created successfully.');
     }
 
     /**
@@ -224,7 +224,7 @@ class ProductController extends Controller
             }
         }
 
-        return redirect()->route('products.index')->with('success', 'Product and variants updated successfully.');
+        return redirect()->route('admin.products.index')->with('success', 'Product and variants updated successfully.');
     }
 
     /**

@@ -1,5 +1,5 @@
 <script setup>
-import { Head, useForm, router } from '@inertiajs/vue3';
+import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
 

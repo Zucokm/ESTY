@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['user_id', 'total_amount', 'status', 'shipping_address', 'phone'])]
+#[Fillable(['user_id', 'total_amount', 'status', 'shipping_address', 'phone', 'payment_method'])]
 class Order extends Model
 {
     /**

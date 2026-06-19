@@ -68,7 +68,7 @@ onUnmounted(() => {
             </Link>
 
             <Link 
-                :href="route('products.index')"
+                :href="route('admin.products.index')"
                 :class="[active === 'products' ? 'bg-white/[0.08] text-white shadow-inner border-white/10' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] border-transparent']"
                 class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm border transition-all duration-200"
             >
