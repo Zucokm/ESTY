@@ -22,7 +22,7 @@ watch(cart, (newCart) => {
     localStorage.setItem('verone_cart', JSON.stringify(newCart));
 }, { deep: true });
 
-export function useCart() {
+export function useCartStore() {
     
     const addToCart = (product, variant, quantity = 1, customImage = null) => {
         const existingItem = cart.value.find(item => item.variant_id === variant.id);

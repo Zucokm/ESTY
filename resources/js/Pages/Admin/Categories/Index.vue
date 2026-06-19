@@ -1,7 +1,8 @@
 <script setup>
-import { Head, Link, useForm, usePage, router } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
+import { categoryApi } from '@/Services/api';
 
 const { props: pageProps } = usePage();
 const userName = ref(pageProps.auth.user?.name || 'Admin');
@@ -90,7 +91,7 @@ const submitUpdate = () => {
 
 const deleteCategory = (id) => {
     if (confirm('Are you sure you want to delete this category?')) {
-        router.delete(route('categories.destroy', id));
+        categoryApi.destroy(id);
     }
 };
 

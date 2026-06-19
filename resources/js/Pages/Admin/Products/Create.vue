@@ -176,7 +176,7 @@ const removeVariant = (index) => {
     }
 };
 
-import axios from 'axios';
+import { categoryApi } from '@/Services/api';
 
 const localCategories = ref([...props.categories]);
 const showAddCategoryModal = ref(false);
@@ -192,7 +192,7 @@ const submitNewCategory = async () => {
     categoryError.value = '';
     
     try {
-        const response = await axios.post(route('admin.categories.store'), {
+        const response = await categoryApi.store({
             name: newCategoryName.value,
             description: newCategoryDescription.value
         });

@@ -1,5 +1,5 @@
 <script setup>
-import { useWishlist } from '@/Composables/useWishlist';
+import { useWishlistStore } from '@/Stores/wishlistStore';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -11,7 +11,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'open-product-modal']);
 
-const { wishlist, removeFromWishlist, wishlistCount } = useWishlist();
+const { wishlist, removeFromWishlist, wishlistCount } = useWishlistStore();
 </script>
 
 <template>

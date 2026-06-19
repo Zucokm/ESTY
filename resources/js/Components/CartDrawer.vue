@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { useForm, usePage, Link } from '@inertiajs/vue3';
-import { useCart } from '@/Composables/useCart';
+import { useCartStore } from '@/Stores/cartStore';
 import LoadingOverlay from '@/Components/LoadingOverlay.vue';
 
 const props = defineProps({
@@ -13,7 +13,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'order-success']);
 
-const { cart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal } = useCart();
+const { cart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal } = useCartStore();
 const page = usePage();
 
 const checkoutStep = ref('cart'); // 'cart' or 'checkout'

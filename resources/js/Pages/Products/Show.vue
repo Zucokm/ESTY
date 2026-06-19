@@ -1,8 +1,8 @@
 <script setup>
 import { Head, Link, useForm, usePage, router } from '@inertiajs/vue3';
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { useCart } from '@/Composables/useCart';
-import { useWishlist } from '@/Composables/useWishlist';
+import { useCartStore } from '@/Stores/cartStore';
+import { useWishlistStore } from '@/Stores/wishlistStore';
 import Footer from '@/Components/Footer.vue';
 
 const props = defineProps({
@@ -12,8 +12,8 @@ const props = defineProps({
     }
 });
 
-const { cart, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal } = useCart();
-const { wishlist, toggleWishlist, removeFromWishlist, isInWishlist, wishlistCount } = useWishlist();
+const { cart, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal } = useCartStore();
+const { wishlist, toggleWishlist, removeFromWishlist, isInWishlist, wishlistCount } = useWishlistStore();
 
 const showWishlistDrawer = ref(false);
 

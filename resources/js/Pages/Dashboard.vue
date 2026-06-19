@@ -1,7 +1,8 @@
 <script setup>
-import { Head, Link, usePage, router } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
+import { orderApi } from '@/Services/api';
 
 const { props: pageProps } = usePage();
 const userName = ref(pageProps.auth.user?.name || 'Admin');
@@ -137,7 +138,7 @@ const formatDate = (dateStr) => {
 };
 
 const updateOrderStatus = (orderId, newStatus) => {
-    router.put(route('admin.orders.updateStatus', orderId), {
+    orderApi.updateStatus(orderId, {
         status: newStatus
     }, {
         preserveScroll: true

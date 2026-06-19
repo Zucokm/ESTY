@@ -1,7 +1,8 @@
 <script setup>
-import { Head, Link, usePage, router } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
+import { productApi } from '@/Services/api';
 
 const { props: pageProps } = usePage();
 const userName = ref(pageProps.auth.user?.name || 'Admin');
@@ -124,7 +125,7 @@ const filteredProducts = computed(() => {
 
 // Toggle product active status direct from list
 const toggleProductStatus = (productId) => {
-    router.patch(route('admin.products.toggleStatus', productId), {}, {
+    productApi.toggleStatus(productId, {
         preserveScroll: true
     });
 };

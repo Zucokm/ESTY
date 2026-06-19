@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
-import { useCart } from '@/Composables/useCart';
+import { useCartStore } from '@/Stores/cartStore';
 
 const props = defineProps({
     show: {
@@ -15,7 +15,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'added-success']);
 
-const { addToCart } = useCart();
+const { addToCart } = useCartStore();
 
 const selectedSize = ref('');
 const selectedColor = ref('');

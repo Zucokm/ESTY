@@ -1,7 +1,8 @@
 <script setup>
-import { Head, Link, useForm, router } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
+import { homepageApi } from '@/Services/api';
 
 const props = defineProps({
     slides: {
@@ -121,7 +122,7 @@ const submitSlideForm = () => {
 
 const deleteSlide = (id) => {
     if (confirm('Are you sure you want to delete this hero slide?')) {
-        router.delete(route('admin.homepage.destroySlide', id));
+        homepageApi.destroySlide(id);
     }
 };
 
@@ -175,7 +176,7 @@ const submitLookbookForm = () => {
 
 const deleteLookbook = (id) => {
     if (confirm('Are you sure you want to delete this lookbook promo card?')) {
-        router.delete(route('admin.homepage.destroyLookbook', id));
+        homepageApi.destroyLookbook(id);
     }
 };
 

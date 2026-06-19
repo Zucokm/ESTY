@@ -1,8 +1,8 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import { ref, computed, watch, onMounted } from 'vue';
-import { useCart } from '@/Composables/useCart';
-import { useWishlist } from '@/Composables/useWishlist';
+import { useCartStore } from '@/Stores/cartStore';
+import { useWishlistStore } from '@/Stores/wishlistStore';
 import Footer from '@/Components/Footer.vue';
 import HeroCarousel from '@/Components/HeroCarousel.vue';
 import CartDrawer from '@/Components/CartDrawer.vue';
@@ -83,8 +83,8 @@ onMounted(() => {
     }
 });
 
-const { cartCount } = useCart();
-const { wishlistCount, toggleWishlist, isInWishlist } = useWishlist();
+const { cartCount } = useCartStore();
+const { wishlistCount, toggleWishlist, isInWishlist } = useWishlistStore();
 
 const showWishlistDrawer = ref(false);
 const showCartDrawer = ref(false);

@@ -1,7 +1,8 @@
 <script setup>
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import Footer from '@/Components/Footer.vue';
+import { orderApi } from '@/Services/api';
 
 defineProps({
     orders: {
@@ -70,7 +71,7 @@ const confirmCancel = (orderId) => {
 
 const cancelOrder = () => {
     if (activeCancelOrderId.value) {
-        router.post(route('orders.cancel', activeCancelOrderId.value), {}, {
+        orderApi.cancel(activeCancelOrderId.value, {
             onSuccess: () => {
                 activeCancelOrderId.value = null;
             }

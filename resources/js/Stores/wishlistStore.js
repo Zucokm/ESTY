@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 const wishlist = ref([]);
 
@@ -19,7 +19,7 @@ watch(wishlist, (newWishlist) => {
     localStorage.setItem('esty_wishlist', JSON.stringify(newWishlist));
 }, { deep: true });
 
-export function useWishlist() {
+export function useWishlistStore() {
     const addToWishlist = (product) => {
         if (!wishlist.value.some(p => p.id === product.id)) {
             wishlist.value.push({
@@ -61,6 +61,3 @@ export function useWishlist() {
         wishlistCount
     };
 }
-
-// Helper computed fallback
-import { computed } from 'vue';
