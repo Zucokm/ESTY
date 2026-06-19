@@ -16,7 +16,7 @@ class CatalogController extends Controller
     public function index(): Response
     {
         $products = Cache::rememberForever('esty_active_products', function () {
-            return Product::with(['category', 'variants', 'images'])->where('is_active', true)->latest()->get();
+            return Product::with(['category', 'variants', 'images'])->where('is_active', true)->latest()->get()->values();
         });
         $categories = Cache::rememberForever('esty_all_categories', function () {
             return Category::all();
