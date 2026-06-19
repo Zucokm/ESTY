@@ -23,10 +23,11 @@ class OrderService
         try {
             return DB::transaction(function () use ($data, $userId) {
                 $totalAmount = 0;
+                $verifiedPrices = [];
                 
-                // 1. Lock rows and validate variant stock levels first
+                // 1. Lock rows, validate variant stock levels, and securely resolve prices first
                 foreach ($data['items'] as $itemData) {
-                    $variant = ProductVariant::lockForUpdate()->findOrFail($itemData['variant_id']);
+                    $variant = ProductVariant::with('product')->lockForUpdate()->findOrFail($itemData['variant_id']);
                     
                     if ($variant->stock_quantity < $itemData['quantity']) {
                         throw ValidationException::withMessages([
@@ -34,8 +35,11 @@ class OrderService
                         ]);
                     }
                     
-                    $price = (float) $itemData['price'];
-                    $totalAmount += $price * $itemData['quantity'];
+                    // Securely resolve the product price from the database state
+                    $actualPrice = (float) $variant->product->base_price + (float) ($variant->additional_price ?? 0);
+                    $verifiedPrices[$variant->id] = $actualPrice;
+                    
+                    $totalAmount += $actualPrice * $itemData['quantity'];
                 }
 
                 // 2. Create the Order record
@@ -57,7 +61,7 @@ class OrderService
                         'product_id' => $itemData['product_id'],
                         'variant_id' => $itemData['variant_id'],
                         'quantity' => $itemData['quantity'],
-                        'price' => $itemData['price'],
+                        'price' => $verifiedPrices[$variant->id],
                     ]);
                 }
 

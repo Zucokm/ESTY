@@ -184,4 +184,66 @@ class OrderTest extends TestCase
         $variant->refresh();
         $this->assertEquals(2, $variant->stock_quantity);
     }
+
+    public function test_order_price_spoofing_is_ignored_and_actual_price_used(): void
+    {
+        $user = User::factory()->create(['role' => 'customer']);
+        
+        $category = Category::create([
+            'name' => 'Shirts',
+            'slug' => 'shirts',
+            'description' => 'Fine shirts',
+        ]);
+
+        $product = Product::create([
+            'category_id' => $category->id,
+            'name' => 'Lounge Shirt',
+            'slug' => 'lounge-shirt',
+            'base_price' => 50.00,
+            'is_active' => true,
+        ]);
+
+        $variant = ProductVariant::create([
+            'product_id' => $product->id,
+            'size' => 'M',
+            'color' => 'Sage',
+            'stock_quantity' => 10,
+            'sku' => 'lounge-shirt-sage-m',
+            'additional_price' => 15.00, // Total price: 50.00 + 15.00 = 65.00
+        ]);
+
+        // Attempt price spoofing by claiming the price is 1.00
+        $response = $this
+            ->actingAs($user)
+            ->post(route('checkout.store'), [
+                'shipping_address' => '123 Main St, Yangon',
+                'phone' => '091234567',
+                'payment_method' => 'cod',
+                'items' => [
+                    [
+                        'product_id' => $product->id,
+                        'variant_id' => $variant->id,
+                        'quantity' => 2,
+                        'price' => 1.00, // Spoofed price
+                    ]
+                ]
+            ]);
+
+        $response->assertSessionHasNoErrors();
+        
+        // Assert order created with CORRECT price (65.00 * 2 = 130.00) instead of spoofed price (1.00 * 2 = 2.00)
+        $this->assertDatabaseHas('orders', [
+            'user_id' => $user->id,
+            'total_amount' => 130.00,
+        ]);
+
+        $order = Order::where('user_id', $user->id)->first();
+        
+        // Assert order item has secure resolved price (65.00)
+        $this->assertDatabaseHas('order_items', [
+            'order_id' => $order->id,
+            'variant_id' => $variant->id,
+            'price' => 65.00,
+        ]);
+    }
 }
