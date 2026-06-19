@@ -21,19 +21,19 @@ class HomeController extends Controller
     public function index(): Response
     {
         $products = Cache::rememberForever('esty_active_products', function () {
-            return Product::with(['category', 'variants', 'images'])->where('is_active', true)->latest()->get()->values();
+            return Product::with(['category', 'variants', 'images'])->where('is_active', true)->latest()->get()->values()->toArray();
         });
 
         $categories = Cache::rememberForever('esty_all_categories', function () {
-            return Category::all();
+            return Category::all()->toArray();
         });
         
         $heroSlides = Cache::rememberForever('esty_active_slides', function () {
-            return HeroSlide::where('is_active', true)->orderBy('sort_order')->get();
+            return HeroSlide::where('is_active', true)->orderBy('sort_order')->get()->toArray();
         });
 
         $lookbooks = Cache::rememberForever('esty_active_lookbooks', function () {
-            return Lookbook::where('is_active', true)->orderBy('sort_order')->get();
+            return Lookbook::where('is_active', true)->orderBy('sort_order')->get()->toArray();
         });
         
         $settings = Cache::rememberForever('esty_homepage_settings', function () {

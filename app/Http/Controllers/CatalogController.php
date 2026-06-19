@@ -16,10 +16,10 @@ class CatalogController extends Controller
     public function index(): Response
     {
         $products = Cache::rememberForever('esty_active_products', function () {
-            return Product::with(['category', 'variants', 'images'])->where('is_active', true)->latest()->get()->values();
+            return Product::with(['category', 'variants', 'images'])->where('is_active', true)->latest()->get()->values()->toArray();
         });
         $categories = Cache::rememberForever('esty_all_categories', function () {
-            return Category::all();
+            return Category::all()->toArray();
         });
         
         return Inertia::render('Products/Index', [
