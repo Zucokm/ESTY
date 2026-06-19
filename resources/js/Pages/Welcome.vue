@@ -1,6 +1,6 @@
 <script setup>
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useCart } from '@/Composables/useCart';
 import { useWishlist } from '@/Composables/useWishlist';
 import Footer from '@/Components/Footer.vue';
@@ -332,6 +332,36 @@ const submitCheckout = () => {
         }
     });
 };
+
+onMounted(() => {
+    // Scroll reveal observer initialization
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => {
+        observer.observe(el);
+    });
+
+    if (window.location.hash) {
+        setTimeout(() => {
+            const element = document.querySelector(window.location.hash);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 100);
+    }
+});
 </script>
 
 <template>
@@ -370,6 +400,7 @@ const submitCheckout = () => {
                 <div class="hidden md:flex items-center gap-7">
                     <a href="#" class="text-sm font-semibold text-slate-200 hover:text-white transition-colors duration-200">Home</a>
                     <a href="#shop" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200">Shop</a>
+                    <Link :href="route('projects.index')" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200">Products</Link>
                     <button @click="showWishlistDrawer = true" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200 flex items-center gap-1.5 focus:outline-none">
                         Wishlist
                         <span v-if="wishlistCount > 0" class="px-2 py-0.5 rounded-full text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold">{{ wishlistCount }}</span>
@@ -429,7 +460,7 @@ const submitCheckout = () => {
         <!-- Value Highlights Banner -->
         <section class="py-12 border-b border-white/[0.04] bg-white/[0.01] relative z-10">
             <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-8">
-                <div class="flex items-start gap-4">
+                <div class="flex items-start gap-4 reveal">
                     <div class="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center text-indigo-400 shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -440,7 +471,7 @@ const submitCheckout = () => {
                         <p class="text-slate-400 text-xs mt-1">On all domestic orders over $150.</p>
                     </div>
                 </div>
-                <div class="flex items-start gap-4">
+                <div class="flex items-start gap-4 reveal">
                     <div class="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center text-purple-400 shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.25" />
@@ -451,7 +482,7 @@ const submitCheckout = () => {
                         <p class="text-slate-400 text-xs mt-1">30-day effortless swap collection service.</p>
                     </div>
                 </div>
-                <div class="flex items-start gap-4">
+                <div class="flex items-start gap-4 reveal">
                     <div class="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center text-pink-400 shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
@@ -462,7 +493,7 @@ const submitCheckout = () => {
                         <p class="text-slate-400 text-xs mt-1">100% sustainably grown in Myanmar.</p>
                     </div>
                 </div>
-                <div class="flex items-start gap-4">
+                <div class="flex items-start gap-4 reveal">
                     <div class="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center text-teal-400 shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -476,14 +507,66 @@ const submitCheckout = () => {
             </div>
         </section>
 
+        <!-- Shop by Category Section -->
+        <section class="py-16 px-6 max-w-7xl mx-auto relative z-10 border-b border-white/[0.04] reveal">
+            <div class="mb-10 text-center lg:text-left">
+                <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Collections</span>
+                <h2 class="text-3xl font-extrabold text-white tracking-tight mt-1">Shop by Category</h2>
+                <p class="text-slate-400 text-sm mt-1.5 font-medium">Browse premium garments curated by seasonal collections.</p>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Link 
+                    v-for="category in categories" 
+                    :key="category.id" 
+                    :href="route('projects.index', { category: category.id })"
+                    class="glass-card hover:bg-white/[0.06] hover:border-white/[0.12] hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] group relative aspect-[4/3] rounded-3xl overflow-hidden flex flex-col justify-end p-5 border border-white/5 active:scale-[0.98] transition-all duration-300 cursor-pointer"
+                >
+                    <!-- Background image banner -->
+                    <div class="absolute inset-0 w-full h-full">
+                        <img 
+                            v-if="category.image_path"
+                            :src="category.image_path" 
+                            :alt="category.name"
+                            class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div v-else class="w-full h-full bg-slate-900/60 flex items-center justify-center text-slate-700">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent"></div>
+                    </div>
+                    
+                    <div class="relative z-10">
+                        <h4 class="font-extrabold text-white text-base tracking-tight">{{ category.name }}</h4>
+                        <p class="text-slate-300 text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 line-clamp-1 mt-0.5">
+                            {{ category.description || 'Explore collection' }}
+                        </p>
+                    </div>
+                </Link>
+            </div>
+        </section>
+
         <!-- Product Grid Section -->
         <section id="shop" class="py-16 px-4 max-w-7xl mx-auto relative z-10">
             <!-- Search & Filters -->
             <div class="flex flex-col gap-6 mb-12">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h2 class="text-3xl font-extrabold text-white tracking-tight mb-2">Featured Garments</h2>
-                        <p class="text-slate-400 font-medium">Modern essentials engineered with variant-level precision.</p>
+                        <div class="flex flex-wrap items-center gap-3.5">
+                            <h2 class="text-3xl font-extrabold text-white tracking-tight">Featured Garments</h2>
+                            <Link 
+                                :href="route('projects.index')" 
+                                class="glass-button text-[11px] font-bold py-1.5 px-3.5 rounded-full border border-white/5 text-indigo-400 hover:text-indigo-300 flex items-center gap-1 hover:bg-white/[0.05] transition-all active:scale-[0.97]"
+                            >
+                                View All Products
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </Link>
+                        </div>
+                        <p class="text-slate-400 font-medium mt-1">Modern essentials engineered with variant-level precision.</p>
                     </div>
                     
                     <!-- Search & Sort Controls -->
@@ -651,6 +734,19 @@ const submitCheckout = () => {
                     </div>
                 </Link>
             </div>
+
+            <!-- View All Projects Button (Bottom) -->
+            <div class="flex justify-center mt-14">
+                <Link 
+                    :href="route('projects.index')" 
+                    class="glass-button-primary text-sm font-bold py-3.5 px-8 rounded-full border border-white/10 flex items-center gap-2 hover:scale-[1.03] active:scale-[0.97] transition-all duration-300 shadow-[0_8px_30px_rgba(99,102,241,0.15)] hover:shadow-[0_8px_40px_rgba(99,102,241,0.35)]"
+                >
+                    <span>Explore All Products & Garments</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </Link>
+            </div>
         </section>
 
         <!-- Featured Collections Lookbook Section -->
@@ -663,8 +759,9 @@ const submitCheckout = () => {
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div 
-                    v-for="item in lookbooks" 
+                    v-for="(item, idx) in lookbooks" 
                     :key="item.id" 
+                    :class="[idx % 2 === 0 ? 'reveal-left' : 'reveal-right']"
                     class="group relative h-[450px] rounded-3xl overflow-hidden border border-white/[0.06] shadow-2xl flex flex-col justify-end p-8 bg-slate-950"
                 >
                     <div class="absolute inset-0 w-full h-full overflow-hidden">
@@ -693,7 +790,7 @@ const submitCheckout = () => {
         <section class="py-24 px-6 max-w-7xl mx-auto relative z-10 border-t border-white/[0.04]">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
                 <!-- Left Editorial Text -->
-                <div class="lg:col-span-7 space-y-6 flex flex-col justify-center text-center lg:text-left">
+                <div class="lg:col-span-7 space-y-6 flex flex-col justify-center text-center lg:text-left reveal-left">
                     <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Our Philosophy</span>
                     <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight" v-html="settings.brand_story_title"></h2>
                     <p class="text-slate-400 text-sm sm:text-base leading-relaxed max-w-xl mx-auto lg:mx-0">
@@ -718,7 +815,7 @@ const submitCheckout = () => {
                 </div>
 
                 <!-- Right Close-up Detail Image -->
-                <div class="lg:col-span-5 relative h-[400px] lg:h-[480px] rounded-3xl overflow-hidden border border-white/[0.06] shadow-2xl bg-slate-950">
+                <div class="lg:col-span-5 relative h-[400px] lg:h-[480px] rounded-3xl overflow-hidden border border-white/[0.06] shadow-2xl bg-slate-950 reveal-right">
                     <img 
                         :src="settings.brand_story_image" 
                         alt="Bespoke Tailoring Details" 

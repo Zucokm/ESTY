@@ -31,6 +31,7 @@ defineProps({
                 <div class="hidden md:flex items-center gap-7">
                     <Link href="/" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200">Home</Link>
                     <Link href="/#shop" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200">Shop</Link>
+                    <Link :href="route('projects.index')" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200">Products</Link>
                     <Link v-if="$page.props.auth.user" :href="route('orders.index')" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200">My Orders</Link>
                 </div>
 

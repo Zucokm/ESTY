@@ -1,6 +1,6 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 
 defineProps({
     active: {
@@ -12,10 +12,36 @@ defineProps({
 const page = usePage();
 const userName = computed(() => page.props.auth.user?.name || 'Admin');
 const userEmail = computed(() => page.props.auth.user?.email || 'admin@shop.com');
+
+const isOpen = ref(false);
+
+const toggleSidebar = () => {
+    isOpen.value = !isOpen.value;
+};
+
+onMounted(() => {
+    window.addEventListener('toggle-admin-sidebar', toggleSidebar);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('toggle-admin-sidebar', toggleSidebar);
+});
 </script>
 
 <template>
-    <aside class="w-64 fixed inset-y-0 left-0 bg-black/[0.15] backdrop-blur-3xl border-r border-white/[0.06] flex flex-col z-20">
+    <!-- Mobile Drawer Backdrop -->
+    <div 
+        v-if="isOpen" 
+        @click="isOpen = false"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden"
+    ></div>
+
+    <aside 
+        :class="[
+            isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0',
+            'w-64 fixed inset-y-0 left-0 bg-slate-950/[0.95] lg:bg-black/[0.15] backdrop-blur-3xl border-r border-white/[0.06] flex flex-col z-40 lg:z-20 transform transition-transform duration-300 ease-in-out'
+        ]"
+    >
         <!-- Sidebar Brand Header -->
         <div class="h-16 flex items-center px-6 border-b border-white/[0.06]">
             <div class="flex items-center gap-2.5">
@@ -50,6 +76,17 @@ const userEmail = computed(() => page.props.auth.user?.email || 'admin@shop.com'
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
                 Products
+            </Link>
+
+            <Link 
+                :href="route('categories.index')"
+                :class="[active === 'categories' ? 'bg-white/[0.08] text-white shadow-inner border-white/10' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] border-transparent']"
+                class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm border transition-all duration-200"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" />
+                </svg>
+                Categories
             </Link>
 
             <Link 

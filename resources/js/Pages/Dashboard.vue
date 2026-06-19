@@ -143,23 +143,39 @@ const updateOrderStatus = (orderId, newStatus) => {
         preserveScroll: true
     });
 };
+
+const toggleSidebar = () => {
+    window.dispatchEvent(new CustomEvent('toggle-admin-sidebar'));
+};
 </script>
 
 <template>
     <Head title="Admin Dashboard - ESTY" />
 
-    <div class="min-h-screen flex selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div class="min-h-screen bg-[#080b11] text-slate-100 flex relative overflow-hidden selection:bg-indigo-500/30 selection:text-indigo-200">
+        <!-- Ambient Shifts -->
+        <div class="fixed -top-[40%] -left-[20%] w-[80%] h-[80%] rounded-full bg-indigo-500/10 blur-[150px] pointer-events-none z-0"></div>
+        <div class="fixed -bottom-[30%] -right-[10%] w-[60%] h-[60%] rounded-full bg-purple-500/10 blur-[120px] pointer-events-none z-0"></div>
         
         <!-- Left Sidebar -->
         <AdminSidebar active="dashboard" />
 
         <!-- Main Content Area -->
-        <div class="flex-1 pl-64 flex flex-col min-h-screen">
+        <div class="flex-1 lg:ml-64 flex flex-col min-h-screen relative z-10">
             
             <!-- Top Navigation Bar -->
-            <header class="h-16 bg-white/[0.02] backdrop-blur-md border-b border-white/[0.06] flex items-center justify-between px-8 sticky top-0 z-10">
+            <header class="h-16 bg-white/[0.02] backdrop-blur-md border-b border-white/[0.06] flex items-center justify-between px-4 sm:px-8 sticky top-0 z-10">
+                <!-- Hamburger Menu Button -->
+                <button 
+                    @click="toggleSidebar" 
+                    class="lg:hidden p-2 text-slate-400 hover:text-white transition-colors focus:outline-none"
+                >
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
                 <!-- Search bar -->
-                <div class="w-80 relative">
+                <div class="w-full max-w-[160px] sm:max-w-xs relative">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -218,7 +234,7 @@ const updateOrderStatus = (orderId, newStatus) => {
             </header>
 
             <!-- Main Scrollable Body Area -->
-            <main class="flex-1 p-8 space-y-8">
+            <main class="flex-1 p-4 sm:p-8 space-y-6 sm:space-y-8">
                 <!-- Dashboard Welcome Title -->
                 <div>
                     <h1 class="text-2xl font-bold text-white tracking-tight">Overview</h1>
@@ -432,20 +448,27 @@ const updateOrderStatus = (orderId, newStatus) => {
                                     <td class="px-6 py-4.5 font-bold text-white">${{ parseFloat(order.total_amount).toFixed(2) }}</td>
                                     <td class="px-6 py-4.5 text-xs text-slate-400">{{ formatDate(order.created_at) }}</td>
                                     <td class="px-6 py-4.5">
-                                        <select 
-                                            :value="order.status"
-                                            @change="updateOrderStatus(order.id, $event.target.value)"
-                                            :class="getStatusClass(order.status)"
-                                            class="px-2.5 py-1 text-xs font-semibold rounded-full border bg-slate-900/60 focus:outline-none cursor-pointer focus:ring-1 focus:ring-indigo-500/50"
-                                        >
-                                            <option value="pending" class="bg-[#0f172a] text-amber-400 font-semibold">pending</option>
-                                            <option value="processing" class="bg-[#0f172a] text-blue-400 font-semibold">processing</option>
-                                            <option value="packing" class="bg-[#0f172a] text-pink-400 font-semibold">packing</option>
-                                            <option value="shipping" class="bg-[#0f172a] text-indigo-400 font-semibold">shipping</option>
-                                            <option value="delivered" class="bg-[#0f172a] text-teal-400 font-semibold">delivered</option>
-                                            <option value="completed" class="bg-[#0f172a] text-emerald-400 font-semibold">completed</option>
-                                            <option value="cancelled" class="bg-[#0f172a] text-rose-400 font-semibold">cancelled</option>
-                                        </select>
+                                        <div class="relative inline-block" @click.stop>
+                                            <select 
+                                                :value="order.status"
+                                                @change="updateOrderStatus(order.id, $event.target.value)"
+                                                :class="getStatusClass(order.status)"
+                                                class="pl-3.5 pr-8 py-1.5 text-xs font-extrabold rounded-xl border bg-slate-950/60 focus:outline-none cursor-pointer appearance-none select-none transition-all duration-200 active:scale-95"
+                                            >
+                                                <option value="pending" class="bg-[#0b0f19] text-amber-400 font-bold">pending</option>
+                                                <option value="processing" class="bg-[#0b0f19] text-blue-400 font-bold">processing</option>
+                                                <option value="packing" class="bg-[#0b0f19] text-pink-400 font-bold">packing</option>
+                                                <option value="shipping" class="bg-[#0b0f19] text-indigo-400 font-bold">shipping</option>
+                                                <option value="delivered" class="bg-[#0b0f19] text-teal-400 font-bold">delivered</option>
+                                                <option value="completed" class="bg-[#0b0f19] text-emerald-400 font-bold">completed</option>
+                                                <option value="cancelled" class="bg-[#0b0f19] text-rose-400 font-bold">cancelled</option>
+                                            </select>
+                                            <span class="absolute inset-y-0 right-0 flex items-center pr-2.5 pointer-events-none text-slate-400">
+                                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </span>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr v-if="orders.length === 0">

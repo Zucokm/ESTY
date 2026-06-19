@@ -176,6 +176,42 @@ const removeVariant = (index) => {
     }
 };
 
+import axios from 'axios';
+
+const localCategories = ref([...props.categories]);
+const showAddCategoryModal = ref(false);
+const newCategoryName = ref('');
+const newCategoryDescription = ref('');
+const isCreatingCategory = ref(false);
+const categoryError = ref('');
+
+const submitNewCategory = async () => {
+    if (!newCategoryName.value.trim()) return;
+    
+    isCreatingCategory.value = true;
+    categoryError.value = '';
+    
+    try {
+        const response = await axios.post(route('admin.categories.store'), {
+            name: newCategoryName.value,
+            description: newCategoryDescription.value
+        });
+        
+        const newCat = response.data;
+        localCategories.value.push(newCat);
+        form.category_id = newCat.id;
+        
+        newCategoryName.value = '';
+        newCategoryDescription.value = '';
+        showAddCategoryModal.value = false;
+    } catch (error) {
+        console.error('Error creating category:', error);
+        categoryError.value = error.response?.data?.message || 'Failed to create category. Please check if the category name already exists.';
+    } finally {
+        isCreatingCategory.value = false;
+    }
+};
+
 const submit = () => {
     // Inertia requires posting raw FormData for file uploads, which useForm handles automatically
     form.post(route('products.store'), {
@@ -285,26 +321,43 @@ const submit = () => {
                                 <span v-if="form.errors.slug" class="text-xs text-rose-400 mt-1 block ml-1">{{ form.errors.slug }}</span>
                             </div>
 
-                            <!-- Category Dropdown -->
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 ml-1">Category</label>
-                                <select 
-                                    v-model="form.category_id" 
-                                    class="glass-input appearance-none text-slate-200"
-                                    required
-                                >
-                                    <option value="" disabled class="bg-[#121620]">Select Category</option>
-                                    <option 
-                                        v-for="cat in categories" 
-                                        :key="cat.id" 
-                                        :value="cat.id"
-                                        class="bg-[#121620]"
-                                    >
-                                        {{ cat.name }}
-                                    </option>
-                                </select>
-                                <span v-if="form.errors.category_id" class="text-xs text-rose-400 mt-1 block ml-1">{{ form.errors.category_id }}</span>
-                            </div>
+                             <!-- Category Dropdown -->
+                             <div>
+                                 <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 ml-1">Category</label>
+                                 <div class="flex gap-2">
+                                     <div class="relative flex-1">
+                                         <select 
+                                             v-model="form.category_id" 
+                                             class="glass-input appearance-none text-slate-200 pr-10"
+                                             required
+                                         >
+                                             <option value="" disabled class="bg-[#121620]">Select Category</option>
+                                             <option 
+                                                 v-for="cat in localCategories" 
+                                                 :key="cat.id" 
+                                                 :value="cat.id"
+                                                 class="bg-[#121620]"
+                                             >
+                                                 {{ cat.name }}
+                                             </option>
+                                         </select>
+                                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
+                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                             </svg>
+                                         </span>
+                                     </div>
+                                     <button 
+                                         type="button"
+                                         @click="showAddCategoryModal = true"
+                                         class="px-4 bg-indigo-600/80 hover:bg-indigo-600 border border-white/10 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1 active:scale-[0.97]"
+                                         title="Create New Category"
+                                     >
+                                         <span>+ New</span>
+                                     </button>
+                                 </div>
+                                 <span v-if="form.errors.category_id" class="text-xs text-rose-400 mt-1 block ml-1">{{ form.errors.category_id }}</span>
+                             </div>
 
                             <!-- Base Price -->
                             <div>
@@ -549,6 +602,63 @@ const submit = () => {
                     </div>
                 </form>
             </main>
+        </div>
+
+        <!-- Create Category Modal -->
+        <div 
+            v-if="showAddCategoryModal" 
+            class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        >
+            <div @click="showAddCategoryModal = false" class="absolute inset-0 bg-black/60 backdrop-blur-md"></div>
+            
+            <div class="glass-card w-full max-w-md p-6 relative z-10 border border-white/10 shadow-[0_24px_50px_-12px_rgba(0,0,0,0.7)]">
+                <div class="flex items-center justify-between border-b border-white/[0.06] pb-3 mb-4">
+                    <h3 class="text-lg font-bold text-white">Create New Category</h3>
+                    <button @click="showAddCategoryModal = false" class="text-slate-400 hover:text-white transition-colors">
+                        ✕
+                    </button>
+                </div>
+                
+                <form @submit.prevent="submitNewCategory" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 ml-1">Category Name</label>
+                        <input 
+                            v-model="newCategoryName" 
+                            type="text" 
+                            required
+                            placeholder="e.g. Hats, Accessories"
+                            class="glass-input text-sm"
+                        />
+                        <span v-if="categoryError" class="text-xs text-rose-400 mt-1 block ml-1">{{ categoryError }}</span>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 ml-1">Description (Optional)</label>
+                        <textarea 
+                            v-model="newCategoryDescription" 
+                            class="glass-input text-sm h-20 resize-none"
+                            placeholder="Brief description of category items..."
+                        ></textarea>
+                    </div>
+                    
+                    <div class="pt-4 border-t border-white/[0.06] flex justify-end gap-3">
+                        <button 
+                            type="button" 
+                            @click="showAddCategoryModal = false" 
+                            class="glass-button text-xs py-2 px-4 rounded-xl border border-white/5 text-slate-300 hover:text-white"
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            type="submit" 
+                            :disabled="isCreatingCategory || !newCategoryName.trim()"
+                            class="glass-button-primary text-xs py-2 px-5 rounded-xl border border-white/10 font-bold disabled:opacity-50"
+                        >
+                            {{ isCreatingCategory ? 'Creating...' : 'Create Category' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </template>

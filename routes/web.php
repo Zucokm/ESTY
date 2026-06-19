@@ -50,6 +50,15 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/projects', function () {
+    $products = Product::with(['category', 'variants', 'images'])->where('is_active', true)->latest()->get();
+    $categories = Category::all();
+    return Inertia::render('Projects/Index', [
+        'products' => $products,
+        'categories' => $categories,
+    ]);
+})->name('projects.index');
+
 Route::get('/products/{slug}', function ($slug) {
     $product = Product::with(['category', 'variants', 'images'])->where('slug', $slug)->where('is_active', true)->firstOrFail();
     return Inertia::render('Products/Show', [
@@ -60,6 +69,7 @@ Route::get('/products/{slug}', function ($slug) {
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\HomepageController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Models\Order;
 
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
@@ -172,6 +182,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     })->name('dashboard');
 
     Route::resource('admin/products', ProductController::class);
+    Route::resource('admin/categories', CategoryController::class);
     Route::patch('admin/products/{product}/toggle-status', [ProductController::class, 'toggleStatus'])->name('admin.products.toggleStatus');
     Route::get('admin/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
     Route::put('admin/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
