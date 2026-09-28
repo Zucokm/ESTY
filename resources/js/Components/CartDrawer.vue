@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useForm, usePage, Link } from '@inertiajs/vue3';
 import { useCartStore } from '@/Stores/cartStore';
 import LoadingOverlay from '@/Components/LoadingOverlay.vue';
@@ -234,7 +234,7 @@ const getColorStyle = (colorName) => {
                         <!-- Payment Method -->
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 ml-1">Payment Method</label>
-                            <div class="grid grid-cols-2 gap-3">
+                            <div class="grid grid-cols-1 gap-3">
                                 <label 
                                     class="flex flex-col items-center justify-center p-3.5 rounded-2xl border cursor-pointer transition-all text-center gap-1.5"
                                     :class="paymentMethod === 'cod' ? 'bg-indigo-500/10 border-indigo-500/40 text-indigo-300' : 'bg-white/[0.02] border-white/5 text-slate-400 hover:text-white'"
@@ -244,16 +244,6 @@ const getColorStyle = (colorName) => {
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                                     </svg>
                                     <span class="text-[11px] font-bold">Cash on Delivery</span>
-                                </label>
-                                <label 
-                                    class="flex flex-col items-center justify-center p-3.5 rounded-2xl border cursor-pointer transition-all text-center gap-1.5"
-                                    :class="paymentMethod === 'bank_transfer' ? 'bg-indigo-500/10 border-indigo-500/40 text-indigo-300' : 'bg-white/[0.02] border-white/5 text-slate-400 hover:text-white'"
-                                >
-                                    <input type="radio" value="bank_transfer" v-model="paymentMethod" class="sr-only" />
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                    </svg>
-                                    <span class="text-[11px] font-bold">Bank Transfer</span>
                                 </label>
                             </div>
                             <span v-if="checkoutForm.errors.payment_method" class="text-xs text-rose-400 mt-1 block ml-1">{{ checkoutForm.errors.payment_method }}</span>

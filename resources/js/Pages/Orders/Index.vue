@@ -357,7 +357,7 @@ const getItemImage = (item) => {
                                     Cancel Order
                                 </button>
                                 <span class="text-[10px] font-bold text-rose-400/80 tracking-wide uppercase">
-                                    Cancellable for next {{ order.cancellation_minutes_remaining }} mins
+                                    Cancellable for next {{ Math.ceil(order.cancellation_minutes_remaining) }} mins
                                 </span>
                             </div>
 

@@ -101,6 +101,17 @@ onUnmounted(() => {
             </Link>
 
             <Link 
+                :href="route('admin.contacts.index')"
+                :class="[active === 'contacts' ? 'bg-white/[0.08] text-white shadow-inner border-white/10' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] border-transparent']"
+                class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm border transition-all duration-200"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                Messages
+            </Link>
+
+            <Link 
                 :href="route('admin.homepage.index')"
                 :class="[active === 'homepage' ? 'bg-white/[0.08] text-white shadow-inner border-white/10' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] border-transparent']"
                 class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm border transition-all duration-200"
@@ -124,6 +135,18 @@ onUnmounted(() => {
                     <span class="text-[10px] text-slate-400 font-medium truncate max-w-[120px]">{{ userEmail }}</span>
                 </div>
             </div>
+            
+            <Link 
+                :href="route('logout')" 
+                method="post" 
+                as="button"
+                class="p-2 text-slate-400 hover:text-rose-400 transition-colors bg-white/[0.02] hover:bg-rose-500/10 rounded-lg"
+                title="Log Out"
+            >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+            </Link>
         </div>
     </aside>
 </template>

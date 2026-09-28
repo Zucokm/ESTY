@@ -12,8 +12,13 @@ Route::get('/products', [CatalogController::class, 'index'])->name('products.ind
 Route::get('/products/{slug}', [CatalogController::class, 'show'])->name('products.show');
 
 use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\ContactController;
+
 Route::get('/auth/{provider}/redirect', [SocialiteController::class, 'redirect'])->name('socialite.redirect');
 Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback'])->name('socialite.callback');
+
+Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
@@ -39,6 +44,9 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::post('admin/homepage/lookbooks/{id}', [HomepageController::class, 'updateLookbook'])->name('admin.homepage.updateLookbook');
     Route::delete('admin/homepage/lookbooks/{id}', [HomepageController::class, 'destroyLookbook'])->name('admin.homepage.destroyLookbook');
     Route::post('admin/homepage/settings', [HomepageController::class, 'updateSettings'])->name('admin.homepage.updateSettings');
+
+    Route::get('admin/contacts', [\App\Http\Controllers\Admin\ContactController::class, 'index'])->name('admin.contacts.index');
+    Route::put('admin/contacts/{contact}', [\App\Http\Controllers\Admin\ContactController::class, 'updateStatus'])->name('admin.contacts.update');
 });
 
 use App\Http\Controllers\OrderController;
