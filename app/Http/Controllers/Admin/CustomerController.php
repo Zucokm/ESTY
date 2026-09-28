@@ -12,7 +12,7 @@ class CustomerController extends Controller
     public function index()
     {
         // Get all users who are not admins
-        $customers = User::where('role', 'user')
+        $customers = User::where('role', '!=', 'admin')
             ->withCount('orders')
             ->withSum('orders', 'total_amount')
             ->latest()
