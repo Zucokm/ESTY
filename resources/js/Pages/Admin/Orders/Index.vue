@@ -208,9 +208,19 @@ const toggleSidebar = () => {
             <!-- Main Body -->
             <main class="flex-1 min-w-0 p-4 sm:p-8 space-y-6">
                 <!-- Page Title -->
-                <div>
-                    <h1 class="text-2xl font-bold text-white tracking-tight">Orders Management</h1>
-                    <p class="text-slate-400 text-sm font-medium">Fulfill client purchases and modify order statuses.</p>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-white tracking-tight">Orders Management</h1>
+                        <p class="text-slate-400 text-sm font-medium">Fulfill client purchases and modify order statuses.</p>
+                    </div>
+                    <a 
+                        :href="route('admin.reports.export')" 
+                        target="_blank"
+                        class="px-5 py-2.5 bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 text-emerald-400 font-bold rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.1)] transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        Export CSV
+                    </a>
                 </div>
 
                 <!-- Stats Summary -->
