@@ -437,6 +437,35 @@ const toggleSidebar = () => {
                     </div>
                 </div>
 
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 mb-6">
+                    <!-- Top Townships -->
+                    <div class="glass-card p-6 flex flex-col justify-between min-h-[320px]">
+                        <div>
+                            <h3 class="text-white font-bold text-base tracking-tight mb-1">Sales by Township</h3>
+                            <p class="text-slate-400 text-xs font-medium mb-6">Top performing areas by revenue.</p>
+
+                            <div class="space-y-4">
+                                <div v-for="(item, idx) in charts.salesByTownship" :key="item.township" class="space-y-1">
+                                    <div class="flex items-center justify-between text-xs font-bold tracking-wider">
+                                        <span class="text-slate-300 truncate max-w-[50%]">{{ item.township }}</span>
+                                        <span class="text-emerald-400">{{ Number(item.total_revenue).toLocaleString() }} Ks ({{ item.total_orders }} orders)</span>
+                                    </div>
+                                    <div class="h-2 w-full bg-white/[0.03] border border-white/[0.06] rounded-full overflow-hidden">
+                                        <div 
+                                            :style="{ width: `${Math.min((item.total_revenue / Math.max(...charts.salesByTownship.map(d => d.total_revenue), 1)) * 100, 100)}%` }"
+                                            class="bg-emerald-400 shadow-md shadow-emerald-500/20 h-full rounded-full transition-all duration-1000 ease-out"
+                                        ></div>
+                                    </div>
+                                </div>
+                                <div v-if="charts.salesByTownship?.length === 0" class="text-center py-6 text-slate-500 text-xs">
+                                    No township data available yet.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
                 <!-- Data Table: Recent Orders (Real Database Data) -->
                 <div class="glass-card overflow-hidden">
                     <!-- Table Header -->

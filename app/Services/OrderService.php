@@ -71,6 +71,8 @@ class OrderService
                     'coupon_id' => $couponId,
                     'status' => 'pending',
                     'shipping_address' => $data['shipping_address'],
+                    'township' => $data['township'] ?? null,
+
                     'phone' => $data['phone'],
                     'payment_method' => $data['payment_method'] ?? 'cod',
                 ]);

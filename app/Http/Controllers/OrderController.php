@@ -25,6 +25,8 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'shipping_address' => 'required|string|max:1000',
+            'township' => 'required|string|max:100',
+
             'phone' => 'required|string|max:50',
             'payment_method' => 'nullable|string|in:cod,bank_transfer',
             'items' => 'required|array|min:1',

@@ -365,6 +365,8 @@ const toggleSidebar = () => {
                                     <!-- Shipping Info -->
                                     <td class="whitespace-nowrap px-6 py-5">
                                         <div class="flex flex-col text-xs text-slate-400 max-w-[180px] truncate" :title="order.shipping_address">
+                                            <span v-if="order.township" class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-0.5">{{ order.township }}</span>
+
                                             <span class="truncate font-semibold text-slate-300">{{ order.shipping_address }}</span>
                                             <span class="mt-1.5 font-mono text-[10px] text-slate-500">{{ order.phone }}</span>
                                         </div>

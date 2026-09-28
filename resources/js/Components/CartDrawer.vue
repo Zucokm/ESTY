@@ -18,11 +18,15 @@ const page = usePage();
 
 const checkoutStep = ref('cart'); // 'cart' or 'checkout'
 const shippingAddress = ref(page.props.auth.user?.shipping_address || '');
+const township = ref(page.props.auth.user?.township || '');
+
 const phone = ref(page.props.auth.user?.phone || '');
 const paymentMethod = ref('cod');
 
 const checkoutForm = useForm({
     shipping_address: '',
+    township: '',
+
     phone: '',
     payment_method: 'cod',
     coupon_code: '',
@@ -71,6 +75,8 @@ const submitCheckout = () => {
         price: item.price
     }));
     checkoutForm.shipping_address = shippingAddress.value;
+    checkoutForm.township = township.value;
+
     checkoutForm.phone = phone.value;
     checkoutForm.payment_method = paymentMethod.value;
 
@@ -216,6 +222,33 @@ const getColorStyle = (colorName) => {
                                 required
                             ></textarea>
                             <span v-if="checkoutForm.errors.shipping_address" class="text-xs text-rose-400 mt-1 block ml-1">{{ checkoutForm.errors.shipping_address }}</span>
+                        </div>
+
+                        <!-- Township -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 ml-1">Township</label>
+                            <input 
+                                type="text" 
+                                v-model="township" 
+                                list="townships-list"
+                                class="glass-input text-sm" 
+                                placeholder="E.g. Bahan, Kamayut..."
+                                required
+                            />
+                            <datalist id="townships-list">
+                                <option value="Bahan"></option>
+                                <option value="Dagon"></option>
+                                <option value="Kamayut"></option>
+                                <option value="Hlaing"></option>
+                                <option value="Sanchaung"></option>
+                                <option value="Yankin"></option>
+                                <option value="Tamwe"></option>
+                                <option value="South Okkalapa"></option>
+                                <option value="North Okkalapa"></option>
+                                <option value="Insein"></option>
+                                <option value="Thingangyun"></option>
+                            </datalist>
+                            <span v-if="checkoutForm.errors.township" class="text-xs text-rose-400 mt-1 block ml-1">{{ checkoutForm.errors.township }}</span>
                         </div>
 
                         <!-- Phone Number -->

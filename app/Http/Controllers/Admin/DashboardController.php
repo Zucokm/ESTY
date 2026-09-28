@@ -135,6 +135,14 @@ class DashboardController extends Controller
             ];
         }
 
+        $salesByTownship = Order::select('township', \DB::raw('COUNT(*) as total_orders'), \DB::raw('SUM(total_amount) as total_revenue'))
+            ->whereNotNull('township')
+            ->where('township', '!=', '')
+            ->groupBy('township')
+            ->orderByDesc('total_revenue')
+            ->limit(5)
+            ->get();
+
         return Inertia::render('Dashboard', [
             'orders' => $orders,
             'stats' => [
@@ -161,6 +169,8 @@ class DashboardController extends Controller
                 'categoryDistribution' => $categoryDistribution,
                 'topProducts' => $topProducts,
                 'newCustomersTrend' => $newCustomersTrend
+                , 'salesByTownship' => $salesByTownship
+
             ]
         ]);
     }

@@ -20,6 +20,8 @@ const form = useForm({
     name: user.name,
     email: user.email,
     shipping_address: user.shipping_address || '',
+    township: user.township || '',
+
     phone: user.phone || '',
 });
 </script>
@@ -86,6 +88,33 @@ const form = useForm({
             </div>
 
             <div>
+            <div>
+                <InputLabel for="township" value="Township" />
+                <TextInput
+                    id="township"
+                    type="text"
+                    class="mt-1 block w-full"
+                    v-model="form.township"
+                    list="townships-list"
+                    placeholder="E.g. Bahan, Kamayut..."
+                />
+                <datalist id="townships-list">
+                    <option value="Bahan"></option>
+                    <option value="Dagon"></option>
+                    <option value="Kamayut"></option>
+                    <option value="Hlaing"></option>
+                    <option value="Sanchaung"></option>
+                    <option value="Yankin"></option>
+                    <option value="Tamwe"></option>
+                    <option value="South Okkalapa"></option>
+                    <option value="North Okkalapa"></option>
+                    <option value="Insein"></option>
+                    <option value="Thingangyun"></option>
+                </datalist>
+                <InputError class="mt-2" :message="form.errors.township" />
+            </div>
+
+
                 <InputLabel for="shipping_address" value="Default Shipping Address" />
 
                 <textarea
