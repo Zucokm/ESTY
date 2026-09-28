@@ -75,15 +75,15 @@ const props = defineProps({
                                     <td class="whitespace-nowrap px-6 py-5 font-mono text-xs text-slate-400">
                                         {{ item.sku || `VAR-${item.id}` }}
                                     </td>
-                                    <td class="whitespace-nowrap px-6 py-5 font-extrabold text-base" :class="item.stock <= 5 ? 'text-rose-400' : (item.stock <= 20 ? 'text-amber-400' : 'text-emerald-400')">
-                                        {{ item.stock }}
+                                    <td class="whitespace-nowrap px-6 py-5 font-extrabold text-base" :class="item.stock_quantity <= 5 ? 'text-rose-400' : (item.stock_quantity <= 20 ? 'text-amber-400' : 'text-emerald-400')">
+                                        {{ item.stock_quantity }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-5">
                                         <span 
                                             class="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider rounded-full"
-                                            :class="item.stock === 0 ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : (item.stock <= 5 ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20')"
+                                            :class="item.stock_quantity === 0 ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : (item.stock_quantity <= 5 ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20')"
                                         >
-                                            {{ item.stock === 0 ? 'Out of Stock' : (item.stock <= 5 ? 'Low Stock' : 'In Stock') }}
+                                            {{ item.stock_quantity === 0 ? 'Out of Stock' : (item.stock_quantity <= 5 ? 'Low Stock' : 'In Stock') }}
                                         </span>
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-5 text-right">

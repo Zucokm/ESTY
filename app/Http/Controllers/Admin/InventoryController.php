@@ -13,7 +13,7 @@ class InventoryController extends Controller
     {
         // Get all variants ordered by stock
         $inventory = ProductVariant::with('product')
-            ->orderBy('stock', 'asc')
+            ->orderBy('stock_quantity', 'asc')
             ->get();
 
         return Inertia::render('Admin/Inventory/Index', [
