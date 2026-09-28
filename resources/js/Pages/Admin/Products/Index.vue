@@ -409,7 +409,7 @@ const toggleSidebar = () => {
 
                                     <!-- Base Price Column -->
                                     <td class="whitespace-nowrap px-6 py-5 font-extrabold text-white text-base">
-                                        ${{ parseFloat(product.base_price).toFixed(2) }}
+                                        {{ Number(product.base_price).toLocaleString() }} Ks
                                     </td>
 
                                     <!-- Total Stock Column -->

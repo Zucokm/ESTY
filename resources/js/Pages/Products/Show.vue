@@ -347,9 +347,9 @@ const submitReview = () => {
                         <div>
                             <h1 class="text-3xl md:text-4xl font-black text-white tracking-tight leading-tight">{{ product.name }}</h1>
                             <div class="flex items-center gap-3 mt-3">
-                                <span class="text-2xl font-black text-white">${{ finalPrice.toFixed(2) }}</span>
+                                <span class="text-2xl font-black text-white">{{ finalPrice.toLocaleString() }} Ks</span>
                                 <span v-if="selectedVariant && selectedVariant.additional_price > 0" class="text-xs text-indigo-300 font-semibold bg-indigo-500/10 px-2.5 py-1 rounded-full border border-indigo-500/20">
-                                    +${{ parseFloat(selectedVariant.additional_price).toFixed(2) }} variant
+                                    +{{ Number(selectedVariant.additional_price).toLocaleString() }} Ks variant
                                 </span>
                             </div>
                         </div>
@@ -606,7 +606,7 @@ const submitReview = () => {
                                             <span class="text-xs text-white font-bold px-1.5">{{ item.quantity }}</span>
                                             <button @click="updateQuantity(item.variant_id, item.quantity + 1)" class="text-slate-400 hover:text-white font-bold text-xs">+</button>
                                         </div>
-                                        <span class="font-extrabold text-white text-sm">${{ (item.price * item.quantity).toFixed(2) }}</span>
+                                        <span class="font-extrabold text-white text-sm">{{ (item.price * item.quantity).toLocaleString() }} Ks</span>
                                     </div>
                                 </div>
 
@@ -670,7 +670,7 @@ const submitReview = () => {
                         <div class="p-6 border-t border-white/[0.08] space-y-4">
                             <div class="flex items-center justify-between">
                                 <span class="text-sm font-bold text-slate-400">Total Price</span>
-                                <span class="text-2xl font-black text-white">${{ cartTotal.toFixed(2) }}</span>
+                                <span class="text-2xl font-black text-white">{{ cartTotal.toLocaleString() }} Ks</span>
                             </div>
 
                             <!-- Button logic for Step 1 -->
@@ -774,7 +774,7 @@ const submitReview = () => {
                                 <div class="flex-1 flex flex-col justify-between">
                                     <div>
                                         <Link :href="route('products.show', item.slug)" @click="showWishlistDrawer = false" class="font-bold text-white text-sm tracking-tight line-clamp-1 hover:text-indigo-300 transition-colors">{{ item.name }}</Link>
-                                        <span class="block mt-1 text-xs font-extrabold text-slate-300">${{ parseFloat(item.base_price).toFixed(2) }}</span>
+                                        <span class="block mt-1 text-xs font-extrabold text-slate-300">{{ Number(item.base_price).toLocaleString() }} Ks</span>
                                     </div>
 
                                     <!-- Quick actions -->

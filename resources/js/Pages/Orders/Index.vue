@@ -142,7 +142,7 @@ const getItemImage = (item) => {
                             </div>
                             <div>
                                 <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Total Bill</span>
-                                <span class="text-sm text-white font-extrabold mt-1 block">${{ parseFloat(order.total_amount).toFixed(2) }}</span>
+                                <span class="text-sm text-white font-extrabold mt-1 block">{{ Number(order.total_amount).toLocaleString() }} Ks</span>
                             </div>
                             <div>
                                 <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Status</span>
@@ -335,7 +335,7 @@ const getItemImage = (item) => {
                             </div>
 
                             <!-- Price -->
-                            <span class="text-sm font-extrabold text-white shrink-0">${{ (parseFloat(item.price) * item.quantity).toFixed(2) }}</span>
+                            <span class="text-sm font-extrabold text-white shrink-0">{{ (Number(item.price) * item.quantity).toLocaleString() }} Ks</span>
                         </div>
                     </div>
 

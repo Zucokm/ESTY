@@ -38,7 +38,7 @@ const statsSummary = computed(() => {
     
     return {
         totalOrders: props.orders.length,
-        revenue: '$' + revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        revenue: revenue.toLocaleString() + ' Ks',
         pending,
         completed
     };
@@ -385,7 +385,7 @@ const toggleSidebar = () => {
 
                                     <!-- Total Price Column -->
                                     <td class="whitespace-nowrap px-6 py-5 font-extrabold text-white text-base">
-                                        ${{ parseFloat(order.total_amount).toFixed(2) }}
+                                        {{ Number(order.total_amount).toLocaleString() }} Ks
                                     </td>
 
                                     <!-- Date Column -->

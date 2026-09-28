@@ -256,7 +256,7 @@ const filteredProducts = computed(() => {
                     </div>
                     <div>
                         <h4 class="text-white font-bold text-xs sm:text-sm tracking-wide uppercase">Free Express Shipping</h4>
-                        <p class="text-slate-400 text-xs mt-1">On all domestic orders over $150.</p>
+                        <p class="text-slate-400 text-xs mt-1">On all domestic orders over 150,000 Ks..</p>
                     </div>
                 </div>
                 <div class="flex items-start gap-4 reveal">

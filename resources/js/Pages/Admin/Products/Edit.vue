@@ -387,7 +387,7 @@ const submit = () => {
 
                             <!-- Base Price -->
                             <div>
-                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 ml-1">Base Price ($)</label>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 ml-1">Base Price (Ks)</label>
                                 <input 
                                     type="number" 
                                     step="0.01" 
@@ -619,7 +619,7 @@ const submit = () => {
                                 <!-- Additional Price & Remove Button -->
                                 <div class="flex items-center gap-3">
                                     <div class="flex-1">
-                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Add. Price ($)</label>
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Add. Price (Ks)</label>
                                         <input 
                                             type="number" 
                                             step="0.01" 

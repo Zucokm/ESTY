@@ -91,7 +91,7 @@ const formatDate = (dateString) => {
                                         {{ customer.orders_count }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-5 font-bold text-emerald-400">
-                                        ${{ parseFloat(customer.orders_sum_total_amount || 0).toFixed(2) }}
+                                        {{ Number(customer.orders_sum_total_amount || 0).toLocaleString() }} Ks
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-5 text-slate-400">
                                         {{ formatDate(customer.created_at) }}

@@ -139,7 +139,7 @@ class DashboardController extends Controller
             'orders' => $orders,
             'stats' => [
                 'totalRevenue' => [
-                    'value' => '$' . number_format($totalRevenue, 2),
+                    'value' => number_format($totalRevenue, 0) . ' Ks',
                     'change' => ($revenueChange >= 0 ? '+' : '') . number_format($revenueChange, 1) . '%'
                 ],
                 'activeOrders' => [

@@ -257,6 +257,19 @@ const getColorStyle = (colorName) => {
                         <!-- Coupon Code -->
                         <div class="pt-2">
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 ml-1">Promo Code (Optional)</label>
+                            
+                            <!-- Available Coupons (Click to Apply) -->
+                            <div v-if="$page.props.active_coupons?.length" class="mb-3 flex flex-wrap gap-2">
+                                <button 
+                                    v-for="coupon in $page.props.active_coupons" 
+                                    :key="coupon.id"
+                                    @click="couponCodeInput = coupon.code; applyCoupon()"
+                                    class="px-2.5 py-1 text-[10px] font-bold tracking-wider rounded border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500/20 transition-colors uppercase"
+                                >
+                                    {{ coupon.code }} (-{{ coupon.discount_type === 'percentage' ? coupon.discount_amount + '%' : Number(coupon.discount_amount).toLocaleString() + ' Ks' }})
+                                </button>
+                            </div>
+
                             <div class="flex gap-2">
                                 <input 
                                     type="text" 
@@ -278,10 +291,10 @@ const getColorStyle = (colorName) => {
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-bold text-slate-400">Total Price</span>
                         <div class="text-right">
-                            <span v-if="appliedCoupon" class="text-sm text-slate-500 line-through mr-2">${{ cartTotal.toFixed(2) }}</span>
-                            <span class="text-2xl font-black text-white">${{ finalTotal.toFixed(2) }}</span>
+                            <span v-if="appliedCoupon" class="text-sm text-slate-500 line-through mr-2">{{ cartTotal.toLocaleString() }} Ks</span>
+                            <span class="text-2xl font-black text-white">{{ finalTotal.toLocaleString() }} Ks</span>
                             <div v-if="appliedCoupon" class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">
-                                (-{{ appliedCoupon.type === 'percent' ? appliedCoupon.value + '%' : '$' + appliedCoupon.value }})
+                                (-{{ appliedCoupon.type === 'percent' ? appliedCoupon.value + '%' : Number(appliedCoupon.value).toLocaleString() + ' Ks' }})
                             </div>
                         </div>
                     </div>

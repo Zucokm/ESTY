@@ -368,7 +368,7 @@ const toggleSidebar = () => {
                                 {{ hoveredPointIndex !== null ? `Daily Revenue on ${charts.revenueTrend[hoveredPointIndex].label}:` : 'Hover graph points to view detailed daily sales volume.' }}
                             </span>
                             <span v-if="hoveredPointIndex !== null" class="text-white font-extrabold text-sm tracking-tight text-indigo-400">
-                                ${{ charts.revenueTrend[hoveredPointIndex].value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                                {{ charts.revenueTrend[hoveredPointIndex].value.toLocaleString() }} Ks
                             </span>
                         </div>
                     </div>
@@ -474,7 +474,7 @@ const toggleSidebar = () => {
                                     <td class="whitespace-nowrap px-6 py-4.5 font-semibold text-white">{{ order.user?.name || 'Guest' }}</td>
                                     <td class="whitespace-nowrap px-6 py-4.5 text-xs text-slate-400 max-w-[200px] truncate">{{ order.shipping_address }}</td>
                                     <td class="whitespace-nowrap px-6 py-4.5 font-mono text-xs text-slate-400">{{ order.phone }}</td>
-                                    <td class="whitespace-nowrap px-6 py-4.5 font-bold text-white">${{ parseFloat(order.total_amount).toFixed(2) }}</td>
+                                    <td class="whitespace-nowrap px-6 py-4.5 font-bold text-white">{{ Number(order.total_amount).toLocaleString() }} Ks</td>
                                     <td class="whitespace-nowrap px-6 py-4.5 text-xs text-slate-400">{{ formatDate(order.created_at) }}</td>
                                     <td class="whitespace-nowrap px-6 py-4.5">
                                         <div class="relative inline-block" @click.stop>

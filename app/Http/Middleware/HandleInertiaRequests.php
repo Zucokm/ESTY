@@ -38,6 +38,16 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
+            'active_coupons' => \App\Models\Coupon::where('is_active', true)
+                ->where(function ($query) {
+                    $query->whereNull('expires_at')
+                          ->orWhere('expires_at', '>', now());
+                })
+                ->where(function ($query) {
+                    $query->whereNull('usage_limit')
+                          ->orWhereColumn('used_count', '<', 'usage_limit');
+                })
+                ->get(),
         ];
     }
 }

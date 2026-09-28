@@ -138,10 +138,10 @@ const formatDate = (dateString) => {
                                         {{ coupon.code }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-5 font-bold text-white">
-                                        {{ coupon.discount_type === 'percentage' ? coupon.discount_amount + '%' : '$' + coupon.discount_amount }}
+                                        {{ coupon.discount_type === 'percentage' ? coupon.discount_amount + '%' : coupon.discount_amount + ' Ks' }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-5 text-slate-400">
-                                        {{ coupon.minimum_spend ? '$' + coupon.minimum_spend : 'No Min' }}
+                                        {{ coupon.minimum_spend ? coupon.minimum_spend + ' Ks' : 'No Min' }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-5 text-slate-400">
                                         {{ coupon.used_count }} / {{ coupon.usage_limit || '∞' }}
@@ -211,19 +211,19 @@ const formatDate = (dateString) => {
                             <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Discount Type</label>
                             <select v-model="form.discount_type" class="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500">
                                 <option value="percentage">Percentage (%)</option>
-                                <option value="fixed">Fixed Amount ($)</option>
+                                <option value="fixed">Fixed Amount (Ks)</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Amount</label>
-                            <input v-model="form.discount_amount" type="number" step="0.01" class="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500" placeholder="e.g. 20" required>
+                            <input v-model="form.discount_amount" type="number" step="0.01" class="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500" placeholder="e.g. 5000" required>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Min. Spend ($)</label>
-                            <input v-model="form.minimum_spend" type="number" step="0.01" class="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500" placeholder="e.g. 100">
+                            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Min. Spend (Ks)</label>
+                            <input v-model="form.minimum_spend" type="number" step="0.01" class="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500" placeholder="e.g. 50000">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Usage Limit</label>
