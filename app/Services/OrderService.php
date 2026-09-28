@@ -42,10 +42,33 @@ class OrderService
                     $totalAmount += $actualPrice * $itemData['quantity'];
                 }
 
+                $discountAmount = 0;
+                $couponId = null;
+
+                if (!empty($data['coupon_code'])) {
+                    $coupon = \App\Models\Coupon::lockForUpdate()->where('code', $data['coupon_code'])->first();
+                    if ($coupon && $coupon->isValid()) {
+                        $couponId = $coupon->id;
+                        if ($coupon->type === 'percent') {
+                            $discountAmount = ($totalAmount * $coupon->value) / 100;
+                        } else {
+                            $discountAmount = min($totalAmount, $coupon->value); // Discount shouldn't exceed total
+                        }
+                        $totalAmount -= $discountAmount;
+                        $coupon->increment('times_used');
+                    } else {
+                        throw ValidationException::withMessages([
+                            'coupon_code' => 'Invalid or expired coupon.'
+                        ]);
+                    }
+                }
+
                 // 2. Create the Order record
                 $order = Order::create([
                     'user_id' => $userId,
                     'total_amount' => $totalAmount,
+                    'discount_amount' => $discountAmount,
+                    'coupon_id' => $couponId,
                     'status' => 'pending',
                     'shipping_address' => $data['shipping_address'],
                     'phone' => $data['phone'],

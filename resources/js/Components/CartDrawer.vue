@@ -25,7 +25,38 @@ const checkoutForm = useForm({
     shipping_address: '',
     phone: '',
     payment_method: 'cod',
+    coupon_code: '',
     items: []
+});
+
+const couponCodeInput = ref('');
+const appliedCoupon = ref(null);
+const couponError = ref('');
+const couponSuccess = ref('');
+
+const applyCoupon = async () => {
+    couponError.value = '';
+    couponSuccess.value = '';
+    if (!couponCodeInput.value) return;
+    
+    try {
+        const response = await window.axios.post(route('coupon.apply'), { code: couponCodeInput.value });
+        appliedCoupon.value = response.data;
+        checkoutForm.coupon_code = response.data.code;
+        couponSuccess.value = 'Coupon applied successfully!';
+    } catch (error) {
+        couponError.value = error.response?.data?.message || 'Invalid coupon code.';
+        appliedCoupon.value = null;
+        checkoutForm.coupon_code = '';
+    }
+};
+
+const finalTotal = computed(() => {
+    if (!appliedCoupon.value) return cartTotal.value;
+    if (appliedCoupon.value.type === 'percent') {
+        return cartTotal.value - (cartTotal.value * appliedCoupon.value.value / 100);
+    }
+    return Math.max(0, cartTotal.value - appliedCoupon.value.value);
 });
 
 const handleCheckoutProceed = () => {
@@ -232,6 +263,23 @@ const getColorStyle = (colorName) => {
                         <div v-if="checkoutForm.errors.items" class="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs font-semibold text-rose-400 leading-relaxed">
                             {{ checkoutForm.errors.items }}
                         </div>
+
+                        <!-- Coupon Code -->
+                        <div class="pt-2">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 ml-1">Promo Code (Optional)</label>
+                            <div class="flex gap-2">
+                                <input 
+                                    type="text" 
+                                    v-model="couponCodeInput" 
+                                    class="glass-input text-sm uppercase flex-1" 
+                                    placeholder="Enter code..."
+                                />
+                                <button type="button" @click="applyCoupon" class="glass-button text-xs font-bold px-4 rounded-xl text-indigo-300 hover:text-white">Apply</button>
+                            </div>
+                            <span v-if="couponError" class="text-xs text-rose-400 mt-1 block ml-1">{{ couponError }}</span>
+                            <span v-if="couponSuccess" class="text-xs text-emerald-400 mt-1 block ml-1">{{ couponSuccess }}</span>
+                            <span v-if="checkoutForm.errors.coupon_code" class="text-xs text-rose-400 mt-1 block ml-1">{{ checkoutForm.errors.coupon_code }}</span>
+                        </div>
                     </div>
                 </div>
 
@@ -239,7 +287,13 @@ const getColorStyle = (colorName) => {
                 <div class="p-6 border-t border-white/[0.08] space-y-4">
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-bold text-slate-400">Total Price</span>
-                        <span class="text-2xl font-black text-white">${{ cartTotal.toFixed(2) }}</span>
+                        <div class="text-right">
+                            <span v-if="appliedCoupon" class="text-sm text-slate-500 line-through mr-2">${{ cartTotal.toFixed(2) }}</span>
+                            <span class="text-2xl font-black text-white">${{ finalTotal.toFixed(2) }}</span>
+                            <div v-if="appliedCoupon" class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">
+                                (-{{ appliedCoupon.type === 'percent' ? appliedCoupon.value + '%' : '$' + appliedCoupon.value }})
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Step 1 Actions -->

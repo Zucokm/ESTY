@@ -35,6 +35,12 @@ class OrderController extends Controller
         $order->update([
             'status' => $validated['status']
         ]);
+        
+        if ($validated['status'] === 'shipping' && $order->user) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($order->user)->send(new \App\Mail\OrderShipped($order));
+            } catch (\Exception $e) {}
+        }
 
         return redirect()->back()->with('success', 'Order status updated successfully.');
     }

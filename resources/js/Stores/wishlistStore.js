@@ -1,41 +1,61 @@
 import { ref, computed, watch } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import axios from 'axios';
 
 const wishlist = ref([]);
-
-// Load from localStorage on initialization
-if (typeof window !== 'undefined') {
-    const saved = localStorage.getItem('esty_wishlist');
-    if (saved) {
-        try {
-            wishlist.value = JSON.parse(saved);
-        } catch (e) {
-            console.error('Error parsing wishlist from localStorage', e);
-        }
-    }
-}
-
-// Sync with localStorage
-watch(wishlist, (newWishlist) => {
-    localStorage.setItem('esty_wishlist', JSON.stringify(newWishlist));
-}, { deep: true });
+let isInitialized = false;
 
 export function useWishlistStore() {
-    const addToWishlist = (product) => {
+    const page = usePage();
+    const isLoggedIn = computed(() => !!page.props.auth?.user);
+
+    const initWishlist = async () => {
+        if (isInitialized) return;
+        
+        if (isLoggedIn.value) {
+            try {
+                // If using ziggy for routes globally
+                const response = await axios.get(route('wishlist.index'));
+                wishlist.value = response.data;
+            } catch (e) {
+                console.error('Failed to fetch wishlist', e);
+            }
+        } else {
+            const saved = localStorage.getItem('esty_wishlist');
+            if (saved) {
+                try {
+                    wishlist.value = JSON.parse(saved);
+                } catch (e) {}
+            }
+        }
+        isInitialized = true;
+    };
+
+    // Watcher to save to localstorage only if not logged in
+    watch(wishlist, (newWishlist) => {
+        if (!isLoggedIn.value) {
+            localStorage.setItem('esty_wishlist', JSON.stringify(newWishlist));
+        }
+    }, { deep: true });
+
+    const addToWishlist = async (product) => {
         if (!wishlist.value.some(p => p.id === product.id)) {
-            wishlist.value.push({
-                id: product.id,
-                name: product.name,
-                slug: product.slug,
-                base_price: product.base_price,
-                images: product.images,
-                category: product.category,
-                variants: product.variants
-            });
+            wishlist.value.push(product);
+            if (isLoggedIn.value) {
+                try {
+                    await axios.post(route('wishlist.toggle'), { product_id: product.id });
+                } catch(e) {}
+            }
         }
     };
 
-    const removeFromWishlist = (productId) => {
+    const removeFromWishlist = async (productId) => {
         wishlist.value = wishlist.value.filter(p => p.id !== productId);
+        if (isLoggedIn.value) {
+            try {
+                await axios.post(route('wishlist.toggle'), { product_id: productId });
+            } catch(e) {}
+        }
     };
 
     const toggleWishlist = (product) => {
@@ -51,6 +71,11 @@ export function useWishlistStore() {
     };
 
     const wishlistCount = computed(() => wishlist.value.length);
+
+    // Call init when hook is used
+    if (typeof window !== 'undefined') {
+        initWishlist();
+    }
 
     return {
         wishlist,

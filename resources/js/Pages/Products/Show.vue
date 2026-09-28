@@ -248,6 +248,20 @@ const submitCheckout = () => {
         }
     });
 };
+
+const reviewForm = useForm({
+    rating: 5,
+    comment: ''
+});
+
+const submitReview = () => {
+    reviewForm.post(route('reviews.store', props.product.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            reviewForm.reset('comment');
+        }
+    });
+};
 </script>
 
 <template>
@@ -433,6 +447,80 @@ const submitCheckout = () => {
 
                 </div>
 
+            </div>
+
+            <!-- Product Reviews Section -->
+            <div class="mt-12 glass-card p-6 md:p-10 rounded-[3rem] border-white/10">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="text-2xl font-black text-white tracking-tight">Customer Reviews</h2>
+                        <div class="flex items-center gap-2 mt-2">
+                            <span class="text-3xl font-extrabold text-white">{{ parseFloat(product.average_rating || 0).toFixed(1) }}</span>
+                            <div class="flex text-amber-400">
+                                <svg v-for="i in 5" :key="i" class="w-5 h-5" :class="i <= Math.round(product.average_rating || 0) ? 'fill-current' : 'text-slate-600'" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                            </div>
+                            <span class="text-sm font-semibold text-slate-400">based on {{ product.reviews_count || 0 }} reviews</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Form -->
+                <div v-if="$page.props.auth.user" class="mb-10 bg-white/[0.03] p-6 rounded-2xl border border-white/[0.05]">
+                    <h3 class="text-lg font-bold text-white mb-4">Write a Review</h3>
+                    <form @submit.prevent="submitReview">
+                        <div class="mb-4">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Rating</label>
+                            <div class="flex gap-1">
+                                <button type="button" v-for="i in 5" :key="i" @click="reviewForm.rating = i" class="focus:outline-none transition-colors" :class="i <= reviewForm.rating ? 'text-amber-400' : 'text-slate-600 hover:text-amber-200'">
+                                    <svg class="w-8 h-8 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                </button>
+                            </div>
+                            <span v-if="reviewForm.errors.rating" class="text-xs text-rose-400 mt-1 block">{{ reviewForm.errors.rating }}</span>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Comment</label>
+                            <textarea v-model="reviewForm.comment" rows="3" class="w-full bg-slate-900/50 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Share your thoughts about this garment..."></textarea>
+                            <span v-if="reviewForm.errors.comment" class="text-xs text-rose-400 mt-1 block">{{ reviewForm.errors.comment }}</span>
+                            <span v-if="reviewForm.errors.review" class="text-xs text-rose-400 mt-1 block">{{ reviewForm.errors.review }}</span>
+                        </div>
+                        <button type="submit" :disabled="reviewForm.processing" class="glass-button-primary px-6 py-2.5 font-bold text-sm rounded-xl shadow-lg shadow-indigo-500/25 disabled:opacity-50 transition-all">
+                            Submit Review
+                        </button>
+                    </form>
+                </div>
+                <div v-else class="mb-10 p-4 rounded-xl bg-white/[0.02] border border-white/[0.05] text-center">
+                    <p class="text-slate-400 text-sm">Please <Link :href="route('login')" class="text-indigo-400 hover:text-indigo-300 font-bold">sign in</Link> to leave a review.</p>
+                </div>
+
+                <!-- Reviews List -->
+                <div class="space-y-4">
+                    <template v-if="product.reviews && product.reviews.length > 0">
+                        <div v-for="review in product.reviews" :key="review.id" class="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.04] transition-all hover:border-white/[0.08]">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-300 font-bold">
+                                        {{ review.user?.name ? review.user.name.charAt(0).toUpperCase() : 'U' }}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-white text-sm">{{ review.user?.name || 'Anonymous' }}</h4>
+                                        <span class="text-[10px] font-semibold text-slate-500">{{ new Date(review.created_at).toLocaleDateString() }}</span>
+                                    </div>
+                                </div>
+                                <div class="flex text-amber-400">
+                                    <svg v-for="i in 5" :key="i" class="w-4 h-4" :class="i <= review.rating ? 'fill-current' : 'text-slate-600'" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <p v-if="review.comment" class="text-slate-300 text-sm leading-relaxed">{{ review.comment }}</p>
+                        </div>
+                    </template>
+                    <div v-else class="text-center py-8">
+                        <p class="text-slate-500 text-sm">No reviews yet. Be the first to review this garment!</p>
+                    </div>
+                </div>
             </div>
         </main>
 

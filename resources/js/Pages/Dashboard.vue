@@ -265,7 +265,7 @@ const toggleSidebar = () => {
                 </div>
 
                 <!-- Charts Section -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
                     <!-- Revenue Trend Area Chart (col-span-2) -->
                     <div class="glass-card p-6 flex flex-col justify-between col-span-1 lg:col-span-2 min-h-[320px]">
                         <div>
@@ -405,6 +405,34 @@ const toggleSidebar = () => {
                         <!-- Info Footer -->
                         <div class="mt-4 text-[10px] text-slate-500 font-semibold tracking-wider text-center uppercase">
                             Total Orders: {{ charts.orderDistribution.reduce((acc, curr) => acc + curr.value, 0) }}
+                        </div>
+                    </div>
+                    
+                    <!-- Top Products Bar Chart (col-span-1) -->
+                    <div class="glass-card p-6 flex flex-col justify-between min-h-[320px]">
+                        <div>
+                            <h3 class="text-white font-bold text-base tracking-tight mb-1">Top Products</h3>
+                            <p class="text-slate-400 text-xs font-medium mb-6">Best selling garments by volume.</p>
+
+                            <!-- Simple visual horizontal bar chart -->
+                            <div class="space-y-4">
+                                <div v-for="(item, idx) in charts.topProducts" :key="item.name" class="space-y-1">
+                                    <div class="flex items-center justify-between text-xs font-bold tracking-wider">
+                                        <span class="text-slate-300 truncate max-w-[70%]">{{ item.name }}</span>
+                                        <span class="text-white">{{ item.total_sold }} sold</span>
+                                    </div>
+                                    <div class="h-2 w-full bg-white/[0.03] border border-white/[0.06] rounded-full overflow-hidden">
+                                        <div 
+                                            :style="{ width: `${Math.min((item.total_sold / Math.max(...charts.topProducts.map(d => d.total_sold), 1)) * 100, 100)}%` }"
+                                            :class="['bg-indigo-400 shadow-md shadow-indigo-500/20']"
+                                            class="h-full rounded-full transition-all duration-1000 ease-out"
+                                        ></div>
+                                    </div>
+                                </div>
+                                <div v-if="charts.topProducts.length === 0" class="text-center py-6 text-slate-500 text-xs">
+                                    No sales data available yet.
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

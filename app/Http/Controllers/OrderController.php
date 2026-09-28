@@ -32,9 +32,16 @@ class OrderController extends Controller
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.price' => 'required|numeric|min:0',
+            'coupon_code' => 'nullable|string|exists:coupons,code',
         ]);
 
-        $this->orderService->createOrder($validated, Auth::id());
+        $order = $this->orderService->createOrder($validated, Auth::id());
+        
+        try {
+            if (Auth::user()) {
+                \Illuminate\Support\Facades\Mail::to(Auth::user())->send(new \App\Mail\OrderPlaced($order));
+            }
+        } catch (\Exception $e) {}
 
         return redirect()->back()->with('success', 'Order processed successfully.');
     }

@@ -33,10 +33,16 @@ class CatalogController extends Controller
      */
     public function show(string $slug): Response
     {
-        $product = Product::with(['category', 'variants', 'images'])
+        $product = Product::with(['category', 'variants', 'images', 'reviews' => function ($query) {
+                $query->with('user')->latest();
+            }])
             ->where('slug', $slug)
             ->where('is_active', true)
             ->firstOrFail();
+
+        // Calculate average rating
+        $product->average_rating = $product->reviews->avg('rating');
+        $product->reviews_count = $product->reviews->count();
 
         return Inertia::render('Products/Show', [
             'product' => $product

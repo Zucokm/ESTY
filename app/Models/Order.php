@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['user_id', 'total_amount', 'status', 'shipping_address', 'phone', 'payment_method'])]
+#[Fillable(['user_id', 'total_amount', 'discount_amount', 'coupon_id', 'status', 'shipping_address', 'phone', 'payment_method'])]
 class Order extends Model
 {
     /**
@@ -24,5 +24,13 @@ class Order extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the coupon applied to the order.
+     */
+    public function coupon(): BelongsTo
+    {
+        return $this->belongsTo(Coupon::class);
     }
 }

@@ -106,6 +106,34 @@ class DashboardController extends Controller
                 'value' => $category->products_count
             ];
         }
+        
+        // 8. Top Products (By Quantity Sold)
+        $topProducts = \Illuminate\Support\Facades\DB::table('order_items')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.status', '!=', 'cancelled')
+            ->select('products.name', \Illuminate\Support\Facades\DB::raw('SUM(order_items.quantity) as total_sold'))
+            ->groupBy('products.id', 'products.name')
+            ->orderByDesc('total_sold')
+            ->limit(5)
+            ->get();
+            
+        // 9. New Customers Trend (Last 7 Days)
+        $newCustomersTrendRaw = \App\Models\User::where('created_at', '>=', $sevenDaysAgo)
+            ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->get()
+            ->pluck('count', 'date');
+            
+        $newCustomersTrend = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i);
+            $formattedDate = $date->format('Y-m-d');
+            $newCustomersTrend[] = [
+                'label' => $date->format('D'),
+                'value' => $newCustomersTrendRaw->get($formattedDate, 0)
+            ];
+        }
 
         return Inertia::render('Dashboard', [
             'orders' => $orders,
@@ -130,7 +158,9 @@ class DashboardController extends Controller
             'charts' => [
                 'revenueTrend' => $revenueTrend,
                 'orderDistribution' => $orderDistribution,
-                'categoryDistribution' => $categoryDistribution
+                'categoryDistribution' => $categoryDistribution,
+                'topProducts' => $topProducts,
+                'newCustomersTrend' => $newCustomersTrend
             ]
         ]);
     }
