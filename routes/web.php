@@ -47,10 +47,21 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
     Route::get('admin/contacts', [\App\Http\Controllers\Admin\ContactController::class, 'index'])->name('admin.contacts.index');
     Route::put('admin/contacts/{contact}', [\App\Http\Controllers\Admin\ContactController::class, 'updateStatus'])->name('admin.contacts.update');
-    // Admin Reportsn    Route::get('admin/reports/export-orders', [\App\Http\Controllers\Admin\ReportController::class, 'exportOrders'])->name('admin.reports.export');n
-    // Admin Inventoryn    Route::get('admin/inventory', [\App\Http\Controllers\Admin\InventoryController::class, 'index'])->name('admin.inventory.index');n
-    // Admin Reviewsn    Route::get('admin/reviews', [\App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('admin.reviews.index');n    Route::put('admin/reviews/{review}/toggle-approval', [\App\Http\Controllers\Admin\ReviewController::class, 'toggleApproval'])->name('admin.reviews.toggle-approval');n    Route::delete('admin/reviews/{review}', [\App\Http\Controllers\Admin\ReviewController::class, 'destroy'])->name('admin.reviews.destroy');n
-    // Admin Customersn    Route::get('admin/customers', [\App\Http\Controllers\Admin\CustomerController::class, 'index'])->name('admin.customers.index');n    Route::put('admin/customers/{user}/toggle-ban', [\App\Http\Controllers\Admin\CustomerController::class, 'toggleBan'])->name('admin.customers.toggle-ban');n
+    // Admin Reports
+    Route::get('admin/reports/export-orders', [\App\Http\Controllers\Admin\ReportController::class, 'exportOrders'])->name('admin.reports.export');
+
+    // Admin Inventory
+    Route::get('admin/inventory', [\App\Http\Controllers\Admin\InventoryController::class, 'index'])->name('admin.inventory.index');
+
+    // Admin Reviews
+    Route::get('admin/reviews', [\App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('admin.reviews.index');
+    Route::put('admin/reviews/{review}/toggle-approval', [\App\Http\Controllers\Admin\ReviewController::class, 'toggleApproval'])->name('admin.reviews.toggle-approval');
+    Route::delete('admin/reviews/{review}', [\App\Http\Controllers\Admin\ReviewController::class, 'destroy'])->name('admin.reviews.destroy');
+
+    // Admin Customers
+    Route::get('admin/customers', [\App\Http\Controllers\Admin\CustomerController::class, 'index'])->name('admin.customers.index');
+    Route::put('admin/customers/{user}/toggle-ban', [\App\Http\Controllers\Admin\CustomerController::class, 'toggleBan'])->name('admin.customers.toggle-ban');
+
     // Admin Coupons
     Route::get('admin/coupons', [\App\Http\Controllers\Admin\CouponController::class, 'index'])->name('admin.coupons.index');
     Route::post('admin/coupons', [\App\Http\Controllers\Admin\CouponController::class, 'store'])->name('admin.coupons.store');
