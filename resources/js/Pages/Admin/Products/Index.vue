@@ -147,14 +147,14 @@ const toggleSidebar = () => {
         <AdminSidebar active="products" />
 
         <!-- Main Content Area -->
-        <div class="flex-1 lg:ml-64 flex flex-col min-h-screen relative z-10">
+        <div class="flex-1 min-w-0 md:ml-64 flex flex-col min-h-screen relative z-10">
             
             <!-- Top Navigation -->
             <header class="h-16 bg-white/[0.02] backdrop-blur-md border-b border-white/[0.06] flex items-center justify-between px-4 sm:px-8 sticky top-0 z-10">
                 <!-- Hamburger Menu Button -->
                 <button 
                     @click="toggleSidebar" 
-                    class="lg:hidden p-2 text-slate-400 hover:text-white transition-colors focus:outline-none"
+                    class="md:hidden p-2 text-slate-400 hover:text-white transition-colors focus:outline-none"
                 >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -210,7 +210,7 @@ const toggleSidebar = () => {
             </header>
 
             <!-- Main Body -->
-            <main class="flex-1 p-4 sm:p-8 space-y-6">
+            <main class="flex-1 min-w-0 p-4 sm:p-8 space-y-6">
                 <!-- Page Title -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
@@ -361,16 +361,16 @@ const toggleSidebar = () => {
                 <!-- Products Table -->
                 <div class="glass-card overflow-hidden border border-white/5 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.6)]">
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
+                        <table class="w-full text-left border-collapse min-w-[900px]">
                             <thead>
                                 <tr class="border-b border-white/[0.06] bg-white/[0.01] text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                                    <th class="px-6 py-4.5">Product Info</th>
-                                    <th class="px-6 py-4.5">Category</th>
-                                    <th class="px-6 py-4.5">Base Price</th>
-                                    <th class="px-6 py-4.5">Total Stock</th>
-                                    <th class="px-6 py-4.5">Variants Detail (Sizes / Colors)</th>
-                                    <th class="px-6 py-4.5">Status</th>
-                                    <th class="px-6 py-4.5 text-right">Actions</th>
+                                    <th class="whitespace-nowrap px-6 py-4.5">Product Info</th>
+                                    <th class="whitespace-nowrap px-6 py-4.5">Category</th>
+                                    <th class="whitespace-nowrap px-6 py-4.5">Base Price</th>
+                                    <th class="whitespace-nowrap px-6 py-4.5">Total Stock</th>
+                                    <th class="whitespace-nowrap px-6 py-4.5">Variants Detail (Sizes / Colors)</th>
+                                    <th class="whitespace-nowrap px-6 py-4.5">Status</th>
+                                    <th class="whitespace-nowrap px-6 py-4.5 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-white/[0.02]">
@@ -380,7 +380,7 @@ const toggleSidebar = () => {
                                     class="hover:bg-white/[0.03] hover:translate-x-0.5 text-sm text-slate-200 transition-all duration-200"
                                 >
                                     <!-- Product Info Column -->
-                                    <td class="px-6 py-5">
+                                    <td class="whitespace-nowrap px-6 py-5">
                                         <div class="flex items-center gap-3.5">
                                             <div class="w-11 h-11 rounded-2xl overflow-hidden bg-slate-900 border border-white/10 shrink-0 shadow-lg relative group">
                                                 <img 
@@ -400,7 +400,7 @@ const toggleSidebar = () => {
                                     </td>
                                     
                                     <!-- Category Column -->
-                                    <td class="px-6 py-5">
+                                    <td class="whitespace-nowrap px-6 py-5">
                                         <div class="flex items-center gap-2">
                                             <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 shadow-[0_0_8px_rgba(129,140,248,0.6)]"></span>
                                             <span class="font-bold text-slate-300">{{ product.category?.name || 'Unassigned' }}</span>
@@ -408,12 +408,12 @@ const toggleSidebar = () => {
                                     </td>
 
                                     <!-- Base Price Column -->
-                                    <td class="px-6 py-5 font-extrabold text-white text-base">
+                                    <td class="whitespace-nowrap px-6 py-5 font-extrabold text-white text-base">
                                         ${{ parseFloat(product.base_price).toFixed(2) }}
                                     </td>
 
                                     <!-- Total Stock Column -->
-                                    <td class="px-6 py-5">
+                                    <td class="whitespace-nowrap px-6 py-5">
                                         <div class="flex flex-col gap-1.5 min-w-[100px]">
                                             <div class="flex items-center justify-between gap-2">
                                                 <span 
@@ -446,7 +446,7 @@ const toggleSidebar = () => {
                                     </td>
 
                                     <!-- Variants Info Column -->
-                                    <td class="px-6 py-5">
+                                    <td class="whitespace-nowrap px-6 py-5">
                                         <div class="flex flex-col gap-1">
                                             <span class="text-xs font-semibold text-slate-400 leading-relaxed">{{ getVariantsSummary(product.variants) }}</span>
                                             <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{{ product.variants?.length || 0 }} SKUs total</span>
@@ -454,7 +454,7 @@ const toggleSidebar = () => {
                                     </td>
 
                                     <!-- Status Column -->
-                                    <td class="px-6 py-5">
+                                    <td class="whitespace-nowrap px-6 py-5">
                                         <button 
                                             @click="toggleProductStatus(product.id)"
                                             :class="[
@@ -471,7 +471,7 @@ const toggleSidebar = () => {
                                     </td>
 
                                     <!-- Actions Column -->
-                                    <td class="px-6 py-5 text-right">
+                                    <td class="whitespace-nowrap px-6 py-5 text-right">
                                         <Link 
                                             :href="route('admin.products.edit', product.id)" 
                                             class="glass-button text-xs py-2 px-4 rounded-xl border border-white/5 hover:border-white/10 hover:bg-white/[0.06] hover:text-white transition-all duration-200 flex items-center gap-1.5 inline-flex"

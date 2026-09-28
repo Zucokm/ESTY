@@ -162,14 +162,14 @@ const toggleSidebar = () => {
         <AdminSidebar active="dashboard" />
 
         <!-- Main Content Area -->
-        <div class="flex-1 lg:ml-64 flex flex-col min-h-screen relative z-10">
+        <div class="flex-1 min-w-0 md:ml-64 flex flex-col min-h-screen relative z-10">
             
             <!-- Top Navigation Bar -->
             <header class="h-16 bg-white/[0.02] backdrop-blur-md border-b border-white/[0.06] flex items-center justify-between px-4 sm:px-8 sticky top-0 z-10">
                 <!-- Hamburger Menu Button -->
                 <button 
                     @click="toggleSidebar" 
-                    class="lg:hidden p-2 text-slate-400 hover:text-white transition-colors focus:outline-none"
+                    class="md:hidden p-2 text-slate-400 hover:text-white transition-colors focus:outline-none"
                 >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -235,7 +235,7 @@ const toggleSidebar = () => {
             </header>
 
             <!-- Main Scrollable Body Area -->
-            <main class="flex-1 p-4 sm:p-8 space-y-6 sm:space-y-8">
+            <main class="flex-1 min-w-0 p-4 sm:p-8 space-y-6 sm:space-y-8">
                 <!-- Dashboard Welcome Title -->
                 <div>
                     <h1 class="text-2xl font-bold text-white tracking-tight">Overview</h1>
@@ -243,7 +243,7 @@ const toggleSidebar = () => {
                 </div>
 
                 <!-- Stats Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
                     <div 
                         v-for="(stat, idx) in statsData" 
                         :key="idx" 
@@ -265,9 +265,9 @@ const toggleSidebar = () => {
                 </div>
 
                 <!-- Charts Section -->
-                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
                     <!-- Revenue Trend Area Chart (col-span-2) -->
-                    <div class="glass-card p-6 flex flex-col justify-between col-span-1 lg:col-span-2 min-h-[320px]">
+                    <div class="glass-card p-6 flex flex-col justify-between col-span-1 lg:col-span-2 xl:col-span-2 min-h-[320px]">
                         <div>
                             <div class="flex items-center justify-between mb-4">
                                 <div>
@@ -452,16 +452,16 @@ const toggleSidebar = () => {
 
                     <!-- Table Data -->
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
+                        <table class="w-full text-left border-collapse min-w-[900px]">
                             <thead>
                                 <tr class="border-b border-white/[0.04] text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                                    <th class="px-6 py-4">Order ID</th>
-                                    <th class="px-6 py-4">Customer</th>
-                                    <th class="px-6 py-4">Shipping Details</th>
-                                    <th class="px-6 py-4">Phone Number</th>
-                                    <th class="px-6 py-4">Total Amount</th>
-                                    <th class="px-6 py-4">Date</th>
-                                    <th class="px-6 py-4">Status</th>
+                                    <th class="whitespace-nowrap px-6 py-4">Order ID</th>
+                                    <th class="whitespace-nowrap px-6 py-4">Customer</th>
+                                    <th class="whitespace-nowrap px-6 py-4">Shipping Details</th>
+                                    <th class="whitespace-nowrap px-6 py-4">Phone Number</th>
+                                    <th class="whitespace-nowrap px-6 py-4">Total Amount</th>
+                                    <th class="whitespace-nowrap px-6 py-4">Date</th>
+                                    <th class="whitespace-nowrap px-6 py-4">Status</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-white/[0.02]">
@@ -470,13 +470,13 @@ const toggleSidebar = () => {
                                     :key="order.id"
                                     class="hover:bg-white/[0.02] text-sm text-slate-200 transition-colors duration-150"
                                 >
-                                    <td class="px-6 py-4.5 font-mono text-xs text-slate-400">#VR-{{ order.id }}</td>
-                                    <td class="px-6 py-4.5 font-semibold text-white">{{ order.user?.name || 'Guest' }}</td>
-                                    <td class="px-6 py-4.5 text-xs text-slate-400 max-w-[200px] truncate">{{ order.shipping_address }}</td>
-                                    <td class="px-6 py-4.5 font-mono text-xs text-slate-400">{{ order.phone }}</td>
-                                    <td class="px-6 py-4.5 font-bold text-white">${{ parseFloat(order.total_amount).toFixed(2) }}</td>
-                                    <td class="px-6 py-4.5 text-xs text-slate-400">{{ formatDate(order.created_at) }}</td>
-                                    <td class="px-6 py-4.5">
+                                    <td class="whitespace-nowrap px-6 py-4.5 font-mono text-xs text-slate-400">#VR-{{ order.id }}</td>
+                                    <td class="whitespace-nowrap px-6 py-4.5 font-semibold text-white">{{ order.user?.name || 'Guest' }}</td>
+                                    <td class="whitespace-nowrap px-6 py-4.5 text-xs text-slate-400 max-w-[200px] truncate">{{ order.shipping_address }}</td>
+                                    <td class="whitespace-nowrap px-6 py-4.5 font-mono text-xs text-slate-400">{{ order.phone }}</td>
+                                    <td class="whitespace-nowrap px-6 py-4.5 font-bold text-white">${{ parseFloat(order.total_amount).toFixed(2) }}</td>
+                                    <td class="whitespace-nowrap px-6 py-4.5 text-xs text-slate-400">{{ formatDate(order.created_at) }}</td>
+                                    <td class="whitespace-nowrap px-6 py-4.5">
                                         <div class="relative inline-block" @click.stop>
                                             <select 
                                                 :value="order.status"

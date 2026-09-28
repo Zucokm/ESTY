@@ -33,13 +33,13 @@ onUnmounted(() => {
     <div 
         v-if="isOpen" 
         @click="isOpen = false"
-        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden"
     ></div>
 
     <aside 
         :class="[
-            isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0',
-            'w-64 fixed inset-y-0 left-0 bg-slate-950/[0.95] lg:bg-black/[0.15] backdrop-blur-3xl border-r border-white/[0.06] flex flex-col z-40 lg:z-20 transform transition-transform duration-300 ease-in-out'
+            isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0',
+            'w-64 fixed inset-y-0 left-0 bg-slate-950/[0.95] md:bg-black/[0.15] backdrop-blur-3xl border-r border-white/[0.06] flex flex-col z-40 md:z-20 transform transition-transform duration-300 ease-in-out'
         ]"
     >
         <!-- Sidebar Brand Header -->

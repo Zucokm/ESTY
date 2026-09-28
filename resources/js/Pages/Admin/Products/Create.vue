@@ -273,7 +273,7 @@ const submit = () => {
             </header>
 
             <!-- Main Body (Form) -->
-            <main class="flex-1 p-8 space-y-6">
+            <main class="flex-1 min-w-0 p-8 space-y-6">
                 <!-- Page Title -->
                 <div class="flex items-center justify-between">
                     <div>

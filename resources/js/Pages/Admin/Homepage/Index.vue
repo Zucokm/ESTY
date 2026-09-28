@@ -216,7 +216,7 @@ const toggleSidebar = () => {
         <AdminSidebar active="homepage" />
 
         <!-- Main Content Area -->
-        <div class="flex-1 lg:ml-64 flex flex-col min-h-screen">
+        <div class="flex-1 min-w-0 md:ml-64 flex flex-col min-h-screen">
             
             <!-- Top Navigation Bar -->
             <header class="h-16 bg-black/10 backdrop-blur-md border-b border-white/[0.06] flex items-center justify-between px-4 sm:px-8 sticky top-0 z-10">
@@ -224,7 +224,7 @@ const toggleSidebar = () => {
                     <!-- Hamburger Menu Button -->
                     <button 
                         @click="toggleSidebar" 
-                        class="lg:hidden p-2 text-slate-400 hover:text-white transition-colors focus:outline-none"
+                        class="md:hidden p-2 text-slate-400 hover:text-white transition-colors focus:outline-none"
                     >
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -271,7 +271,7 @@ const toggleSidebar = () => {
             </header>
 
             <!-- Main Scrollable Body Area -->
-            <main class="flex-1 p-4 sm:p-8 space-y-6 sm:space-y-8 max-w-6xl w-full mx-auto">
+            <main class="flex-1 min-w-0 p-4 sm:p-8 space-y-6 sm:space-y-8 max-w-6xl w-full mx-auto">
                 
                 <!-- Page Title -->
                 <div>

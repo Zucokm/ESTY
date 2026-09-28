@@ -112,14 +112,14 @@ const toggleSidebar = () => {
         <AdminSidebar active="categories" />
 
         <!-- Main Content Area -->
-        <div class="flex-1 min-h-screen lg:ml-64 flex flex-col relative z-10">
+        <div class="flex-1 min-w-0 min-h-screen md:ml-64 flex flex-col relative z-10">
             <!-- Header bar -->
             <header class="h-16 border-b border-white/[0.06] flex items-center justify-between px-4 sm:px-8 bg-black/[0.05] backdrop-blur-md">
                 <div class="flex items-center gap-2">
                     <!-- Hamburger Menu Button -->
                     <button 
                         @click="toggleSidebar" 
-                        class="lg:hidden p-2 text-slate-400 hover:text-white transition-colors focus:outline-none"
+                        class="md:hidden p-2 text-slate-400 hover:text-white transition-colors focus:outline-none"
                     >
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -163,7 +163,7 @@ const toggleSidebar = () => {
             </header>
 
             <!-- Main Panel -->
-            <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
+            <main class="flex-1 min-w-0 p-4 sm:p-8 overflow-y-auto">
                 
                 <!-- Welcome alerts/actions bar -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">

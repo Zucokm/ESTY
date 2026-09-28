@@ -43,9 +43,9 @@ const toggleSidebar = () => {
         </template>
 
         <!-- Body Area -->
-        <main :class="['pt-32 px-4 max-w-4xl mx-auto space-y-8 relative z-10', $page.props.auth.user?.role === 'admin' ? 'lg:ml-64' : '']">
+        <main :class="['pt-32 px-4 max-w-4xl mx-auto space-y-8 relative z-10', $page.props.auth.user?.role === 'admin' ? 'md:ml-64' : '']">
             <!-- Mobile Hamburger for Admin -->
-            <div v-if="$page.props.auth.user?.role === 'admin'" class="lg:hidden flex justify-start -mt-20 mb-6">
+            <div v-if="$page.props.auth.user?.role === 'admin'" class="md:hidden flex justify-start -mt-20 mb-6">
                 <button @click="toggleSidebar" class="p-2 text-slate-400 hover:text-white glass-button rounded-lg">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
