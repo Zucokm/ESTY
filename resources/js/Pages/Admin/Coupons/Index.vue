@@ -12,11 +12,11 @@ const editingCoupon = ref(null);
 
 const form = useForm({
     code: '',
-    discount_type: 'percentage',
-    discount_amount: '',
+    type: 'percent',
+    value: '',
     minimum_spend: '',
     usage_limit: '',
-    expires_at: '',
+    valid_until: '',
     is_active: true
 });
 
@@ -24,11 +24,11 @@ const openModal = (coupon = null) => {
     if (coupon) {
         editingCoupon.value = coupon;
         form.code = coupon.code;
-        form.discount_type = coupon.discount_type;
-        form.discount_amount = coupon.discount_amount;
+        form.type = coupon.type;
+        form.value = coupon.value;
         form.minimum_spend = coupon.minimum_spend;
         form.usage_limit = coupon.usage_limit;
-        form.expires_at = coupon.expires_at ? coupon.expires_at.split('T')[0] : '';
+        form.valid_until = coupon.valid_until ? coupon.valid_until.split('T')[0] : '';
         form.is_active = !!coupon.is_active;
     } else {
         editingCoupon.value = null;
@@ -138,7 +138,7 @@ const formatDate = (dateString) => {
                                         {{ coupon.code }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-5 font-bold text-white">
-                                        {{ coupon.discount_type === 'percentage' ? coupon.discount_amount + '%' : coupon.discount_amount + ' Ks' }}
+                                        {{ coupon.type === 'percent' ? coupon.value + '%' : coupon.value + ' Ks' }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-5 text-slate-400">
                                         {{ coupon.minimum_spend ? coupon.minimum_spend + ' Ks' : 'No Min' }}
@@ -147,7 +147,7 @@ const formatDate = (dateString) => {
                                         {{ coupon.used_count }} / {{ coupon.usage_limit || '∞' }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-5 text-slate-400">
-                                        {{ formatDate(coupon.expires_at) }}
+                                        {{ formatDate(coupon.valid_until) }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-5">
                                         <span 
@@ -209,31 +209,26 @@ const formatDate = (dateString) => {
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Discount Type</label>
-                            <select v-model="form.discount_type" class="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500">
-                                <option value="percentage">Percentage (%)</option>
+                            <select v-model="form.type" class="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500">
+                                <option value="percent">Percentage (%)</option>
                                 <option value="fixed">Fixed Amount (Ks)</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Amount</label>
-                            <input v-model="form.discount_amount" type="number" step="0.01" class="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500" placeholder="e.g. 5000" required>
+                            <input v-model="form.value" type="number" step="0.01" class="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500" placeholder="e.g. 5000" required>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Min. Spend (Ks)</label>
-                            <input v-model="form.minimum_spend" type="number" step="0.01" class="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500" placeholder="e.g. 50000">
-                        </div>
-                        <div>
                             <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Usage Limit</label>
                             <input v-model="form.usage_limit" type="number" class="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500" placeholder="e.g. 50">
                         </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Expiry Date</label>
-                        <input v-model="form.expires_at" type="date" class="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500" style="color-scheme: dark;">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Expiry Date</label>
+                            <input v-model="form.valid_until" type="date" class="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500" style="color-scheme: dark;">
+                        </div>
                     </div>
 
                     <div class="flex items-center gap-3 pt-2">

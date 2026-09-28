@@ -40,12 +40,12 @@ class HandleInertiaRequests extends Middleware
             ],
             'active_coupons' => \App\Models\Coupon::where('is_active', true)
                 ->where(function ($query) {
-                    $query->whereNull('expires_at')
-                          ->orWhere('expires_at', '>', now());
+                    $query->whereNull('valid_until')
+                          ->orWhere('valid_until', '>', now());
                 })
                 ->where(function ($query) {
                     $query->whereNull('usage_limit')
-                          ->orWhereColumn('used_count', '<', 'usage_limit');
+                          ->orWhereColumn('times_used', '<', 'usage_limit');
                 })
                 ->get(),
         ];
