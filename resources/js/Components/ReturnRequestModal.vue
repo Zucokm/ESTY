@@ -12,6 +12,10 @@
             </div>
 
             <form @submit.prevent="submitReturn" class="space-y-5">
+                <div v-if="form.errors.message" class="p-4 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-xl text-sm font-bold">
+                    {{ form.errors.message }}
+                </div>
+
                 <div>
                     <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Reason for Return</label>
                     <select v-model="form.reason" class="glass-input w-full py-2.5 px-4 text-sm bg-slate-900 appearance-none" required>
@@ -22,11 +26,15 @@
                         <option value="Not as Expected">Item not as expected</option>
                         <option value="Other">Other</option>
                     </select>
+                    <div v-if="form.errors.reason" class="text-rose-400 text-xs mt-1">{{ form.errors.reason }}</div>
+
                 </div>
 
                 <div>
                     <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Detailed Description</label>
                     <textarea v-model="form.description" rows="3" class="glass-input w-full py-2.5 px-4 text-sm resize-none" placeholder="Please explain the issue in detail..." required></textarea>
+                    <div v-if="form.errors.description" class="text-rose-400 text-xs mt-1">{{ form.errors.description }}</div>
+
                 </div>
 
                 <div>
@@ -35,6 +43,8 @@
                         <input type="file" @change="handleFileUpload" multiple accept="image/*" class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-500/10 file:text-indigo-400 hover:file:bg-indigo-500/20" />
                     </div>
                     <p class="text-[10px] text-slate-500 mt-1">You can upload multiple photos. Max 5MB per photo.</p>
+                    <div v-if="form.errors.images" class="text-rose-400 text-xs mt-1">{{ form.errors.images }}</div>
+
                 </div>
 
                 <div class="pt-4 flex items-center justify-end gap-3 border-t border-white/[0.04]">

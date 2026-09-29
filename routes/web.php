@@ -34,6 +34,11 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::patch('admin/products/{product}/toggle-status', [ProductController::class, 'toggleStatus'])->name('admin.products.toggleStatus');
     Route::get('admin/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
     Route::put('admin/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
+    Route::get('admin/returns', [App\Http\Controllers\Admin\ReturnRequestController::class, 'index'])->name('admin.returns.index');
+    Route::get('admin/returns/{returnRequest}', [App\Http\Controllers\Admin\ReturnRequestController::class, 'show'])->name('admin.returns.show');
+    Route::put('admin/returns/{returnRequest}/status', [App\Http\Controllers\Admin\ReturnRequestController::class, 'updateStatus'])->name('admin.returns.status');
+    Route::post('admin/returns/{returnRequest}/message', [App\Http\Controllers\Admin\ReturnRequestController::class, 'message'])->name('admin.returns.message');
+
 
     // Admin Homepage settings
     Route::get('admin/homepage', [HomepageController::class, 'index'])->name('admin.homepage.index');
@@ -89,6 +94,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [CustomerOrderController::class, 'index'])->name('orders.index');
     Route::post('/orders/{order}/cancel', [CustomerOrderController::class, 'cancel'])->name('orders.cancel');
     
+    Route::post('/orders/{order}/return', [App\Http\Controllers\ReturnRequestController::class, 'store'])->name('returns.store');
+    Route::get('/returns/{id}', [App\Http\Controllers\ReturnRequestController::class, 'show'])->name('returns.show');
+    Route::post('/returns/{returnRequest}/message', [App\Http\Controllers\ReturnRequestController::class, 'message'])->name('returns.message');
+
     Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 });
 
