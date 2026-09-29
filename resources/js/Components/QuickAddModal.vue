@@ -213,7 +213,7 @@ const getColorStyle = (colorName) => {
                 <div class="pt-5 border-t border-white/[0.08] flex items-center justify-between gap-4 mt-auto">
                     <div class="flex flex-col">
                         <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Total Price</span>
-                        <span class="text-2xl font-black text-white">${{ variantPrice.toFixed(2) }}</span>
+                        <span class="text-2xl font-black text-white">{{ variantPrice.toLocaleString() }} Ks</span>
                     </div>
 
                     <button 

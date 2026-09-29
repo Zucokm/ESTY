@@ -474,8 +474,8 @@ const toggleSidebar = () => {
                                                                 </span>
                                                             </div>
                                                             <div class="text-right">
-                                                                <span class="font-mono text-xs text-slate-400 block">${{ parseFloat(item.price).toFixed(2) }} x {{ item.quantity }}</span>
-                                                                <span class="font-extrabold text-white text-sm block mt-1">${{ (parseFloat(item.price) * item.quantity).toFixed(2) }}</span>
+                                                                <span class="font-mono text-xs text-slate-400 block">{{ parseFloat(item.price).toLocaleString() }} Ks x {{ item.quantity }}</span>
+                                                                <span class="font-extrabold text-white text-sm block mt-1">{{ (parseFloat(item.price) * item.quantity).toLocaleString() }} Ks</span>
                                                             </div>
                                                         </div>
                                                     </div>

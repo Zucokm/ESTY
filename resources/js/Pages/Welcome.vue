@@ -490,7 +490,7 @@ const filteredProducts = computed(() => {
                             <h3 class="font-bold text-white tracking-tight text-lg group-hover:text-indigo-200 transition-colors duration-200 line-clamp-1">
                                 {{ product.name }}
                             </h3>
-                            <span class="font-extrabold text-white text-lg">${{ parseFloat(product.base_price).toFixed(2) }}</span>
+                            <span class="font-extrabold text-white text-lg">{{ parseFloat(product.base_price).toLocaleString() }} Ks</span>
                         </div>
 
                         <!-- Variant Specs: Colors & Sizes -->

@@ -66,7 +66,7 @@ const { wishlist, removeFromWishlist, wishlistCount } = useWishlistStore();
                             <div class="flex-1 flex flex-col justify-between">
                                 <div>
                                     <Link :href="route('products.show', item.slug)" @click="emit('close')" class="font-bold text-white text-sm tracking-tight line-clamp-1 hover:text-indigo-300 transition-colors">{{ item.name }}</Link>
-                                    <span class="block mt-1 text-xs font-extrabold text-slate-300">${{ parseFloat(item.base_price).toFixed(2) }}</span>
+                                    <span class="block mt-1 text-xs font-extrabold text-slate-300">{{ parseFloat(item.base_price).toLocaleString() }} Ks</span>
                                 </div>
 
                                 <!-- Quick actions -->

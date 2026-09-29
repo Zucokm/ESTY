@@ -184,7 +184,7 @@ const getColorStyle = (colorName) => {
                                     <span class="text-xs text-white font-bold px-1.5">{{ item.quantity }}</span>
                                     <button @click="updateQuantity(item.variant_id, item.quantity + 1)" class="text-slate-400 hover:text-white font-bold text-xs">+</button>
                                 </div>
-                                <span class="font-extrabold text-white text-sm">${{ (item.price * item.quantity).toFixed(2) }}</span>
+                                <span class="font-extrabold text-white text-sm">{{ (item.price * item.quantity).toLocaleString() }} Ks</span>
                             </div>
                         </div>
 
