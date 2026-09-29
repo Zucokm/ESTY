@@ -54,6 +54,8 @@ class OrderController extends Controller
         }
 
         $order->update([
+            'delivered_at' => $newStatus === 'delivered' ? now() : $order->delivered_at,
+
             'status' => $newStatus
         ]);
         
