@@ -21,7 +21,7 @@ class ReturnRequestController extends Controller
 
     public function show($id)
     {
-        $returnRequest = ReturnRequest::with(['order.items.product', 'order.items.variant', 'user', 'messages.user'])->findOrFail($id);
+        $returnRequest = ReturnRequest::with(['order.items.product.images', 'order.items.variant', 'user', 'messages.user'])->findOrFail($id);
         return Inertia::render('Admin/ReturnRequests/Show', [
             'returnRequest' => $returnRequest
         ]);
