@@ -396,7 +396,7 @@ const getItemImage = (item) => {
                                     Delivering - Cannot Cancel
                                 </span>
                             </div>
-                            <div v-else-if="order.status.toLowerCase() === 'delivered'" class="text-right">
+                            <div v-else-if="['delivered', 'return_requested', 'returned', 'refunded'].includes(order.status.toLowerCase())" class="text-right">
                                 <template v-if="order.return_request">
                                     <Link 
                                         :href="route('returns.show', order.return_request.id)"

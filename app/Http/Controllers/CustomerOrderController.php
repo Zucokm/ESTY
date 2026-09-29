@@ -18,7 +18,7 @@ class CustomerOrderController extends Controller
     public function index()
     {
         $orders = Order::where('user_id', Auth::id())
-            ->with(['items.product.images', 'items.variant'])
+            ->with(['items.product.images', 'items.variant', 'returnRequest'])
             ->latest()
             ->get();
 
