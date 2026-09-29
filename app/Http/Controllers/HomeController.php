@@ -52,6 +52,19 @@ class HomeController extends Controller
                 'brand_story_stat_2_val' => 'Limited',
                 'brand_story_stat_2_lbl' => 'Studio Run',
                 'brand_story_image' => '/images/brand_story.png',
+                'feature_1_title' => 'Free Express Shipping',
+                'feature_1_subtitle' => 'On all domestic orders over 150,000 Ks.',
+                'feature_1_icon' => 'truck',
+                'feature_2_title' => 'Easy Returns',
+                'feature_2_subtitle' => '30-day effortless swap collection service.',
+                'feature_2_icon' => 'arrow-path',
+                'feature_3_title' => 'Premium Quality',
+                'feature_3_subtitle' => '100% sustainably grown materials.',
+                'feature_3_icon' => 'check-badge',
+                'feature_4_title' => 'Bespoke Adjustments',
+                'feature_4_subtitle' => 'Tailored customization for select products.',
+                'feature_4_icon' => 'adjustments',
+
             ];
             return array_merge($defaults, $settings);
         });

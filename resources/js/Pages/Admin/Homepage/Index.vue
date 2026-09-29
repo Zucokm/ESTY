@@ -62,6 +62,18 @@ const settingsForm = useForm({
     brand_story_stat_2_val: props.settings.brand_story_stat_2_val || '',
     brand_story_stat_2_lbl: props.settings.brand_story_stat_2_lbl || '',
     brand_story_image_file: null
+    , feature_1_title: props.settings.feature_1_title || '',
+    feature_1_subtitle: props.settings.feature_1_subtitle || '',
+    feature_1_icon: props.settings.feature_1_icon || 'truck',
+    feature_2_title: props.settings.feature_2_title || '',
+    feature_2_subtitle: props.settings.feature_2_subtitle || '',
+    feature_2_icon: props.settings.feature_2_icon || 'arrow-path',
+    feature_3_title: props.settings.feature_3_title || '',
+    feature_3_subtitle: props.settings.feature_3_subtitle || '',
+    feature_3_icon: props.settings.feature_3_icon || 'check-badge',
+    feature_4_title: props.settings.feature_4_title || '',
+    feature_4_subtitle: props.settings.feature_4_subtitle || '',
+    feature_4_icon: props.settings.feature_4_icon || 'adjustments'
 });
 
 // Image preview references
@@ -537,6 +549,41 @@ const toggleSidebar = () => {
                                             accept="image/*"
                                             class="text-xs text-slate-400"
                                         />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-8 border-t border-white/[0.04] mt-8">
+                            <div class="mb-6">
+                                <h3 class="text-xl font-bold text-white tracking-tight">Features Banner</h3>
+                                <p class="text-slate-400 text-sm mt-1">Configure the 4 key features displayed below the hero section.</p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div v-for="i in 4" :key="i" class="space-y-4 p-4 rounded-xl border border-white/[0.05] bg-white/[0.01]">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <div class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 font-bold text-xs">{{ i }}</div>
+                                        <h4 class="text-white font-semibold text-sm">Feature {{ i }}</h4>
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Title</label>
+                                        <input type="text" v-model="settingsForm['feature_'+i+'_title']" class="glass-input w-full py-2 px-3 text-sm" required />
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Subtitle</label>
+                                        <input type="text" v-model="settingsForm['feature_'+i+'_subtitle']" class="glass-input w-full py-2 px-3 text-sm" required />
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Icon Type</label>
+                                        <select v-model="settingsForm['feature_'+i+'_icon']" class="glass-input w-full py-2 px-3 text-sm appearance-none bg-slate-900">
+                                            <option value="truck">Truck (Shipping)</option>
+                                            <option value="arrow-path">Circular Arrow (Returns)</option>
+                                            <option value="check-badge">Check Badge (Quality/Organic)</option>
+                                            <option value="adjustments">Sliders (Bespoke)</option>
+                                            <option value="shield-check">Shield (Secure)</option>
+                                            <option value="star">Star (Premium)</option>
+                                            <option value="heart">Heart</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>

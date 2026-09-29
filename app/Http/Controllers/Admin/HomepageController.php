@@ -38,6 +38,19 @@ class HomepageController extends Controller
             'brand_story_stat_2_val' => '',
             'brand_story_stat_2_lbl' => '',
             'brand_story_image' => '',
+            'feature_1_title' => 'Free Express Shipping',
+            'feature_1_subtitle' => 'On all domestic orders over 150,000 Ks.',
+            'feature_1_icon' => 'truck',
+            'feature_2_title' => 'Easy Returns',
+            'feature_2_subtitle' => '30-day effortless swap collection service.',
+            'feature_2_icon' => 'arrow-path',
+            'feature_3_title' => 'Premium Quality',
+            'feature_3_subtitle' => '100% sustainably grown materials.',
+            'feature_3_icon' => 'check-badge',
+            'feature_4_title' => 'Bespoke Adjustments',
+            'feature_4_subtitle' => 'Tailored customization for select products.',
+            'feature_4_icon' => 'adjustments',
+
         ];
         $settings = array_merge($defaults, $settings);
 
@@ -224,6 +237,19 @@ class HomepageController extends Controller
             'brand_story_stat_2_val' => 'required|string|max:255',
             'brand_story_stat_2_lbl' => 'required|string|max:255',
             'brand_story_image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'feature_1_title' => 'required|string|max:255',
+            'feature_1_subtitle' => 'required|string|max:255',
+            'feature_1_icon' => 'required|string|max:255',
+            'feature_2_title' => 'required|string|max:255',
+            'feature_2_subtitle' => 'required|string|max:255',
+            'feature_2_icon' => 'required|string|max:255',
+            'feature_3_title' => 'required|string|max:255',
+            'feature_3_subtitle' => 'required|string|max:255',
+            'feature_3_icon' => 'required|string|max:255',
+            'feature_4_title' => 'required|string|max:255',
+            'feature_4_subtitle' => 'required|string|max:255',
+            'feature_4_icon' => 'required|string|max:255',
+
         ]);
 
         // Process settings updates
@@ -234,6 +260,19 @@ class HomepageController extends Controller
         Setting::set('brand_story_stat_1_lbl', $validated['brand_story_stat_1_lbl']);
         Setting::set('brand_story_stat_2_val', $validated['brand_story_stat_2_val']);
         Setting::set('brand_story_stat_2_lbl', $validated['brand_story_stat_2_lbl']);
+        Setting::set('feature_1_title', $validated['feature_1_title']);
+        Setting::set('feature_1_subtitle', $validated['feature_1_subtitle']);
+        Setting::set('feature_1_icon', $validated['feature_1_icon']);
+        Setting::set('feature_2_title', $validated['feature_2_title']);
+        Setting::set('feature_2_subtitle', $validated['feature_2_subtitle']);
+        Setting::set('feature_2_icon', $validated['feature_2_icon']);
+        Setting::set('feature_3_title', $validated['feature_3_title']);
+        Setting::set('feature_3_subtitle', $validated['feature_3_subtitle']);
+        Setting::set('feature_3_icon', $validated['feature_3_icon']);
+        Setting::set('feature_4_title', $validated['feature_4_title']);
+        Setting::set('feature_4_subtitle', $validated['feature_4_subtitle']);
+        Setting::set('feature_4_icon', $validated['feature_4_icon']);
+
 
         if ($request->hasFile('brand_story_image_file')) {
             $currentImage = Setting::get('brand_story_image');

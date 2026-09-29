@@ -8,6 +8,8 @@ import HeroCarousel from '@/Components/HeroCarousel.vue';
 import CartDrawer from '@/Components/CartDrawer.vue';
 import WishlistDrawer from '@/Components/WishlistDrawer.vue';
 import QuickAddModal from '@/Components/QuickAddModal.vue';
+import HeroIcon from '@/Components/HeroIcon.vue';
+
 import LoadingOverlay from '@/Components/LoadingOverlay.vue';
 import NavigationBar from '@/Components/NavigationBar.vue';
 
@@ -248,48 +250,40 @@ const filteredProducts = computed(() => {
         <!-- Value Highlights Banner -->
         <section class="py-12 border-b border-white/[0.04] bg-white/[0.01] relative z-10">
             <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-8">
-                <div class="flex items-start gap-4 reveal">
+                <div class="flex items-start gap-4 reveal" v-if="settings.feature_1_title">
                     <div class="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center text-indigo-400 shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
+                        <HeroIcon :name="settings.feature_1_icon || 'truck'" />
                     </div>
                     <div>
-                        <h4 class="text-white font-bold text-xs sm:text-sm tracking-wide uppercase">Free Express Shipping</h4>
-                        <p class="text-slate-400 text-xs mt-1">On all domestic orders over 150,000 Ks..</p>
+                        <h4 class="text-white font-bold text-xs sm:text-sm tracking-wide uppercase">{{ settings.feature_1_title }}</h4>
+                        <p class="text-slate-400 text-xs mt-1">{{ settings.feature_1_subtitle }}</p>
                     </div>
                 </div>
-                <div class="flex items-start gap-4 reveal">
+                <div class="flex items-start gap-4 reveal" v-if="settings.feature_2_title">
                     <div class="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center text-purple-400 shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.25" />
-                        </svg>
+                        <HeroIcon :name="settings.feature_2_icon || 'arrow-path'" />
                     </div>
                     <div>
-                        <h4 class="text-white font-bold text-xs sm:text-sm tracking-wide uppercase">Easy Returns</h4>
-                        <p class="text-slate-400 text-xs mt-1">30-day effortless swap collection service.</p>
+                        <h4 class="text-white font-bold text-xs sm:text-sm tracking-wide uppercase">{{ settings.feature_2_title }}</h4>
+                        <p class="text-slate-400 text-xs mt-1">{{ settings.feature_2_subtitle }}</p>
                     </div>
                 </div>
-                <div class="flex items-start gap-4 reveal">
+                <div class="flex items-start gap-4 reveal" v-if="settings.feature_3_title">
                     <div class="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center text-pink-400 shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                        </svg>
+                        <HeroIcon :name="settings.feature_3_icon || 'check-badge'" />
                     </div>
                     <div>
-                        <h4 class="text-white font-bold text-xs sm:text-sm tracking-wide uppercase">Organic Cotton</h4>
-                        <p class="text-slate-400 text-xs mt-1">100% sustainably grown in Myanmar.</p>
+                        <h4 class="text-white font-bold text-xs sm:text-sm tracking-wide uppercase">{{ settings.feature_3_title }}</h4>
+                        <p class="text-slate-400 text-xs mt-1">{{ settings.feature_3_subtitle }}</p>
                     </div>
                 </div>
-                <div class="flex items-start gap-4 reveal">
+                <div class="flex items-start gap-4 reveal" v-if="settings.feature_4_title">
                     <div class="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center text-teal-400 shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                        </svg>
+                        <HeroIcon :name="settings.feature_4_icon || 'adjustments'" />
                     </div>
                     <div>
-                        <h4 class="text-white font-bold text-xs sm:text-sm tracking-wide uppercase">Bespoke Adjustments</h4>
-                        <p class="text-slate-400 text-xs mt-1">Tailored customization for select products.</p>
+                        <h4 class="text-white font-bold text-xs sm:text-sm tracking-wide uppercase">{{ settings.feature_4_title }}</h4>
+                        <p class="text-slate-400 text-xs mt-1">{{ settings.feature_4_subtitle }}</p>
                     </div>
                 </div>
             </div>
