@@ -13,6 +13,11 @@ class Order extends Model
     /**
      * Get the items for the order.
      */
+    public function returnRequest()
+    {
+        return $this->hasOne(ReturnRequest::class);
+    }
+
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);

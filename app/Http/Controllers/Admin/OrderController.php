@@ -14,7 +14,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::with(['user', 'items.product.images', 'items.variant'])->latest()->get();
+        $orders = Order::with(['user', 'items.product.images', 'items.variant', 'returnRequest'])->latest()->get();
         
         return Inertia::render('Admin/Orders/Index', [
             'orders' => $orders

@@ -5,6 +5,8 @@ import Footer from '@/Components/Footer.vue';
 import { orderApi } from '@/Services/api';
 import NavigationBar from '@/Components/NavigationBar.vue';
 import WishlistDrawer from '@/Components/WishlistDrawer.vue';
+import ReturnRequestModal from '@/Components/ReturnRequestModal.vue';
+
 
 defineProps({
     orders: {
@@ -73,6 +75,13 @@ const formatDate = (dateStr) => {
 };
 
 const activeCancelOrderId = ref(null);
+const showReturnModal = ref(false);
+const activeReturnOrder = ref(null);
+const openReturnModal = (order) => {
+    activeReturnOrder.value = order;
+    showReturnModal.value = true;
+};
+
 
 const confirmCancel = (orderId) => {
     activeCancelOrderId.value = orderId;
@@ -388,6 +397,22 @@ const getItemImage = (item) => {
                                 </span>
                             </div>
                             <div v-else-if="order.status.toLowerCase() === 'delivered'" class="text-right">
+                                <template v-if="order.return_request">
+                                    <Link 
+                                        :href="route('returns.show', order.return_request.id)"
+                                        class="inline-block px-5 py-2.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500 hover:text-white text-indigo-400 hover:shadow-lg hover:shadow-indigo-500/20 active:scale-95 text-xs font-bold tracking-wide transition-all mb-2"
+                                    >
+                                        View Return Request
+                                    </Link><br>
+                                </template>
+                                <template v-else>
+                                    <button 
+                                        @click="openReturnModal(order)"
+                                        class="px-5 py-2.5 rounded-xl border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500 hover:text-white text-orange-400 hover:shadow-lg hover:shadow-orange-500/20 active:scale-95 text-xs font-bold tracking-wide transition-all mb-2"
+                                    >
+                                        Request Return
+                                    </button><br>
+                                </template>
                                 <span class="inline-block px-3 py-1.5 rounded-lg bg-teal-500/10 border border-teal-500/20 text-teal-400/70 text-[10px] font-bold uppercase tracking-wider">
                                     Delivered - Cannot Cancel
                                 </span>
@@ -453,5 +478,12 @@ const getItemImage = (item) => {
         </div>
 
         <WishlistDrawer :show="showWishlistDrawer" @close="showWishlistDrawer = false" />
+        <ReturnRequestModal 
+            :show="showReturnModal"
+            :order="activeReturnOrder"
+            @close="showReturnModal = false"
+            @success="() => { /* page will reload from inertia */ }"
+        />
+
     </div>
 </template>
