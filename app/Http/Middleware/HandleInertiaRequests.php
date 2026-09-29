@@ -38,6 +38,10 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
+            'admin_unread_returns' => fn () => $request->user() && $request->user()->role === 'admin' ? \App\Models\ReturnRequest::where('status', 'pending')->orWhereHas('messages', function($q) {
+                $q->where('is_admin', false)->where('is_read', false);
+            })->count() : 0,
+
             'active_coupons' => \App\Models\Coupon::where('is_active', true)
                 ->where(function ($query) {
                     $query->whereNull('valid_until')

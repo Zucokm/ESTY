@@ -83,6 +83,7 @@
                                      :class="msg.is_admin ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-200 border border-white/5'">
                                     <p class="font-bold text-xs mb-1 opacity-70">{{ msg.is_admin ? 'You' : 'Customer' }}</p>
                                     <p>{{ msg.message }}</p>
+                                    <div v-if="msg.is_admin && msg.is_read" class="text-[10px] text-right text-indigo-200 mt-1">Seen</div>
                                 </div>
                             </div>
                         </div>

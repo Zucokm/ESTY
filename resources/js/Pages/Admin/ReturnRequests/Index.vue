@@ -31,7 +31,9 @@
                                 <tr v-for="req in returnRequests" :key="req.id" class="hover:bg-white/[0.01] transition-colors group">
                                     <td class="px-6 py-4 text-sm font-bold text-white">#R-{{ req.id }}</td>
                                     <td class="px-6 py-4 text-sm font-bold text-indigo-400">#VR-{{ req.order_id }}</td>
-                                    <td class="px-6 py-4 text-sm text-slate-300">{{ req.user.name }}</td>
+                                    <td class="px-6 py-4 text-sm text-slate-300">{{ req.user.name }}
+                                        <span v-if="req.unread_count > 0" class="ml-2 bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">{{ req.unread_count }} new</span>
+                                    </td>
                                     <td class="px-6 py-4 text-sm text-slate-400">{{ req.reason }}</td>
                                     <td class="px-6 py-4">
                                         <span class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg border" :class="getStatusClass(req.status)">

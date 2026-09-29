@@ -13,7 +13,7 @@ class ReturnRequestController extends Controller
 {
     public function index()
     {
-        $requests = ReturnRequest::with(['order', 'user'])->latest()->get();
+        $requests = ReturnRequest::with(['order', 'user'])->withCount(['messages as unread_count' => function($q) { $q->where('is_admin', false)->where('is_read', false); }])->latest()->get();
         return Inertia::render('Admin/ReturnRequests/Index', [
             'returnRequests' => $requests
         ]);
@@ -21,6 +21,8 @@ class ReturnRequestController extends Controller
 
     public function show($id)
     {
+        \App\Models\ReturnMessage::where('return_request_id', $id)->where('is_admin', false)->update(['is_read' => true]);
+
         $returnRequest = ReturnRequest::with(['order.items.product.images', 'order.items.variant', 'user', 'messages.user'])->findOrFail($id);
         return Inertia::render('Admin/ReturnRequests/Show', [
             'returnRequest' => $returnRequest
