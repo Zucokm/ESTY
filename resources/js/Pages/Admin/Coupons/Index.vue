@@ -9,6 +9,12 @@ const props = defineProps({
 
 const isModalOpen = ref(false);
 const editingCoupon = ref(null);
+const expandedCouponId = ref(null);
+
+const toggleExpandCoupon = (id) => {
+    expandedCouponId.value = expandedCouponId.value === id ? null : id;
+};
+
 
 const form = useForm({
     code: '',
@@ -129,53 +135,84 @@ const formatDate = (dateString) => {
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-white/[0.06]">
-                                <tr 
-                                    v-for="coupon in coupons" 
-                                    :key="coupon.id"
-                                    class="hover:bg-white/[0.03] hover:translate-x-0.5 text-sm text-slate-200 transition-all duration-200"
-                                >
-                                    <td class="whitespace-nowrap px-6 py-5 font-mono font-bold text-indigo-400">
-                                        {{ coupon.code }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-5 font-bold text-white">
-                                        {{ coupon.type === 'percent' ? coupon.value + '%' : coupon.value + ' Ks' }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-5 text-slate-400">
-                                        {{ coupon.minimum_spend ? coupon.minimum_spend + ' Ks' : 'No Min' }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-5 text-slate-400">
-                                        {{ coupon.used_count }} / {{ coupon.usage_limit || '∞' }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-5 text-slate-400">
-                                        {{ formatDate(coupon.valid_until) }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-5">
-                                        <span 
-                                            class="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider rounded-full"
-                                            :class="coupon.is_active ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'"
-                                        >
-                                            {{ coupon.is_active ? 'Active' : 'Inactive' }}
-                                        </span>
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-5 text-right">
-                                        <div class="flex items-center justify-end gap-2">
-                                            <button 
-                                                @click="openModal(coupon)"
-                                                class="p-2 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors"
-                                                title="Edit"
+                                <template v-for="coupon in coupons" :key="coupon.id">
+                                    <tr 
+                                        @click="toggleExpandCoupon(coupon.id)"
+                                        :class="[expandedCouponId === coupon.id ? 'bg-indigo-500/[0.04] border-l border-indigo-500' : 'hover:bg-white/[0.03] hover:translate-x-0.5']"
+                                        class="text-sm text-slate-200 transition-all duration-200 cursor-pointer"
+                                    >
+                                        <td class="whitespace-nowrap px-6 py-5 font-mono font-bold text-indigo-400">
+                                            {{ coupon.code }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-6 py-5 font-bold text-white">
+                                            {{ coupon.type === 'percent' ? coupon.value + '%' : coupon.value + ' Ks' }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-6 py-5 text-slate-400">
+                                            {{ coupon.minimum_spend ? coupon.minimum_spend + ' Ks' : 'No Min' }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-6 py-5 text-slate-400">
+                                            {{ coupon.times_used || coupon.used_count || 0 }} / {{ coupon.usage_limit || '∞' }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-6 py-5 text-slate-400">
+                                            {{ formatDate(coupon.valid_until) }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-6 py-5">
+                                            <span 
+                                                class="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider rounded-full"
+                                                :class="coupon.is_active ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'"
                                             >
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                            </button>
-                                            <button 
-                                                @click="deleteCoupon(coupon.id)"
-                                                class="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
-                                                title="Delete"
-                                            >
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                                {{ coupon.is_active ? 'Active' : 'Inactive' }}
+                                            </span>
+                                        </td>
+                                        <td class="whitespace-nowrap px-6 py-5 text-right">
+                                            <div class="flex items-center justify-end gap-2" @click.stop>
+                                                <button 
+                                                    @click="openModal(coupon)"
+                                                    class="p-2 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors"
+                                                    title="Edit"
+                                                >
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                                </button>
+                                                <button 
+                                                    @click="deleteCoupon(coupon.id)"
+                                                    class="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+                                                    title="Delete"
+                                                >
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Expanded Details (History) -->
+                                    <tr v-if="expandedCouponId === coupon.id" class="bg-slate-900/40">
+                                        <td colspan="7" class="p-6">
+                                            <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-4">Usage History ({{ coupon.orders?.length || 0 }} orders)</h4>
+                                            
+                                            <div v-if="coupon.orders && coupon.orders.length > 0" class="space-y-3">
+                                                <div v-for="order in coupon.orders" :key="order.id" class="bg-slate-900/50 border border-white/5 p-4 rounded-xl flex items-center justify-between">
+                                                    <div>
+                                                        <div class="text-sm font-bold text-white mb-1">
+                                                            Order <span class="text-indigo-400">#VR-{{ order.id }}</span>
+                                                        </div>
+                                                        <div class="text-xs text-slate-400">
+                                                            Customer: <span class="text-slate-300">{{ order.user?.name || 'Guest' }}</span> &bull; 
+                                                            Date: {{ new Date(order.created_at).toLocaleString() }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        <div class="text-sm font-bold text-emerald-400">-{{ order.discount_amount }} Ks</div>
+                                                        <div class="text-[10px] text-slate-500 uppercase font-semibold">Discount Applied</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div v-else class="text-sm text-slate-500 italic bg-white/[0.02] p-4 rounded-lg border border-white/5 text-center">
+                                                This coupon has not been used yet.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
                                 <tr v-if="!coupons.length">
                                     <td colspan="7" class="px-6 py-12 text-center text-slate-500 font-medium">
                                         No coupons found. Create one to get started.

@@ -16,6 +16,11 @@ class Coupon extends Model
         ];
     }
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
     public function isValid(): bool
     {
         if (!$this->is_active) return false;
