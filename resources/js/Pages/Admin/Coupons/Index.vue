@@ -215,8 +215,8 @@ const formatDate = (dateString) => {
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Amount</label>
-                            <input v-model="form.value" type="number" step="0.01" class="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500" placeholder="e.g. 5000" required>
+                            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">{{ form.type === 'percent' ? 'Percentage (%)' : 'Amount (Ks)' }}</label>
+                            <input v-model="form.value" type="number" step="0.01" class="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500" :placeholder="form.type === 'percent' ? 'e.g. 20' : 'e.g. 5000'" required>
                         </div>
                     </div>
 
