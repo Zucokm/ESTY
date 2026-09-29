@@ -34,8 +34,7 @@ class ReturnRequestController extends Controller
             return redirect()->back()->withErrors(['message' => 'The 3-day return window has expired.']);
         }
 
-            return redirect()->back()->withErrors(['message' => 'Returns are only available for delivered orders.']);
-        }
+
 
         $validated = $request->validate([
             'reason' => 'required|string|max:255',
