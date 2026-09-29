@@ -139,6 +139,7 @@ onUnmounted(() => {
                     :class="[active === 'orders' ? 'text-white' : 'text-slate-400 hover:text-white']"
                 >
                     My Orders
+                    <span v-if="$page.props.customer_unread_returns > 0" class="absolute -top-2 -right-3 w-4 h-4 flex items-center justify-center bg-rose-500 text-white text-[9px] font-bold rounded-full">{{ $page.props.customer_unread_returns }}</span>
                     <span 
                         class="absolute bottom-0 left-0 h-0.5 bg-indigo-400 transition-all duration-300" 
                         :class="[active === 'orders' ? 'w-full' : 'w-0 group-hover:w-full']"

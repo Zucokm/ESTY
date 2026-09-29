@@ -403,6 +403,7 @@ const getItemImage = (item) => {
                                         class="inline-block px-5 py-2.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500 hover:text-white text-indigo-400 hover:shadow-lg hover:shadow-indigo-500/20 active:scale-95 text-xs font-bold tracking-wide transition-all mb-2"
                                     >
                                         View Return Request
+                                        <span v-if="order.return_request.messages && order.return_request.messages.filter(m => m.is_admin && !m.is_read).length > 0" class="ml-2 bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">{{ order.return_request.messages.filter(m => m.is_admin && !m.is_read).length }} new</span>
                                     </Link><br>
                                 </template>
                                 <template v-else>
