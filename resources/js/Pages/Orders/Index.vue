@@ -29,6 +29,11 @@ const getStatusClass = (status) => {
             return 'bg-teal-500/10 text-teal-400 border-teal-500/20';
         case 'completed':
             return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+        case 'returned':
+            return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
+        case 'refunded':
+            return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+
         case 'cancelled':
             return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
         default:

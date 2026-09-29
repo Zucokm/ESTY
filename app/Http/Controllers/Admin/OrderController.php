@@ -26,17 +26,38 @@ class OrderController extends Controller
      */
     public function updateStatus(Request $request, $id)
     {
-        $order = Order::findOrFail($id);
+        $order = Order::with('items.variant')->findOrFail($id);
+        $oldStatus = $order->status;
         
         $validated = $request->validate([
-            'status' => 'required|string|in:pending,processing,packing,shipping,delivered,completed,cancelled'
+            'status' => 'required|string|in:pending,processing,packing,shipping,delivered,completed,cancelled,returned,refunded'
         ]);
 
+        $newStatus = $validated['status'];
+        
+        // Check if we need to restore stock (transitioning to cancelled/returned/refunded)
+        $restoreStatuses = ['cancelled', 'returned', 'refunded'];
+        if (!in_array($oldStatus, $restoreStatuses) && in_array($newStatus, $restoreStatuses)) {
+            foreach ($order->items as $item) {
+                if ($item->variant) {
+                    $item->variant->increment('stock_quantity', $item->quantity);
+                }
+            }
+        } 
+        // Check if we need to deduct stock (transitioning back from cancelled/returned to active)
+        elseif (in_array($oldStatus, $restoreStatuses) && !in_array($newStatus, $restoreStatuses)) {
+            foreach ($order->items as $item) {
+                if ($item->variant) {
+                    $item->variant->decrement('stock_quantity', $item->quantity);
+                }
+            }
+        }
+
         $order->update([
-            'status' => $validated['status']
+            'status' => $newStatus
         ]);
         
-        if ($validated['status'] === 'shipping' && $order->user) {
+        if ($newStatus === 'shipping' && $order->user) {
             try {
                 \Illuminate\Support\Facades\Mail::to($order->user)->send(new \App\Mail\OrderShipped($order));
             } catch (\Exception $e) {}

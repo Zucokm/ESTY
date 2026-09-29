@@ -122,6 +122,11 @@ const getStatusClass = (status) => {
             return 'bg-teal-500/10 text-teal-400 border-teal-500/20';
         case 'completed':
             return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+        case 'returned':
+            return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
+        case 'refunded':
+            return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+
         case 'cancelled':
             return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
         default:
@@ -520,6 +525,9 @@ const toggleSidebar = () => {
                                                 <option value="delivered" class="bg-[#0b0f19] text-teal-400 font-bold">delivered</option>
                                                 <option value="completed" class="bg-[#0b0f19] text-emerald-400 font-bold">completed</option>
                                                 <option value="cancelled" class="bg-[#0b0f19] text-rose-400 font-bold">cancelled</option>
+                                                    <option value="returned" class="bg-[#0b0f19] text-orange-400 font-bold">returned</option>
+                                                    <option value="refunded" class="bg-[#0b0f19] text-slate-400 font-bold">refunded</option>
+
                                             </select>
                                             <span class="absolute inset-y-0 right-0 flex items-center pr-2.5 pointer-events-none text-slate-400">
                                                 <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
