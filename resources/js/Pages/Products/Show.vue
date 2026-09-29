@@ -347,7 +347,7 @@ const submitReview = () => {
                         <div>
                             <h1 class="text-3xl md:text-4xl font-black text-white tracking-tight leading-tight">{{ product.name }}</h1>
                             <div class="flex items-center gap-3 mt-3">
-                                <span class="text-2xl font-black text-white">{{ finalPrice.toLocaleString() }} Ks</span>
+                                <span class="text-2xl font-black text-white whitespace-nowrap shrink-0">{{ finalPrice.toLocaleString() }} Ks</span>
                                 <span v-if="selectedVariant && selectedVariant.additional_price > 0" class="text-xs text-indigo-300 font-semibold bg-indigo-500/10 px-2.5 py-1 rounded-full border border-indigo-500/20">
                                     +{{ Number(selectedVariant.additional_price).toLocaleString() }} Ks variant
                                 </span>
@@ -670,7 +670,7 @@ const submitReview = () => {
                         <div class="p-6 border-t border-white/[0.08] space-y-4">
                             <div class="flex items-center justify-between">
                                 <span class="text-sm font-bold text-slate-400">Total Price</span>
-                                <span class="text-2xl font-black text-white">{{ cartTotal.toLocaleString() }} Ks</span>
+                                <span class="text-2xl font-black text-white whitespace-nowrap shrink-0">{{ cartTotal.toLocaleString() }} Ks</span>
                             </div>
 
                             <!-- Button logic for Step 1 -->

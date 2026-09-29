@@ -184,7 +184,7 @@ const getColorStyle = (colorName) => {
                                     <span class="text-xs text-white font-bold px-1.5">{{ item.quantity }}</span>
                                     <button @click="updateQuantity(item.variant_id, item.quantity + 1)" class="text-slate-400 hover:text-white font-bold text-xs">+</button>
                                 </div>
-                                <span class="font-extrabold text-white text-sm">{{ (item.price * item.quantity).toLocaleString() }} Ks</span>
+                                <span class="font-extrabold text-white text-sm whitespace-nowrap shrink-0">{{ (item.price * item.quantity).toLocaleString() }} Ks</span>
                             </div>
                         </div>
 
@@ -325,7 +325,7 @@ const getColorStyle = (colorName) => {
                         <span class="text-sm font-bold text-slate-400">Total Price</span>
                         <div class="text-right">
                             <span v-if="appliedCoupon" class="text-sm text-slate-500 line-through mr-2">{{ cartTotal.toLocaleString() }} Ks</span>
-                            <span class="text-2xl font-black text-white">{{ finalTotal.toLocaleString() }} Ks</span>
+                            <span class="text-2xl font-black text-white whitespace-nowrap shrink-0">{{ finalTotal.toLocaleString() }} Ks</span>
                             <div v-if="appliedCoupon" class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">
                                 (-{{ appliedCoupon.type === 'percent' ? appliedCoupon.value + '%' : Number(appliedCoupon.value).toLocaleString() + ' Ks' }})
                             </div>

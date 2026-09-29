@@ -448,7 +448,7 @@ onMounted(() => {
                                     <h3 class="font-bold text-white text-base tracking-tight leading-tight group-hover:text-indigo-400 transition-colors">
                                         {{ product.name }}
                                     </h3>
-                                    <span class="font-extrabold text-white text-lg">{{ parseFloat(product.base_price).toLocaleString() }} Ks</span>
+                                    <span class="font-extrabold text-white text-lg whitespace-nowrap shrink-0">{{ parseFloat(product.base_price).toLocaleString() }} Ks</span>
                                 </div>
 
                                 <!-- Variant Specs: Colors & Sizes -->
