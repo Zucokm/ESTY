@@ -1,15 +1,25 @@
 <script setup>
 import { Head, router, useForm } from '@inertiajs/vue3';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 const props = defineProps({
     coupons: Array
 });
 
 const isModalOpen = ref(false);
+const activeTab = ref('active');
+
 const editingCoupon = ref(null);
 const expandedCouponId = ref(null);
+
+const filteredCoupons = computed(() => {
+    if (activeTab.value === 'active') {
+        return props.coupons.filter(c => !c.deleted_at);
+    } else {
+        return props.coupons.filter(c => c.deleted_at);
+    }
+});
 
 const toggleExpandCoupon = (id) => {
     expandedCouponId.value = expandedCouponId.value === id ? null : id;
@@ -119,6 +129,19 @@ const formatDate = (dateString) => {
                     </button>
                 </div>
 
+                <div class="flex gap-4 border-b border-white/10 mb-6">
+                    <button 
+                        @click="activeTab = 'active'" 
+                        :class="[activeTab === 'active' ? 'text-indigo-400 border-indigo-500' : 'text-slate-400 border-transparent hover:text-white hover:border-white/20']"
+                        class="px-4 py-3 font-bold text-sm tracking-wider uppercase border-b-2 transition-all"
+                    >Active Promotions</button>
+                    <button 
+                        @click="activeTab = 'archived'" 
+                        :class="[activeTab === 'archived' ? 'text-indigo-400 border-indigo-500' : 'text-slate-400 border-transparent hover:text-white hover:border-white/20']"
+                        class="px-4 py-3 font-bold text-sm tracking-wider uppercase border-b-2 transition-all"
+                    >Past/Deleted</button>
+                </div>
+
                 <!-- Coupons Table -->
                 <div class="glass-card overflow-hidden border border-white/5 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.6)]">
                     <div class="overflow-x-auto">
@@ -135,7 +158,7 @@ const formatDate = (dateString) => {
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-white/[0.06]">
-                                <template v-for="coupon in coupons" :key="coupon.id">
+                                <template v-for="coupon in filteredCoupons" :key="coupon.id">
                                     <tr 
                                         @click="toggleExpandCoupon(coupon.id)"
                                         :class="[expandedCouponId === coupon.id ? 'bg-indigo-500/[0.04] border-l border-indigo-500' : 'hover:bg-white/[0.03] hover:translate-x-0.5']"
@@ -157,7 +180,10 @@ const formatDate = (dateString) => {
                                             {{ formatDate(coupon.valid_until) }}
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-5">
-                                            <span 
+                                            <span v-if="coupon.deleted_at" class="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider rounded-full bg-slate-500/10 text-slate-400 border border-slate-500/20">
+                                                Deleted
+                                            </span>
+                                            <span v-else
                                                 class="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider rounded-full"
                                                 :class="coupon.is_active ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'"
                                             >
@@ -165,7 +191,7 @@ const formatDate = (dateString) => {
                                             </span>
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-5 text-right">
-                                            <div class="flex items-center justify-end gap-2" @click.stop>
+                                            <div v-if="!coupon.deleted_at" class="flex items-center justify-end gap-2" @click.stop>
                                                 <button 
                                                     @click="openModal(coupon)"
                                                     class="p-2 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors"
@@ -213,7 +239,7 @@ const formatDate = (dateString) => {
                                         </td>
                                     </tr>
                                 </template>
-                                <tr v-if="!coupons.length">
+                                <tr v-if="!filteredCoupons.length">
                                     <td colspan="7" class="px-6 py-12 text-center text-slate-500 font-medium">
                                         No coupons found. Create one to get started.
                                     </td>

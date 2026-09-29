@@ -11,7 +11,7 @@ class CouponController extends Controller
 {
     public function index()
     {
-        $coupons = Coupon::with('orders.user')->latest()->get();
+        $coupons = Coupon::with('orders.user')->withTrashed()->latest()->get();
         return Inertia::render('Admin/Coupons/Index', [
             'coupons' => $coupons
         ]);
