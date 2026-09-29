@@ -31,6 +31,6 @@ class Order extends Model
      */
     public function coupon(): BelongsTo
     {
-        return $this->belongsTo(Coupon::class);
+        return $this->belongsTo(Coupon::class)->withTrashed();
     }
 }
