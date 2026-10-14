@@ -454,7 +454,6 @@ const toggleSidebar = () => {
                                         v-model="settingsForm.brand_story_title"
                                         class="glass-input w-full py-2.5 px-4 text-sm"
                                         placeholder="Crafting a Dialogue..."
-                                        required
                                     />
                                 </div>
                                 
@@ -465,7 +464,6 @@ const toggleSidebar = () => {
                                         rows="4"
                                         class="glass-input w-full py-2.5 px-4 text-sm resize-none"
                                         placeholder="First description paragraph..."
-                                        required
                                     ></textarea>
                                 </div>
 
@@ -476,7 +474,6 @@ const toggleSidebar = () => {
                                         rows="4"
                                         class="glass-input w-full py-2.5 px-4 text-sm resize-none"
                                         placeholder="Second craftsmanship details paragraph..."
-                                        required
                                     ></textarea>
                                 </div>
                             </div>
@@ -491,7 +488,6 @@ const toggleSidebar = () => {
                                             v-model="settingsForm.brand_story_stat_1_val"
                                             class="glass-input w-full py-2.5 px-4 text-sm"
                                             placeholder="100%"
-                                            required
                                         />
                                     </div>
                                     <div>
@@ -501,7 +497,6 @@ const toggleSidebar = () => {
                                             v-model="settingsForm.brand_story_stat_1_lbl"
                                             class="glass-input w-full py-2.5 px-4 text-sm"
                                             placeholder="Local Sourcing"
-                                            required
                                         />
                                     </div>
                                 </div>
@@ -514,7 +509,6 @@ const toggleSidebar = () => {
                                             v-model="settingsForm.brand_story_stat_2_val"
                                             class="glass-input w-full py-2.5 px-4 text-sm"
                                             placeholder="Limited"
-                                            required
                                         />
                                     </div>
                                     <div>
@@ -524,7 +518,6 @@ const toggleSidebar = () => {
                                             v-model="settingsForm.brand_story_stat_2_lbl"
                                             class="glass-input w-full py-2.5 px-4 text-sm"
                                             placeholder="Studio Run"
-                                            required
                                         />
                                     </div>
                                 </div>
@@ -567,11 +560,11 @@ const toggleSidebar = () => {
                                     </div>
                                     <div>
                                         <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Title</label>
-                                        <input type="text" v-model="settingsForm['feature_'+i+'_title']" class="glass-input w-full py-2 px-3 text-sm" required />
+                                        <input type="text" v-model="settingsForm['feature_'+i+'_title']" class="glass-input w-full py-2 px-3 text-sm" />
                                     </div>
                                     <div>
                                         <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Subtitle</label>
-                                        <input type="text" v-model="settingsForm['feature_'+i+'_subtitle']" class="glass-input w-full py-2 px-3 text-sm" required />
+                                        <input type="text" v-model="settingsForm['feature_'+i+'_subtitle']" class="glass-input w-full py-2 px-3 text-sm" />
                                     </div>
                                     <div>
                                         <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Icon Type</label>

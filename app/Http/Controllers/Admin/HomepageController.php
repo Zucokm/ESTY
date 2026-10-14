@@ -30,14 +30,14 @@ class HomepageController extends Controller
 
         // Provide defaults if not set in DB
         $defaults = [
-            'brand_story_title' => '',
-            'brand_story_text_1' => '',
-            'brand_story_text_2' => '',
-            'brand_story_stat_1_val' => '',
-            'brand_story_stat_1_lbl' => '',
-            'brand_story_stat_2_val' => '',
-            'brand_story_stat_2_lbl' => '',
-            'brand_story_image' => '',
+            'brand_story_title' => 'Crafting a Dialogue Between Material & Form.',
+            'brand_story_text_1' => 'At ESTY, we believe garments should not simply be worn, but experienced.',
+            'brand_story_text_2' => 'Every buttonhole, every shoulder drape, and every single stitch is carefully planned and executed.',
+            'brand_story_stat_1_val' => '100%',
+            'brand_story_stat_1_lbl' => 'Local Sourcing',
+            'brand_story_stat_2_val' => 'Limited',
+            'brand_story_stat_2_lbl' => 'Studio Run',
+            'brand_story_image' => '/images/brand_story.png',
             'feature_1_title' => 'Free Express Shipping',
             'feature_1_subtitle' => 'On all domestic orders over 150,000 Ks.',
             'feature_1_icon' => 'truck',
@@ -50,7 +50,6 @@ class HomepageController extends Controller
             'feature_4_title' => 'Bespoke Adjustments',
             'feature_4_subtitle' => 'Tailored customization for select products.',
             'feature_4_icon' => 'adjustments',
-
         ];
         $settings = array_merge($defaults, $settings);
 
@@ -229,49 +228,35 @@ class HomepageController extends Controller
     public function updateSettings(Request $request)
     {
         $validated = $request->validate([
-            'brand_story_title' => 'required|string|max:255',
-            'brand_story_text_1' => 'required|string',
-            'brand_story_text_2' => 'required|string',
-            'brand_story_stat_1_val' => 'required|string|max:255',
-            'brand_story_stat_1_lbl' => 'required|string|max:255',
-            'brand_story_stat_2_val' => 'required|string|max:255',
-            'brand_story_stat_2_lbl' => 'required|string|max:255',
+            'brand_story_title' => 'nullable|string|max:255',
+            'brand_story_text_1' => 'nullable|string',
+            'brand_story_text_2' => 'nullable|string',
+            'brand_story_stat_1_val' => 'nullable|string|max:255',
+            'brand_story_stat_1_lbl' => 'nullable|string|max:255',
+            'brand_story_stat_2_val' => 'nullable|string|max:255',
+            'brand_story_stat_2_lbl' => 'nullable|string|max:255',
             'brand_story_image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'feature_1_title' => 'required|string|max:255',
-            'feature_1_subtitle' => 'required|string|max:255',
-            'feature_1_icon' => 'required|string|max:255',
-            'feature_2_title' => 'required|string|max:255',
-            'feature_2_subtitle' => 'required|string|max:255',
-            'feature_2_icon' => 'required|string|max:255',
-            'feature_3_title' => 'required|string|max:255',
-            'feature_3_subtitle' => 'required|string|max:255',
-            'feature_3_icon' => 'required|string|max:255',
-            'feature_4_title' => 'required|string|max:255',
-            'feature_4_subtitle' => 'required|string|max:255',
-            'feature_4_icon' => 'required|string|max:255',
-
+            'feature_1_title' => 'nullable|string|max:255',
+            'feature_1_subtitle' => 'nullable|string|max:255',
+            'feature_1_icon' => 'nullable|string|max:255',
+            'feature_2_title' => 'nullable|string|max:255',
+            'feature_2_subtitle' => 'nullable|string|max:255',
+            'feature_2_icon' => 'nullable|string|max:255',
+            'feature_3_title' => 'nullable|string|max:255',
+            'feature_3_subtitle' => 'nullable|string|max:255',
+            'feature_3_icon' => 'nullable|string|max:255',
+            'feature_4_title' => 'nullable|string|max:255',
+            'feature_4_subtitle' => 'nullable|string|max:255',
+            'feature_4_icon' => 'nullable|string|max:255',
         ]);
 
         // Process settings updates
-        Setting::set('brand_story_title', $validated['brand_story_title']);
-        Setting::set('brand_story_text_1', $validated['brand_story_text_1']);
-        Setting::set('brand_story_text_2', $validated['brand_story_text_2']);
-        Setting::set('brand_story_stat_1_val', $validated['brand_story_stat_1_val']);
-        Setting::set('brand_story_stat_1_lbl', $validated['brand_story_stat_1_lbl']);
-        Setting::set('brand_story_stat_2_val', $validated['brand_story_stat_2_val']);
-        Setting::set('brand_story_stat_2_lbl', $validated['brand_story_stat_2_lbl']);
-        Setting::set('feature_1_title', $validated['feature_1_title']);
-        Setting::set('feature_1_subtitle', $validated['feature_1_subtitle']);
-        Setting::set('feature_1_icon', $validated['feature_1_icon']);
-        Setting::set('feature_2_title', $validated['feature_2_title']);
-        Setting::set('feature_2_subtitle', $validated['feature_2_subtitle']);
-        Setting::set('feature_2_icon', $validated['feature_2_icon']);
-        Setting::set('feature_3_title', $validated['feature_3_title']);
-        Setting::set('feature_3_subtitle', $validated['feature_3_subtitle']);
-        Setting::set('feature_3_icon', $validated['feature_3_icon']);
-        Setting::set('feature_4_title', $validated['feature_4_title']);
-        Setting::set('feature_4_subtitle', $validated['feature_4_subtitle']);
-        Setting::set('feature_4_icon', $validated['feature_4_icon']);
+        foreach ($validated as $key => $val) {
+            if ($key === 'brand_story_image_file') continue;
+            if ($val !== null) {
+                Setting::set($key, $val);
+            }
+        }
 
 
         if ($request->hasFile('brand_story_image_file')) {
