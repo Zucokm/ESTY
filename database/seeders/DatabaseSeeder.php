@@ -13,30 +13,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create Admin account
-        User::factory()->create([
-            'name' => 'ESTY Admin',
-            'email' => 'admin@shop.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-        ]);
-
-        // Create standard test Customer account
-        User::factory()->create([
-            'name' => 'John Customer',
-            'email' => 'customer@shop.com',
-            'password' => Hash::make('password'),
-            'role' => 'customer',
-        ]);
-
-        // Create 5 random Customer accounts
-        User::factory(5)->create([
-            'role' => 'customer',
-        ]);
-
-        $this->call([
-            ProductSeeder::class,
-            HomepageSeeder::class,
-        ]);
+        // Create Admin account only
+        User::firstOrCreate(
+            ['email' => 'admin@shop.com'],
+            [
+                'name' => 'ESTY Admin',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+            ]
+        );
     }
 }
