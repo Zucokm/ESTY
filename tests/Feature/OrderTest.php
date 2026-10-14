@@ -45,6 +45,7 @@ class OrderTest extends TestCase
             ->actingAs($user)
             ->post(route('checkout.store'), [
                 'shipping_address' => '123 Main St, Yangon',
+                'township' => 'Hlaing',
                 'phone' => '091234567',
                 'payment_method' => 'cod',
                 'items' => [
@@ -105,6 +106,7 @@ class OrderTest extends TestCase
             ->actingAs($user)
             ->post(route('checkout.store'), [
                 'shipping_address' => '456 Second St, Yangon',
+                'township' => 'Kamayut',
                 'phone' => '099876543',
                 'payment_method' => 'bank_transfer',
                 'items' => [
@@ -161,6 +163,7 @@ class OrderTest extends TestCase
             ->actingAs($user)
             ->post(route('checkout.store'), [
                 'shipping_address' => '456 Second St, Yangon',
+                'township' => 'Kamayut',
                 'phone' => '099876543',
                 'payment_method' => 'bank_transfer',
                 'items' => [
@@ -217,6 +220,7 @@ class OrderTest extends TestCase
             ->actingAs($user)
             ->post(route('checkout.store'), [
                 'shipping_address' => '123 Main St, Yangon',
+                'township' => 'Hlaing',
                 'phone' => '091234567',
                 'payment_method' => 'cod',
                 'items' => [
