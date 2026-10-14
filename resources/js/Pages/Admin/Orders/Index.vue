@@ -63,7 +63,12 @@ const filteredOrders = computed(() => {
 
     // 2. Status filter
     if (selectedStatus.value !== 'All') {
-        result = result.filter(o => o.status.toLowerCase() === selectedStatus.value.toLowerCase());
+        const target = selectedStatus.value.toLowerCase();
+        if (target === 'returns') {
+            result = result.filter(o => ['return_requested', 'returned'].includes(o.status.toLowerCase()));
+        } else {
+            result = result.filter(o => o.status.toLowerCase() === target);
+        }
     }
 
     // 3. Sorting
@@ -105,10 +110,12 @@ const getStatusClass = (status) => {
             return 'bg-teal-500/10 text-teal-400 border-teal-500/20';
         case 'completed':
             return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+        case 'return_requested':
+            return 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm shadow-amber-500/10';
         case 'returned':
             return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
         case 'refunded':
-            return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+            return 'bg-slate-500/20 text-slate-300 border-slate-500/30';
 
         case 'cancelled':
             return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
@@ -303,7 +310,7 @@ const toggleSidebar = () => {
                     <!-- Status Filter Tabs -->
                     <div class="flex items-center gap-1.5 overflow-x-auto pb-2 lg:pb-0 scrollbar-thin">
                         <button 
-                            v-for="status in ['All', 'Pending', 'Processing', 'Packing', 'Shipping', 'Delivered', 'Completed', 'Cancelled']" 
+                            v-for="status in ['All', 'Pending', 'Processing', 'Packing', 'Shipping', 'Delivered', 'Completed', 'Cancelled', 'Returns', 'Refunded']" 
                             :key="status"
                             @click="selectedStatus = status"
                             :class="[
@@ -407,7 +414,7 @@ const toggleSidebar = () => {
                                                 :value="order.status"
                                                 @change="updateOrderStatus(order.id, $event.target.value)"
                                                 :class="getStatusClass(order.status)"
-                                                class="pl-3.5 pr-8 py-1.5 text-xs font-extrabold rounded-xl border bg-slate-950/60 focus:outline-none cursor-pointer appearance-none select-none transition-all duration-200 active:scale-95"
+                                                class="pl-3.5 pr-8 py-1.5 text-xs font-extrabold rounded-xl border bg-slate-950/60 focus:outline-none cursor-pointer appearance-none select-none transition-all duration-200 active:scale-95 capitalize"
                                             >
                                                 <option value="pending" class="bg-[#0b0f19] text-amber-400 font-bold">pending</option>
                                                 <option value="processing" class="bg-[#0b0f19] text-blue-400 font-bold">processing</option>
@@ -416,15 +423,24 @@ const toggleSidebar = () => {
                                                 <option value="delivered" class="bg-[#0b0f19] text-teal-400 font-bold">delivered</option>
                                                 <option value="completed" class="bg-[#0b0f19] text-emerald-400 font-bold">completed</option>
                                                 <option value="cancelled" class="bg-[#0b0f19] text-rose-400 font-bold">cancelled</option>
+                                                <option value="return_requested" class="bg-[#0b0f19] text-amber-300 font-bold">return requested</option>
                                                 <option value="returned" class="bg-[#0b0f19] text-orange-400 font-bold">returned</option>
                                                 <option value="refunded" class="bg-[#0b0f19] text-slate-400 font-bold">refunded</option>
-
                                             </select>
                                             <span class="absolute inset-y-0 right-0 flex items-center pr-2.5 pointer-events-none text-slate-400">
                                                 <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
                                                 </svg>
                                             </span>
+                                        </div>
+                                        <div v-if="order.status === 'return_requested' && order.return_request" class="mt-1.5">
+                                            <Link 
+                                                :href="route('admin.returns.show', order.return_request.id)" 
+                                                class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-300 hover:text-amber-200 transition-colors bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/25"
+                                            >
+                                                <span>Review Ticket</span>
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                            </Link>
                                         </div>
                                     </td>
 
@@ -566,6 +582,14 @@ const toggleSidebar = () => {
                                                         >
                                                             Cancel Order
                                                         </button>
+                                                        <Link 
+                                                            v-if="order.status === 'return_requested' && order.return_request"
+                                                            :href="route('admin.returns.show', order.return_request.id)"
+                                                            class="flex-1 py-3 px-4 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 cursor-pointer"
+                                                        >
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                                                            <span>Review Return Ticket</span>
+                                                        </Link>
                                                     </div>
                                                 </div>
                                             </div>

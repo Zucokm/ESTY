@@ -30,7 +30,7 @@ class OrderController extends Controller
         $oldStatus = $order->status;
         
         $validated = $request->validate([
-            'status' => 'required|string|in:pending,processing,packing,shipping,delivered,completed,cancelled,returned,refunded'
+            'status' => 'required|string|in:pending,processing,packing,shipping,delivered,completed,cancelled,returned,refunded,return_requested'
         ]);
 
         $newStatus = $validated['status'];
