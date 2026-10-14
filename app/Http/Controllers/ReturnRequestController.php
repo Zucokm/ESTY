@@ -73,7 +73,10 @@ class ReturnRequestController extends Controller
     {
         \App\Models\ReturnMessage::where('return_request_id', $id)->where('is_admin', true)->update(['is_read' => true]);
 
-        $returnRequest = ReturnRequest::with(['order', 'messages'])->where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        $returnRequest = ReturnRequest::with(['order.items.product.images', 'order.items.variant', 'messages.user'])
+            ->where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
         return Inertia::render('ReturnRequests/Show', [
             'returnRequest' => $returnRequest
         ]);

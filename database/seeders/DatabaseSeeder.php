@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create Admin account only
+        // 1. Create Admin account
         User::firstOrCreate(
             ['email' => 'admin@shop.com'],
             [
@@ -22,5 +22,22 @@ class DatabaseSeeder extends Seeder
                 'role' => 'admin',
             ]
         );
+
+        /*
+        // --- Optional Demo Data (Commented out for Production) ---
+        // User::factory()->create([
+        //     'name' => 'John Customer',
+        //     'email' => 'customer@shop.com',
+        //     'password' => Hash::make('password'),
+        //     'role' => 'customer',
+        // ]);
+        // User::factory(5)->create([
+        //     'role' => 'customer',
+        // ]);
+        // $this->call([
+        //     ProductSeeder::class,
+        //     HomepageSeeder::class,
+        // ]);
+        */
     }
 }
