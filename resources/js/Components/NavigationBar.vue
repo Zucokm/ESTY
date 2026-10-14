@@ -73,20 +73,20 @@ onUnmounted(() => {
 
 <template>
     <div 
-        class="fixed left-0 right-0 z-40 flex justify-center px-3 sm:px-6 pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+        class="fixed left-0 right-0 z-40 flex justify-center px-3 sm:px-6 pointer-events-none transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
         :class="[isScrolled ? 'top-3 sm:top-4' : 'top-4 sm:top-6']"
     >
         <!-- Apple Liquid Glass Responsive Morphing Nav -->
         <nav 
-            class="pointer-events-auto relative flex items-center justify-between rounded-full border transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+            class="pointer-events-auto relative flex items-center justify-between rounded-full border transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu"
             :class="[
                 isScrolled 
-                    ? 'w-full max-w-2xl lg:max-w-3xl py-2 sm:py-2.5 px-3.5 sm:px-5 bg-black/85 backdrop-blur-3xl border-white/20 shadow-[0_25px_60px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.08),inset_0_1px_1px_rgba(255,255,255,0.2)] scale-[0.98]' 
-                    : 'w-full max-w-5xl py-3.5 sm:py-4 px-5 sm:px-8 bg-slate-950/45 backdrop-blur-2xl border-white/[0.16] shadow-[0_20px_50px_rgba(0,0,0,0.45),inset_0_1px_1.5px_rgba(255,255,255,0.25),inset_0_-1px_1px_rgba(255,255,255,0.05)] scale-100 hover:border-white/25 hover:bg-slate-950/55'
+                    ? 'w-full max-w-2xl lg:max-w-3xl py-2.5 px-4 sm:px-6 bg-black/80 backdrop-blur-3xl border-white/[0.18] shadow-[0_25px_60px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.18)]' 
+                    : 'w-full max-w-5xl py-3.5 sm:py-4 px-6 sm:px-8 bg-slate-950/45 backdrop-blur-2xl border-white/[0.14] shadow-[0_20px_50px_rgba(0,0,0,0.4),inset_0_1px_1.5px_rgba(255,255,255,0.22),inset_0_-1px_1px_rgba(255,255,255,0.05)] hover:border-white/25 hover:bg-slate-950/55'
             ]"
         >
             <!-- 1. Left: Brand Logo -->
-            <Link href="/" class="flex items-center gap-2.5 group focus:outline-none pl-1 shrink-0 transition-transform duration-300">
+            <Link href="/" class="flex items-center gap-2.5 group focus:outline-none pl-1 shrink-0">
                 <span 
                     class="rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.85)] animate-pulse transition-all duration-500"
                     :class="[isScrolled ? 'w-2 h-2' : 'w-2.5 h-2.5']"
@@ -99,88 +99,70 @@ onUnmounted(() => {
                 </span>
             </Link>
 
-            <!-- 2. Center: Navigation Links (Fluid transition between spacious links & compact pill segments) -->
+            <!-- 2. Center: Navigation Links (Clean, frameless Apple typography with silky smooth spacing) -->
             <div 
-                class="hidden md:flex items-center transition-all duration-500"
-                :class="[isScrolled ? 'gap-1 px-1 bg-white/[0.04] p-1 rounded-full border border-white/[0.06]' : 'gap-7 lg:gap-9']"
+                class="hidden md:flex items-center transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                :class="[isScrolled ? 'gap-5 lg:gap-6' : 'gap-7 lg:gap-9']"
             >
                 <Link 
                     href="/" 
-                    class="relative transition-all duration-300 font-semibold"
-                    :class="[
-                        isScrolled 
-                            ? 'px-3.5 py-1 rounded-full text-xs ' + (active === 'home' ? 'bg-white/15 text-white font-bold shadow-inner' : 'text-slate-400 hover:text-white hover:bg-white/[0.06]')
-                            : 'py-1 text-sm tracking-wide ' + (active === 'home' ? 'text-white font-bold' : 'text-slate-300 hover:text-white')
-                    ]"
+                    class="relative py-1 text-sm font-semibold tracking-wide transition-colors duration-200 group"
+                    :class="[active === 'home' ? 'text-white font-bold' : 'text-slate-300 hover:text-white']"
                 >
                     Home
                     <span 
-                        v-if="!isScrolled"
                         class="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full transition-all duration-300" 
-                        :class="[active === 'home' ? 'w-full shadow-[0_0_8px_rgba(129,140,248,0.8)]' : 'w-0 hover:w-full']"
+                        :class="[active === 'home' ? 'w-full shadow-[0_0_8px_rgba(129,140,248,0.8)]' : 'w-0 group-hover:w-full']"
                     ></span>
                 </Link>
 
                 <a 
                     href="/#shop" 
-                    class="relative transition-all duration-300 font-semibold"
-                    :class="[
-                        isScrolled 
-                            ? 'px-3.5 py-1 rounded-full text-xs ' + (active === 'shop' ? 'bg-white/15 text-white font-bold shadow-inner' : 'text-slate-400 hover:text-white hover:bg-white/[0.06]')
-                            : 'py-1 text-sm tracking-wide ' + (active === 'shop' ? 'text-white font-bold' : 'text-slate-300 hover:text-white')
-                    ]"
+                    class="relative py-1 text-sm font-semibold tracking-wide transition-colors duration-200 group"
+                    :class="[active === 'shop' ? 'text-white font-bold' : 'text-slate-300 hover:text-white']"
                 >
                     Shop
                     <span 
-                        v-if="!isScrolled"
                         class="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full transition-all duration-300" 
-                        :class="[active === 'shop' ? 'w-full shadow-[0_0_8px_rgba(129,140,248,0.8)]' : 'w-0 hover:w-full']"
+                        :class="[active === 'shop' ? 'w-full shadow-[0_0_8px_rgba(129,140,248,0.8)]' : 'w-0 group-hover:w-full']"
                     ></span>
                 </a>
 
                 <Link 
                     :href="route('products.index')" 
-                    class="relative transition-all duration-300 font-semibold"
-                    :class="[
-                        isScrolled 
-                            ? 'px-3.5 py-1 rounded-full text-xs ' + (active === 'products' ? 'bg-white/15 text-white font-bold shadow-inner' : 'text-slate-400 hover:text-white hover:bg-white/[0.06]')
-                            : 'py-1 text-sm tracking-wide ' + (active === 'products' ? 'text-white font-bold' : 'text-slate-300 hover:text-white')
-                    ]"
+                    class="relative py-1 text-sm font-semibold tracking-wide transition-colors duration-200 group"
+                    :class="[active === 'products' ? 'text-white font-bold' : 'text-slate-300 hover:text-white']"
                 >
                     Products
                     <span 
-                        v-if="!isScrolled"
                         class="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full transition-all duration-300" 
-                        :class="[active === 'products' ? 'w-full shadow-[0_0_8px_rgba(129,140,248,0.8)]' : 'w-0 hover:w-full']"
+                        :class="[active === 'products' ? 'w-full shadow-[0_0_8px_rgba(129,140,248,0.8)]' : 'w-0 group-hover:w-full']"
                     ></span>
                 </Link>
 
                 <Link 
                     :href="route('contact')" 
-                    class="relative transition-all duration-300 font-semibold"
-                    :class="[
-                        isScrolled 
-                            ? 'px-3.5 py-1 rounded-full text-xs ' + (active === 'contact' ? 'bg-white/15 text-white font-bold shadow-inner' : 'text-slate-400 hover:text-white hover:bg-white/[0.06]')
-                            : 'py-1 text-sm tracking-wide ' + (active === 'contact' ? 'text-white font-bold' : 'text-slate-300 hover:text-white')
-                    ]"
+                    class="relative py-1 text-sm font-semibold tracking-wide transition-colors duration-200 group"
+                    :class="[active === 'contact' ? 'text-white font-bold' : 'text-slate-300 hover:text-white']"
                 >
                     Contact
                     <span 
-                        v-if="!isScrolled"
                         class="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full transition-all duration-300" 
-                        :class="[active === 'contact' ? 'w-full shadow-[0_0_8px_rgba(129,140,248,0.8)]' : 'w-0 hover:w-full']"
+                        :class="[active === 'contact' ? 'w-full shadow-[0_0_8px_rgba(129,140,248,0.8)]' : 'w-0 group-hover:w-full']"
                     ></span>
                 </Link>
             </div>
 
-            <!-- 3. Right: Utility Icons (Wishlist, Orders, Profile Capsule) -->
-            <div class="flex items-center gap-1.5 sm:gap-2.5">
+            <!-- 3. Right: Utility Icons (Clean, frameless Apple buttons) -->
+            <div 
+                class="flex items-center transition-all duration-500"
+                :class="[isScrolled ? 'gap-1.5 sm:gap-2' : 'gap-2 sm:gap-3']"
+            >
                 <!-- Wishlist Icon Button -->
                 <button 
                     type="button"
                     @click="emit('open-wishlist')" 
-                    class="relative rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 focus:outline-none"
-                    :class="[isScrolled ? 'p-2' : 'p-2.5 bg-white/[0.04] border border-white/[0.08] hover:border-white/20']"
+                    class="relative p-2 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-colors duration-200 focus:outline-none"
                     title="Wishlist"
                 >
                     <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -198,11 +180,8 @@ onUnmounted(() => {
                 <Link 
                     v-if="$page.props.auth.user" 
                     :href="route('orders.index')" 
-                    class="relative rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 focus:outline-none"
-                    :class="[
-                        isScrolled ? 'p-2' : 'p-2.5 bg-white/[0.04] border border-white/[0.08] hover:border-white/20',
-                        active === 'orders' ? 'bg-white/15 text-white border-white/20' : ''
-                    ]"
+                    class="relative p-2 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-colors duration-200 focus:outline-none"
+                    :class="[active === 'orders' ? 'text-white bg-white/10' : '']"
                     title="My Orders"
                 >
                     <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
